@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/foo.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/foo.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/foo.cpp",
+  "output": "CMakeFiles/gviz.dir/src/foo.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -std=gnu++20 -arch arm64 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /Users/abdulaziz.alahmadi/refactor/main.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/main.cpp",
+  "output": "CMakeFiles/main.dir/main.cpp.o"
+}
+]
