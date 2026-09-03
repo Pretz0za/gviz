@@ -1,3 +1,6 @@
+#pragma once
+
+#include "ecs/admin.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include <concepts>
@@ -21,5 +24,6 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   { cgraph.Size() } -> std::convertible_to<uint32_t>;
   { cgraph.HasNode(nid) } -> std::convertible_to<bool>;
   { cgraph.HasEdge(eid) } -> std::convertible_to<bool>;
+  { graph.Ecs() } -> std::same_as<Admin&>;
 
 };

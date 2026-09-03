@@ -1,13 +1,19 @@
 [
 {
   "directory": "/Users/abdulaziz.alahmadi/refactor/build",
-  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/foo.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/foo.cpp",
-  "file": "/Users/abdulaziz.alahmadi/refactor/src/foo.cpp",
-  "output": "CMakeFiles/gviz.dir/src/foo.cpp.o"
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -g -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/ecs/admin.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/ecs/admin.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/ecs/admin.cpp",
+  "output": "CMakeFiles/gviz.dir/src/ecs/admin.cpp.o"
 },
 {
   "directory": "/Users/abdulaziz.alahmadi/refactor/build",
-  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -std=gnu++20 -arch arm64 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /Users/abdulaziz.alahmadi/refactor/main.cpp",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -g -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/graph/graph.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/graph/graph.cpp",
+  "output": "CMakeFiles/gviz.dir/src/graph/graph.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -g -std=gnu++20 -arch arm64 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /Users/abdulaziz.alahmadi/refactor/main.cpp",
   "file": "/Users/abdulaziz.alahmadi/refactor/main.cpp",
   "output": "CMakeFiles/main.dir/main.cpp.o"
 }

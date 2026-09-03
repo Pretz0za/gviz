@@ -3,6 +3,5 @@
 #include "ecs/components.hpp"
 
 struct PositionComponent : Component {
-	float x;
-	float y;
+	double pos[3];
 };

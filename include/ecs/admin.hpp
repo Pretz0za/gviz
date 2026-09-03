@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "icomponent_pool.hpp"
+#include "resource.hpp"
 
 template <typename T> class ComponentPool;
 
@@ -28,11 +29,19 @@ public:
 
   template <typename T> bool HasComponent(EntityID id) const;
 
+  template <typename T, typename... Args> T &SetResource(Args &&...args);
+
+  template <typename T> T *GetResource();
+
+  template <typename T> bool HasResource() const;
+
 private:
   EntityID m_nextID = 0;
   std::vector<EntityID> m_freeIDs;
   // TODO: can give component pools ids and make this an array
   std::unordered_map<std::type_index, std::unique_ptr<IComponentPool>> m_pools;
+  std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
+      m_resources;
 };
 
 // Iterator to a specific ComponentPool of the Admin
