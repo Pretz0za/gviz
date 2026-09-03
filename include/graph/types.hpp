@@ -2,8 +2,6 @@
 
 #include "ecs/handle.hpp"
 
-// Tag types only used to distinguish Handle<> instantiations; never
-// constructed.
 struct NodeTag {};
 struct EdgeTag {};
 

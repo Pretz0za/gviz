@@ -20,12 +20,13 @@ public:
   void DestroyEntity(EntityID id);
 
   template <typename T> ComponentPool<T> &GetPool();
+  template <typename T> const ComponentPool<T> *TryGetPool() const;
 
   template <typename T> T &AddComponent(EntityID id);
 
   template <typename T> T *GetComponent(EntityID id);
 
-  template <typename T> bool HasComponent(EntityID id);
+  template <typename T> bool HasComponent(EntityID id) const;
 
 private:
   EntityID m_nextID = 0;

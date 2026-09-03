@@ -19,7 +19,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_library(gviz ${GVIZ_LIB_TYPE}
 	# cpp files here
-	src/foo.cpp
+	src/ecs/admin.cpp
+	src/graph/graph.cpp
 )
 
 target_include_directories(gviz

@@ -1,11 +1,19 @@
-#include "ecs/admin.hpp"
-#include "graph/components/adjacency.hpp"
-#include "graph/types.hpp"
+#pragma once
+
+#include <cstddef>
 #include <cstdint>
+#include <vector>
+
+#include "ecs/admin.hpp"
+#include "ecs/components.hpp"
+#include "graph/components/adjacency.hpp"
+#include "graph/components/edge.hpp"
+#include "graph/types.hpp"
 
 class Graph {
 public:
-  // vertices
+  Graph();
+
   NodeID AddNode();
   void RemoveNode(NodeID id);
   bool HasNode(NodeID id) const;
@@ -22,9 +30,18 @@ public:
   uint32_t OutDegree(NodeID id) const;
   uint32_t InDegree(NodeID id) const;
 
-  auto Nodes() const;
-  auto Edges() const;
+  std::vector<NodeID> Nodes() const;
+  std::vector<EdgeID> Edges() const;
+  uint32_t Size() const;
+
+  Admin &Ecs();
 
 private:
   Admin m_admin;
+  ComponentPool<InAdjacencyComponent> *m_inAdjPool;
+  ComponentPool<OutAdjacencyComponent> *m_outAdjPool;
+  ComponentPool<EdgeComponent> *m_edgePool;
 };
+
+#include "concept/graphLike.hpp"
+static_assert(GraphLike<Graph>);

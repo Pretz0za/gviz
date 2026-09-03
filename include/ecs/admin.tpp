@@ -16,6 +16,14 @@ template <typename T> ComponentPool<T> &Admin::GetPool() {
   return *static_cast<ComponentPool<T> *>(it->second.get());
 }
 
+template <typename T> const ComponentPool<T> *Admin::TryGetPool() const {
+  auto key = std::type_index(typeid(T));
+  auto it = m_pools.find(key);
+  if (it == m_pools.end())
+    return nullptr;
+  return static_cast<const ComponentPool<T> *>(it->second.get());
+}
+
 template <typename T> T &Admin::AddComponent(EntityID id) {
   T &out = GetPool<T>().Add(id);
   out.m_owner = id;
@@ -28,6 +36,7 @@ template <typename T> T *Admin::GetComponent(EntityID id) {
   return GetPool<T>().Find(id);
 }
 
-template <typename T> bool Admin::HasComponent(EntityID id) {
-  return GetPool<T>().Find(id) != nullptr;
+template <typename T> bool Admin::HasComponent(EntityID id) const {
+  auto *pool = TryGetPool<T>();
+  return pool != nullptr && pool->Find(id) != nullptr;
 }

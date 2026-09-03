@@ -14,8 +14,14 @@ public:
 
   T &Add(EntityID id);
   void Remove(EntityID id) override;
-  T *Find(EntityID id) const;
-  std::vector<T> &Data() const;
+
+  T *Find(EntityID id);
+  const T *Find(EntityID id) const;
+
+  std::vector<T> &Data();
+  const std::vector<T> &Data() const;
+
+  size_t Size() const;
 
 private:
   std::vector<T> m_local;
