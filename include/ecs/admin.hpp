@@ -12,6 +12,9 @@ template <typename T> class ComponentPool;
 
 class Admin {
 public:
+  Admin();
+  ~Admin() = default;
+
   EntityID CreateEntity();
 
   void DestroyEntity(EntityID id);
@@ -27,27 +30,26 @@ public:
 private:
   EntityID m_nextID = 0;
   std::vector<EntityID> m_freeIDs;
-  // TODO: can give component pools ids and make this an array 
+  // TODO: can give component pools ids and make this an array
   std::unordered_map<std::type_index, std::unique_ptr<IComponentPool>> m_pools;
 };
 
 // Iterator to a specific ComponentPool of the Admin
 template <typename T> class ComponentItr {
 
-  ComponentItr(const Admin &admin) : pool(admin.GetPool<T>()), idx(0) {}
+  ComponentItr(const Admin &admin) : m_pool(admin.GetPool<T>()), m_idx(0) {}
 
-  ComponentItr begin();
-  ComponentItr end();
+  ComponentItr begin() { return m_pool->Data().begin(); }
+  ComponentItr end() { return m_pool->Data().end(); };
 
-  bool operator!=(const ComponentItr &other);
-  void operator++();
-  T *operator*();
+  bool operator!=(const ComponentItr &other) { return m_idx != other.m_idx; };
+  void operator++() { ++m_idx; };
+  T *operator*() { return &m_pool->Data()[m_idx]; };
 
 private:
-  ComponentPool<T> *pool;
-  uint32_t idx;
+  ComponentPool<T> *m_pool;
+  uint32_t m_idx;
 };
 
-// ComponentPool<T> must be complete before the template bodies below.
-#include "components.hpp"
 #include "admin.tpp"
+#include "components.hpp"
