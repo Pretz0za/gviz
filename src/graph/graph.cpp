@@ -111,22 +111,6 @@ uint32_t Graph::InDegree(NodeID id) const {
   return static_cast<uint32_t>(InEdges(id).size());
 }
 
-std::vector<NodeID> Graph::Nodes() const {
-  std::vector<NodeID> nodes;
-  nodes.reserve(m_outAdjPool->Size());
-  for (const auto &component : m_outAdjPool->Data())
-    nodes.emplace_back(component.m_owner);
-  return nodes;
-}
-
-std::vector<EdgeID> Graph::Edges() const {
-  std::vector<EdgeID> edges;
-  edges.reserve(m_edgePool->Size());
-  for (const auto &component : m_edgePool->Data())
-    edges.emplace_back(component.m_owner);
-  return edges;
-}
-
 uint32_t Graph::Size() const {
   return static_cast<uint32_t>(m_outAdjPool->Size());
 }

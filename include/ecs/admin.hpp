@@ -14,6 +14,10 @@ template <typename T> class ComponentPool;
 class Admin {
 public:
   Admin();
+  Admin(const Admin &) = delete;
+  Admin &operator=(const Admin &) = delete;
+  Admin(Admin &&) = default;
+  Admin &operator=(Admin &&) = default;
   ~Admin() = default;
 
   EntityID CreateEntity();

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "layout/randomizer.hpp"
 #include "ecs/exceptions.hpp"
 #include "graph/types.hpp"

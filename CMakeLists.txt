@@ -20,6 +20,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library(gviz ${GVIZ_LIB_TYPE}
 	# cpp files here
 	src/ecs/admin.cpp
+
 	src/graph/graph.cpp
 )
 

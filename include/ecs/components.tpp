@@ -4,15 +4,15 @@
 #include <utility>
 
 template <typename T>
-ComponentPool<T>::ComponentPool(const Admin &admin)
-    : m_admin(&admin), m_local(), m_map() {}
+ComponentPool<T>::ComponentPool()
+    : m_local(), m_map() {}
 
 template <typename T> T &ComponentPool<T>::Add(EntityID id) {
-  m_map[id] = static_cast<uint32_t>(m_local.size());
+  size_t idx = m_local.size();
+  m_map[id] = static_cast<uint32_t>(idx);
+  m_owners.push_back(id);
   m_local.emplace_back();
-  T &out = m_local.back();
-  out.m_owner = id;
-  return out;
+  return m_local.back();
 }
 
 template <typename T> void ComponentPool<T>::Remove(EntityID id) {
@@ -21,11 +21,13 @@ template <typename T> void ComponentPool<T>::Remove(EntityID id) {
     return;
 
   uint32_t idx = it->second;
-  uint32_t last = static_cast<uint32_t>(m_local.size() - 1);
+  uint32_t last = m_local.size() - 1;
 
-  m_map[m_local[last].m_owner] = idx;
+  m_map[m_owners[last]] = idx;
+  std::swap(m_owners[idx], m_owners[last]);
   std::swap(m_local[idx], m_local[last]);
   m_local.pop_back();
+  m_owners.pop_back();
   m_map.erase(id);
 }
 
@@ -42,6 +44,10 @@ template <typename T> T *ComponentPool<T>::Find(EntityID id) {
 
 template <typename T> const std::vector<T> &ComponentPool<T>::Data() const {
   return m_local;
+}
+
+template <typename T> EntityID ComponentPool<T>::Owner(uint32_t local) const {
+  return m_owners[local];
 }
 
 template <typename T> std::vector<T> &ComponentPool<T>::Data() {

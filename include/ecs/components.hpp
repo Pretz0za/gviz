@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <unordered_map>
 #include <vector>
 
@@ -9,7 +10,7 @@ class Admin;
 
 template <typename T> class ComponentPool : public IComponentPool {
 public:
-  ComponentPool(const Admin &admin);
+  ComponentPool();
   ~ComponentPool() = default;
 
   T &Add(EntityID id);
@@ -21,17 +22,17 @@ public:
   std::vector<T> &Data();
   const std::vector<T> &Data() const;
 
+  EntityID Owner(uint32_t local) const;
+
   size_t Size() const;
 
 private:
   std::vector<T> m_local;
-  const Admin *m_admin;
+  std::vector<EntityID> m_owners;
   // TODO: consider how to make this an array instead
   std::unordered_map<EntityID, uint32_t> m_map;
 };
 
-struct Component {
-  EntityID m_owner;
-};
+struct Component {};
 
 #include "components.tpp"

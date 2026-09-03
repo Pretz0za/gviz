@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <ranges>
 #include <vector>
 
 #include "ecs/admin.hpp"
@@ -30,8 +31,22 @@ public:
   uint32_t OutDegree(NodeID id) const;
   uint32_t InDegree(NodeID id) const;
 
-  std::vector<NodeID> Nodes() const;
-  std::vector<EdgeID> Edges() const;
+  auto Nodes() const {
+    auto *pool = m_outAdjPool;
+    return std::views::iota(size_t{0}, pool->Size()) |
+           std::views::transform([pool](size_t i) {
+             return NodeID(pool->Owner(static_cast<uint32_t>(i)));
+           });
+  }
+
+  auto Edges() const {
+    auto *pool = m_edgePool;
+    return std::views::iota(size_t{0}, pool->Size()) |
+           std::views::transform([pool](size_t i) {
+             return EdgeID(pool->Owner(static_cast<uint32_t>(i)));
+           });
+  }
+
   uint32_t Size() const;
 
   Admin &Ecs();

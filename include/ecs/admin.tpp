@@ -8,7 +8,7 @@ template <typename T> ComponentPool<T> &Admin::GetPool() {
   auto key = std::type_index(typeid(T));
   auto it = m_pools.find(key);
   if (it == m_pools.end()) {
-    auto pool = std::make_unique<ComponentPool<T>>(*this);
+    auto pool = std::make_unique<ComponentPool<T>>();
     auto *raw = pool.get();
     m_pools.emplace(key, std::move(pool));
     return *raw;
@@ -26,7 +26,6 @@ template <typename T> const ComponentPool<T> *Admin::TryGetPool() const {
 
 template <typename T> T &Admin::AddComponent(EntityID id) {
   T &out = GetPool<T>().Add(id);
-  out.m_owner = id;
   return out;
 }
 

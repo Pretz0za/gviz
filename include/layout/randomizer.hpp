@@ -1,14 +1,15 @@
 #pragma once
 
-#include "layout/types.hpp"
 #include "concept/graphLike.hpp"
 #include "ecs/components.hpp"
 #include "layout/components/position.hpp"
+#include "layout/types.hpp"
 #include <cstdint>
 #include <random>
 #include <sys/types.h>
 
 template <GraphLike G> class PositionRandomizerSystem {
+public:
   PositionRandomizerSystem(G &graph);
   PositionRandomizerSystem(G &graph, uint32_t seed);
   ~PositionRandomizerSystem() = default;
@@ -26,3 +27,5 @@ private:
   ComponentPool<PositionComponent> *m_positionPool;
   G *m_graph;
 };
+
+#include "layout/randomizer.tpp"
