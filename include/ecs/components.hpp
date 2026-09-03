@@ -1,20 +1,18 @@
 #pragma once
 
 #include <cstdint>
-#include <unordered_map>
 #include <vector>
 
-#include "icomponent_pool.hpp"
+#include "entity.hpp"
+#include "index_space.hpp"
 
-class Admin;
-
-template <typename T> class ComponentPool : public IComponentPool {
+template <typename T> class DenseComponentPool : public IDenseStorageListener {
 public:
-  ComponentPool();
-  ~ComponentPool() = default;
+  explicit DenseComponentPool(IndexSpace &space);
+  ~DenseComponentPool() override = default;
 
-  T &Add(EntityID id);
-  void Remove(EntityID id) override;
+  void OnAdd() override;
+  void OnRemove(uint32_t index) override;
 
   T *Find(EntityID id);
   const T *Find(EntityID id) const;
@@ -26,13 +24,11 @@ public:
 
   size_t Size() const;
 
-  uint32_t ToLocal(EntityID id) const;
+  uint32_t CompactIndex(EntityID id) const;
 
 private:
-  std::vector<T> m_local;
-  std::vector<EntityID> m_owners;
-  // TODO: consider how to make this an array instead
-  std::unordered_map<EntityID, uint32_t> m_map;
+  std::vector<T> m_data;
+  IndexSpace &m_space;
 };
 
 struct Component {};

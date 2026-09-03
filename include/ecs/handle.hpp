@@ -3,7 +3,7 @@
 #include <functional>
 #include <limits>
 
-#include "icomponent_pool.hpp"
+#include "entity.hpp"
 
 template <typename Tag> class Handle {
 public:

@@ -7,8 +7,10 @@
 
 #include "ecs/admin.hpp"
 #include "ecs/components.hpp"
+#include "ecs/index_space.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/components/edge.hpp"
+#include "graph/components/weight.hpp"
 #include "graph/types.hpp"
 
 class Graph {
@@ -53,11 +55,17 @@ public:
 
   Admin &Ecs();
 
+  IndexSpace &NodeSpace();
+  IndexSpace &EdgeSpace();
+
 private:
   Admin m_admin;
-  ComponentPool<InAdjacencyComponent> *m_inAdjPool;
-  ComponentPool<OutAdjacencyComponent> *m_outAdjPool;
-  ComponentPool<EdgeComponent> *m_edgePool;
+  IndexSpace *m_nodeSpace;
+  IndexSpace *m_edgeSpace;
+  DenseComponentPool<InAdjacencyComponent> *m_inAdjPool;
+  DenseComponentPool<OutAdjacencyComponent> *m_outAdjPool;
+  DenseComponentPool<EdgeComponent> *m_edgePool;
+  DenseComponentPool<WeightComponent> *m_weightPool;
 };
 
 #include "concept/graphLike.hpp"

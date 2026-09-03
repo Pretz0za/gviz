@@ -24,7 +24,7 @@ private:
   std::mt19937 m_rng;
   std::uniform_real_distribution<double> m_dist;
   DimensionResource m_dimension;
-  ComponentPool<PositionComponent> *m_positionPool;
+  DenseComponentPool<PositionComponent> *m_positionPool;
   G *m_graph;
 };
 

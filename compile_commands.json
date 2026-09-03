@@ -7,6 +7,12 @@
 },
 {
   "directory": "/Users/abdulaziz.alahmadi/refactor/build",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/ecs/index_space.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/ecs/index_space.cpp",
+  "output": "CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build",
   "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/graph/graph.cpp",
   "file": "/Users/abdulaziz.alahmadi/refactor/src/graph/graph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/graph.cpp.o"

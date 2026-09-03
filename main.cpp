@@ -31,9 +31,9 @@ Graph BuildRectMesh(size_t length, size_t width) {
 
 void InitializePositionComponents(Graph &g) {
   auto &admin = g.Ecs();
-  auto &pool = admin.GetPool<PositionComponent>();
+  auto &pool = admin.GetPool<PositionComponent>(g.NodeSpace());
   for (NodeID nid : g.Nodes()) {
-	  PositionComponent &c = pool.Add(nid.Raw());
+	  PositionComponent &c = *pool.Find(nid.Raw());
 	  c.pos[0] = 0;
 	  c.pos[1] = 0;
 	  c.pos[2] = 0;
@@ -42,7 +42,7 @@ void InitializePositionComponents(Graph &g) {
 
 void PrintPositions(Graph &g) {
   auto &admin = g.Ecs();
-  auto &pool = admin.GetPool<PositionComponent>();
+  auto &pool = admin.GetPool<PositionComponent>(g.NodeSpace());
   for (NodeID nid : g.Nodes()) {
     PositionComponent *c = pool.Find(nid.Raw());
     printf("node %u: (%f, %f)\n", nid.Raw(), c->pos[0], c->pos[1]);

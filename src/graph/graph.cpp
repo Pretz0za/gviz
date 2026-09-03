@@ -4,14 +4,15 @@
 #include "graph/components/weight.hpp"
 
 Graph::Graph()
-    : m_inAdjPool(&m_admin.GetPool<InAdjacencyComponent>()),
-      m_outAdjPool(&m_admin.GetPool<OutAdjacencyComponent>()),
-      m_edgePool(&m_admin.GetPool<EdgeComponent>()) {}
+    : m_nodeSpace(&m_admin.CreateSpace()), m_edgeSpace(&m_admin.CreateSpace()),
+      m_inAdjPool(&m_admin.GetPool<InAdjacencyComponent>(*m_nodeSpace)),
+      m_outAdjPool(&m_admin.GetPool<OutAdjacencyComponent>(*m_nodeSpace)),
+      m_edgePool(&m_admin.GetPool<EdgeComponent>(*m_edgeSpace)),
+      m_weightPool(&m_admin.GetPool<WeightComponent>(*m_edgeSpace)) {}
 
 NodeID Graph::AddNode() {
   EntityID id = m_admin.CreateEntity();
-  m_outAdjPool->Add(id);
-  m_inAdjPool->Add(id);
+  m_nodeSpace->Add(id);
   return NodeID(id);
 }
 
@@ -26,6 +27,7 @@ void Graph::RemoveNode(NodeID id) {
   for (const auto &entry : in)
     RemoveEdge(entry.edge);
 
+  m_nodeSpace->Remove(id.Raw());
   m_admin.DestroyEntity(id.Raw());
 }
 
@@ -36,11 +38,13 @@ bool Graph::HasNode(NodeID id) const {
 EdgeID Graph::AddEdge(NodeID from, NodeID to) {
   auto *outAdj = m_outAdjPool->Find(from.Raw());
   auto *inAdj = m_inAdjPool->Find(to.Raw());
+  // NOTE: throw or assert here
   if (!outAdj || !inAdj)
     return EdgeID{};
 
   EntityID id = m_admin.CreateEntity();
-  auto &edge = m_edgePool->Add(id);
+  m_edgeSpace->Add(id);
+  auto &edge = *m_edgePool->Find(id);
   edge.from = from;
   edge.to = to;
 
@@ -53,7 +57,7 @@ EdgeID Graph::AddEdge(NodeID from, NodeID to) {
 EdgeID Graph::AddEdge(NodeID from, NodeID to, float weight) {
   EdgeID id = AddEdge(from, to);
   if (id.IsValid())
-    m_admin.AddComponent<WeightComponent>(id.Raw()).value = weight;
+    m_weightPool->Find(id.Raw())->value = weight;
   return id;
 }
 
@@ -74,6 +78,7 @@ void Graph::RemoveEdge(EdgeID id) {
     std::erase_if(in, [&](const AdjEntry &e) { return e.edge == id; });
   }
 
+  m_edgeSpace->Remove(id.Raw());
   m_admin.DestroyEntity(id.Raw());
 }
 
@@ -112,11 +117,14 @@ uint32_t Graph::InDegree(NodeID id) const {
 }
 
 uint32_t Graph::ToCompact(NodeID id) const {
-  return m_outAdjPool->ToLocal(id.Raw());
-};
+  return m_outAdjPool->CompactIndex(id.Raw());
+}
 
 uint32_t Graph::Size() const {
   return static_cast<uint32_t>(m_outAdjPool->Size());
 }
 
 Admin &Graph::Ecs() { return m_admin; }
+
+IndexSpace &Graph::NodeSpace() { return *m_nodeSpace; }
+IndexSpace &Graph::EdgeSpace() { return *m_edgeSpace; }

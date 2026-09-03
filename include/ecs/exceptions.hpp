@@ -1,4 +1,4 @@
-#include "ecs/icomponent_pool.hpp"
+#include "ecs/entity.hpp"
 #include <stdexcept>
 #include <string>
 

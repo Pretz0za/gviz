@@ -3,5 +3,5 @@
 #include "ecs/components.hpp"
 
 struct WeightComponent : Component {
-  float value;
+  float value = 1.0f;
 };

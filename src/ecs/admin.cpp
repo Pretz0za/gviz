@@ -1,7 +1,6 @@
 #include "ecs/admin.hpp"
-#include "ecs/icomponent_pool.hpp"
 
-Admin::Admin() : m_freeIDs(), m_pools(), m_nextID(0) {}
+Admin::Admin() : m_freeIDs(), m_spaces(), m_pools(), m_resources(), m_nextID(0) {}
 
 EntityID Admin::CreateEntity() {
   if (m_freeIDs.empty())
@@ -11,9 +10,9 @@ EntityID Admin::CreateEntity() {
   return out;
 }
 
-void Admin::DestroyEntity(EntityID id) {
-  for (const auto &[_, pool] : m_pools) {
-    pool->Remove(id);
-  }
-  m_freeIDs.push_back(id);
+void Admin::DestroyEntity(EntityID id) { m_freeIDs.push_back(id); }
+
+IndexSpace &Admin::CreateSpace() {
+  m_spaces.emplace_back();
+  return m_spaces.back();
 }
