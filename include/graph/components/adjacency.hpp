@@ -1,6 +1,19 @@
-#include "ecs/components.hpp"
+#pragma once
+
 #include <vector>
 
-struct AdjacencyComponent : Component {
-  std::vector<EntityID> neighbors;
+#include "ecs/components.hpp"
+#include "graph/types.hpp"
+
+struct AdjEntry {
+  EdgeID edge;
+  NodeID other;
+};
+
+struct OutAdjacencyComponent : Component {
+  std::vector<AdjEntry> out;
+};
+
+struct InAdjacencyComponent : Component {
+  std::vector<AdjEntry> in;
 };
