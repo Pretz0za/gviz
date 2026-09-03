@@ -47,6 +47,8 @@ public:
            });
   }
 
+  uint32_t ToCompact(NodeID id) const;
+
   uint32_t Size() const;
 
   Admin &Ecs();

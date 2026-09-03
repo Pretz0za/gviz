@@ -26,6 +26,8 @@ public:
 
   size_t Size() const;
 
+  uint32_t ToLocal(EntityID id) const;
+
 private:
   std::vector<T> m_local;
   std::vector<EntityID> m_owners;

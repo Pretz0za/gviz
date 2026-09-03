@@ -1,6 +1,6 @@
 #pragma once
 
-#include "layout/randomizer.hpp"
+#include "layout/randomizer/randomizer.hpp"
 #include "ecs/exceptions.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"

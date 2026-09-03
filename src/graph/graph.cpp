@@ -111,6 +111,10 @@ uint32_t Graph::InDegree(NodeID id) const {
   return static_cast<uint32_t>(InEdges(id).size());
 }
 
+uint32_t Graph::ToCompact(NodeID id) const {
+  return m_outAdjPool->ToLocal(id.Raw());
+};
+
 uint32_t Graph::Size() const {
   return static_cast<uint32_t>(m_outAdjPool->Size());
 }

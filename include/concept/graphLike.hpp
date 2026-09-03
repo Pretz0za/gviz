@@ -16,14 +16,16 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   requires std::same_as<std::ranges::range_value_t<decltype(graph.Nodes())>,
                         NodeID>;
 
-  requires std::same_as<std::ranges::range_value_t<decltype(graph.InEdges(nid))>,
-                        AdjEntry>;
-  requires std::same_as<std::ranges::range_value_t<decltype(graph.OutEdges(nid))>,
-                        AdjEntry>;
+  // TODO: look into if these ranges are copying
+  requires std::same_as<
+      std::ranges::range_value_t<decltype(graph.InEdges(nid))>, AdjEntry>;
+  requires std::same_as<
+      std::ranges::range_value_t<decltype(graph.OutEdges(nid))>, AdjEntry>;
 
   { cgraph.Size() } -> std::convertible_to<uint32_t>;
+
+  { cgraph.ToCompact(nid) } -> std::convertible_to<uint32_t>;
   { cgraph.HasNode(nid) } -> std::convertible_to<bool>;
   { cgraph.HasEdge(eid) } -> std::convertible_to<bool>;
-  { graph.Ecs() } -> std::same_as<Admin&>;
-
+  { graph.Ecs() } -> std::same_as<Admin &>;
 };

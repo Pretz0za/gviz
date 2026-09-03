@@ -1,11 +1,12 @@
 #pragma once
 
 #include "ecs/components.hpp"
+#include "ecs/icomponent_pool.hpp"
+#include <cstdint>
+#include <limits>
 #include <utility>
 
-template <typename T>
-ComponentPool<T>::ComponentPool()
-    : m_local(), m_map() {}
+template <typename T> ComponentPool<T>::ComponentPool() : m_local(), m_map() {}
 
 template <typename T> T &ComponentPool<T>::Add(EntityID id) {
   size_t idx = m_local.size();
@@ -56,4 +57,11 @@ template <typename T> std::vector<T> &ComponentPool<T>::Data() {
 
 template <typename T> size_t ComponentPool<T>::Size() const {
   return m_local.size();
+}
+
+template <typename T> uint32_t ComponentPool<T>::ToLocal(EntityID id) const {
+  auto it = m_map.find(id);
+  if (it == m_map.end())
+    return std::numeric_limits<uint32_t>::max();
+  return it->second;
 }

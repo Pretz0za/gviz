@@ -28,4 +28,4 @@ private:
   G *m_graph;
 };
 
-#include "layout/randomizer.tpp"
+#include "layout/randomizer/randomizer.tpp"

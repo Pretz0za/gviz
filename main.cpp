@@ -1,7 +1,7 @@
 #include "graph/graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
-#include "layout/randomizer.hpp"
+#include "layout/randomizer/randomizer.hpp"
 #include "layout/types.hpp"
 #include <cstdint>
 #include <cstdio>
@@ -40,15 +40,32 @@ void InitializePositionComponents(Graph &g) {
   }
 }
 
+void PrintPositions(Graph &g) {
+  auto &admin = g.Ecs();
+  auto &pool = admin.GetPool<PositionComponent>();
+  for (NodeID nid : g.Nodes()) {
+    PositionComponent *c = pool.Find(nid.Raw());
+    printf("node %u: (%f, %f)\n", nid.Raw(), c->pos[0], c->pos[1]);
+  }
+}
+
 int main() {
 
-  Graph g = BuildRectMesh(100, 100);
+  Graph g = BuildRectMesh(2, 2);
   auto &admin = g.Ecs();
 
   InitializePositionComponents(g);
   admin.SetResource<DimensionResource>(DimensionResource::D2);
   PositionRandomizerSystem Randomizer{g};
 
-  printf("%p\n", &g.Ecs());
+  printf("initial positions:\n");
+  PrintPositions(g);
+
+  for (int i = 0; i < 3; i++) {
+    Randomizer.Tick();
+    printf("after tick %d:\n", i + 1);
+    PrintPositions(g);
+  }
+
   return 0;
 }
