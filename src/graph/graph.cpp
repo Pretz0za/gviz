@@ -20,8 +20,8 @@ void Graph::RemoveNode(NodeID id) {
   if (!HasNode(id))
     return;
 
-  std::vector<AdjEntry> out = OutEdges(id);
-  std::vector<AdjEntry> in = InEdges(id);
+  std::vector<AdjEntry> out = OutNeighbors(id);
+  std::vector<AdjEntry> in = InNeighbors(id);
   for (const auto &entry : out)
     RemoveEdge(entry.edge);
   for (const auto &entry : in)
@@ -61,6 +61,19 @@ EdgeID Graph::AddEdge(NodeID from, NodeID to, float weight) {
   return id;
 }
 
+std::pair<EdgeID, EdgeID> Graph::AddUndirectedEdge(NodeID a, NodeID b) {
+  EdgeID ab = AddEdge(a, b);
+  EdgeID ba = AddEdge(b, a);
+  return {ab, ba};
+}
+
+std::pair<EdgeID, EdgeID> Graph::AddUndirectedEdge(NodeID a, NodeID b,
+                                                    float weight) {
+  EdgeID ab = AddEdge(a, b, weight);
+  EdgeID ba = AddEdge(b, a, weight);
+  return {ab, ba};
+}
+
 void Graph::RemoveEdge(EdgeID id) {
   auto *edge = m_edgePool->Find(id.Raw());
   if (!edge)
@@ -96,24 +109,24 @@ NodeID Graph::Target(EdgeID id) const {
   return edge ? edge->to : NodeID{};
 }
 
-const std::vector<AdjEntry> &Graph::OutEdges(NodeID id) const {
+const std::vector<AdjEntry> &Graph::OutNeighbors(NodeID id) const {
   static const std::vector<AdjEntry> kEmpty;
   auto *adj = m_outAdjPool->Find(id.Raw());
   return adj ? adj->out : kEmpty;
 }
 
-const std::vector<AdjEntry> &Graph::InEdges(NodeID id) const {
+const std::vector<AdjEntry> &Graph::InNeighbors(NodeID id) const {
   static const std::vector<AdjEntry> kEmpty;
   auto *adj = m_inAdjPool->Find(id.Raw());
   return adj ? adj->in : kEmpty;
 }
 
 uint32_t Graph::OutDegree(NodeID id) const {
-  return static_cast<uint32_t>(OutEdges(id).size());
+  return static_cast<uint32_t>(OutNeighbors(id).size());
 }
 
 uint32_t Graph::InDegree(NodeID id) const {
-  return static_cast<uint32_t>(InEdges(id).size());
+  return static_cast<uint32_t>(InNeighbors(id).size());
 }
 
 uint32_t Graph::ToCompact(NodeID id) const {
@@ -121,7 +134,7 @@ uint32_t Graph::ToCompact(NodeID id) const {
 }
 
 uint32_t Graph::Size() const {
-  return static_cast<uint32_t>(m_outAdjPool->Size());
+  return m_nodeSpace->Size();
 }
 
 Admin &Graph::Ecs() { return m_admin; }

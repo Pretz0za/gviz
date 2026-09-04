@@ -43,6 +43,7 @@ private:
   EntityID m_nextID = 0;
   std::vector<EntityID> m_freeIDs;
   std::deque<IndexSpace> m_spaces;
+  // TODO: can i make this not be a map?
   std::unordered_map<std::type_index, std::unique_ptr<IDenseStorageListener>>
       m_pools;
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>

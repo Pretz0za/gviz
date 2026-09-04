@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <ranges>
+#include <utility>
 #include <vector>
 
 #include "ecs/admin.hpp"
@@ -23,13 +24,15 @@ public:
 
   EdgeID AddEdge(NodeID from, NodeID to);
   EdgeID AddEdge(NodeID from, NodeID to, float weight);
+  std::pair<EdgeID, EdgeID> AddUndirectedEdge(NodeID a, NodeID b);
+  std::pair<EdgeID, EdgeID> AddUndirectedEdge(NodeID a, NodeID b, float weight);
   void RemoveEdge(EdgeID id);
   bool HasEdge(EdgeID id) const;
   NodeID Source(EdgeID id) const;
   NodeID Target(EdgeID id) const;
 
-  const std::vector<AdjEntry> &OutEdges(NodeID id) const;
-  const std::vector<AdjEntry> &InEdges(NodeID id) const;
+  const std::vector<AdjEntry> &OutNeighbors(NodeID id) const;
+  const std::vector<AdjEntry> &InNeighbors(NodeID id) const;
   uint32_t OutDegree(NodeID id) const;
   uint32_t InDegree(NodeID id) const;
 

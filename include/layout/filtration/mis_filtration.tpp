@@ -1,14 +1,23 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
-#include "ecs/admin.hpp"
-#include "ecs/components.hpp"
+#include "ds/bitset.hpp"
+#include "ecs/index_space.hpp"
 #include "graph/components/adjacency.hpp"
+#include "graph/types.hpp"
 #include "layout/filtration/mis_filtration.hpp"
+#include "layout/randomizer/randomizer.tpp"
 #include <cstdint>
+#include <deque>
 
 template <GraphLike G>
-MisFiltrationSystem<G>::MisFiltrationSystem(G &graph) : m_graph(&graph) {}
+MisFiltrationSystem<G>::MisFiltrationSystem(G &graph) : m_graph(&graph) {
+  DimensionResource *dim =
+      graph.Ecs().template GetResource<DimensionResource>();
+  if (dim == nullptr)
+    throw MissingResourceException<DimensionResource>();
+  m_dimension = *dim;
+}
 
 template <GraphLike G>
 void MisFiltrationSystem<G>::Tick(NestedFiltrationResult &out) {
@@ -22,45 +31,103 @@ void MisFiltrationSystem<G>::Tick(NestedFiltrationResult &out) {
 template <GraphLike G>
 void MisFiltrationSystem<G>::BuildFiltration(NestedFiltrationResult &out) {
   size_t nvertices = m_graph->Size();
-  Bitset curr(nvertices);
 
-  BuildFirstLayer(out, curr);
+  // layer 0, full graph
+  BitSet currLayer{m_graph->Size(), 1};
+  out.m_borders.push_back(m_graph->Size());
+  out.m_layerCount = 1;
 
-  uint32_t i = 2;
-  while (IterMISFiltration(i, curr))
-    i++;
-
-  // NOTE: why is this loop even needed?
-  size_t k = 0;
-  for (size_t vtx : curr)
-    misFiltration_[k++] = vtx;
-
-  while (MisBorderAt(i) < Dim() + 1) {
-    if (!MigrateOneToFinalLayer(i + 1))
-      break;
+  while (BuildNextLayer(out, currLayer)) {
   }
 
-  return i + 1;
+  // write the final layer
+  size_t k = 0;
+  for (size_t vtx : currLayer)
+    out.m_filtration[k++] = vtx;
+
+  // while (out.m_borders[out.m_layerCount - 1] <
+  // static_cast<uint8_t>(m_dimension) + 1) {
+  //   if (!MigrateOneToFinalLayer(out.m_layerCount + 1))
+  //     break;
+  // }
 }
 
 template <GraphLike G>
-void MisFiltrationSystem<G>::BuildFirstLayer(NestedFiltrationResult &out,
-                                             Bitset &vertices) {
-  size_t writePos = m_graph->Size() - 1;
-  Bitset marked(m_graph->Size());
-  for (NodeID v : m_graph->Nodes()) {
-    uint32_t compact = m_graph->ToCompact(v);
+bool MisFiltrationSystem<G>::BuildNextLayer(NestedFiltrationResult &out,
+                                            BitSet &lastLayer) {
+  uint32_t i = out.m_layerCount;
+  uint32_t count = 0;
+  size_t nvertices = m_graph->Size();
+  BitSet newLayer(nvertices, 0);
+  BitSet marked(nvertices, 0);
 
-    if (marked.Test(compact))
+  uint32_t radius = uint32_t{1} << (i - 1);
+
+  for (size_t curr : lastLayer) {
+    if (marked.Test(curr))
       continue;
 
-    vertices.Set(compact);
-    for (const AdjEntry &adj : m_graph->OutEdges(compact)) {
-      uint32_t nbrCompact = m_graph->ToCompact(adj.other);
-      if (!marked.Test(nbrCompact)) {
-        marked.Set(m_graph->ToCompact(adj.other));
-		out.m_filtration[writePos] = adj.other;
+    newLayer.Set(curr);
+    count++;
+    // marked.Set(curr);
+
+    MarkVerticesWithinRadius(curr, radius, marked);
+  }
+
+  size_t writePos = out.m_borders[i - 1] - 1;
+  for (size_t curr : lastLayer) {
+    if (!newLayer.Test(curr)) {
+      out.m_filtration[writePos--] = curr;
+    }
+  }
+
+  bool cont = count > static_cast<uint8_t>(m_dimension) + 1;
+
+  out.m_borders.push_back(count);
+  out.m_layerCount++;
+  // NOTE: look into this copy
+  lastLayer = newLayer;
+  return cont;
+}
+
+template <GraphLike G>
+void MisFiltrationSystem<G>::MarkVerticesWithinRadius(uint32_t source,
+                                                      uint32_t radius,
+                                                      BitSet &marked) {
+  typedef struct {
+    NodeID node;
+    uint32_t depth;
+  } FoundNode;
+
+  IndexSpace &nodeSpace = m_graph->NodeSpace();
+
+  auto queue = std::deque<FoundNode>{};
+  queue.push_back(FoundNode{NodeID(nodeSpace.Owner(source)), 0});
+
+  BitSet visited(m_graph->Size(), 0);
+
+  while (!queue.empty()) {
+    FoundNode nd = queue.front();
+    queue.pop_front();
+
+    if (radius && nd.depth >= radius)
+      continue;
+
+    for (AdjEntry adj : m_graph->OutNeighbors(nd.node)) {
+
+      uint32_t nbrCompact = nodeSpace.CompactIndex(adj.other.Raw());
+
+      if (visited.Test(nbrCompact))
+        continue;
+      visited.Set(nbrCompact);
+
+      // mark as within radius
+      uint32_t nextDepth = nd.depth + 1;
+      if (nextDepth <= radius) {
+        marked.Set(nbrCompact);
       }
+
+      queue.push_back(FoundNode{adj.other, nextDepth});
     }
   }
 }

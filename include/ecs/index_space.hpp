@@ -29,6 +29,7 @@ public:
 
 private:
   std::vector<EntityID> m_dense;
-  std::unordered_map<EntityID, uint32_t> m_sparse;
   std::vector<IDenseStorageListener *> m_listeners;
+  // TODO: can i make this not be a map?
+  std::unordered_map<EntityID, uint32_t> m_sparse;
 };

@@ -11,17 +11,17 @@
 template <typename G>
 concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   { graph.Nodes() } -> std::ranges::input_range;
-  { graph.InEdges(nid) } -> std::ranges::input_range;
-  { graph.OutEdges(nid) } -> std::ranges::input_range;
+  { graph.InNeighbors(nid) } -> std::ranges::input_range;
+  { graph.OutNeighbors(nid) } -> std::ranges::input_range;
 
   requires std::same_as<std::ranges::range_value_t<decltype(graph.Nodes())>,
                         NodeID>;
 
   // TODO: look into if these ranges are copying
   requires std::same_as<
-      std::ranges::range_value_t<decltype(graph.InEdges(nid))>, AdjEntry>;
+      std::ranges::range_value_t<decltype(graph.InNeighbors(nid))>, AdjEntry>;
   requires std::same_as<
-      std::ranges::range_value_t<decltype(graph.OutEdges(nid))>, AdjEntry>;
+      std::ranges::range_value_t<decltype(graph.OutNeighbors(nid))>, AdjEntry>;
 
   { cgraph.Size() } -> std::convertible_to<uint32_t>;
 
@@ -30,5 +30,4 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   { cgraph.HasEdge(eid) } -> std::convertible_to<bool>;
   { graph.Ecs() } -> std::same_as<Admin &>;
   { graph.NodeSpace() } -> std::same_as<IndexSpace &>;
-  { graph.EdgeSpace() } -> std::same_as<IndexSpace &>;
 };
