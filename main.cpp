@@ -30,8 +30,7 @@ Graph BuildRectMesh(size_t length, size_t width) {
 }
 
 void InitializePositionComponents(Graph &g) {
-  auto &admin = g.Ecs();
-  auto &pool = admin.GetPool<PositionComponent>(g.NodeSpace());
+  auto &pool = g.NodeSpace().GetPool<PositionComponent>();
   for (NodeID nid : g.Nodes()) {
     PositionComponent &c = *pool.Find(nid.Raw());
     c.pos[0] = 0;
@@ -41,8 +40,7 @@ void InitializePositionComponents(Graph &g) {
 }
 
 void PrintPositions(Graph &g) {
-  auto &admin = g.Ecs();
-  auto &pool = admin.GetPool<PositionComponent>(g.NodeSpace());
+  auto &pool = g.NodeSpace().GetPool<PositionComponent>();
   for (NodeID nid : g.Nodes()) {
     PositionComponent *c = pool.Find(nid.Raw());
     printf("node %u: (%f, %f)\n", nid.Raw(), c->pos[0], c->pos[1]);
@@ -51,11 +49,10 @@ void PrintPositions(Graph &g) {
 
 int main() {
 
-  Graph g = BuildRectMesh(1000, 1000);
-  auto &admin = g.Ecs();
+  Graph g = BuildRectMesh(50, 50);
 
   // InitializePositionComponents(g);
-  admin.SetResource<DimensionResource>(DimensionResource::D2);
+  g.SetResource<DimensionResource>(DimensionResource::D2);
   // PositionRandomizerSystem Randomizer{g};
 
   // printf("initial positions:\n");

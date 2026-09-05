@@ -2,7 +2,6 @@
 
 #include "concept/graphLike.hpp"
 #include "ds/bitset.hpp"
-#include "ecs/index_space.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/filtration/mis_filtration.hpp"
@@ -12,8 +11,7 @@
 
 template <GraphLike G>
 MisFiltrationSystem<G>::MisFiltrationSystem(G &graph) : m_graph(&graph) {
-  DimensionResource *dim =
-      graph.Ecs().template GetResource<DimensionResource>();
+  DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
   m_dimension = *dim;
@@ -63,15 +61,15 @@ bool MisFiltrationSystem<G>::BuildNextLayer(NestedFiltrationResult &out,
 
   uint32_t radius = uint32_t{1} << (i - 1);
 
-  for (size_t curr : lastLayer) {
-    if (marked.Test(curr))
+  for (size_t node : lastLayer) {
+    if (marked.Test(node))
       continue;
 
-    newLayer.Set(curr);
+    newLayer.Set(node);
     count++;
     // marked.Set(curr);
 
-    MarkVerticesWithinRadius(curr, radius, marked);
+    MarkVerticesWithinRadius(node, radius, marked);
   }
 
   size_t writePos = out.m_borders[i - 1] - 1;
@@ -99,10 +97,8 @@ void MisFiltrationSystem<G>::MarkVerticesWithinRadius(uint32_t source,
     uint32_t depth;
   } FoundNode;
 
-  IndexSpace &nodeSpace = m_graph->NodeSpace();
-
   auto queue = std::deque<FoundNode>{};
-  queue.push_back(FoundNode{NodeID(nodeSpace.Owner(source)), 0});
+  queue.push_back(FoundNode{NodeID(source), 0});
 
   BitSet visited(m_graph->Size(), 0);
 
@@ -115,13 +111,12 @@ void MisFiltrationSystem<G>::MarkVerticesWithinRadius(uint32_t source,
 
     for (AdjEntry adj : m_graph->OutNeighbors(nd.node)) {
 
-      uint32_t nbrCompact = nodeSpace.CompactIndex(adj.other.Raw());
+      uint32_t nbrCompact = adj.other.Raw();
 
       if (visited.Test(nbrCompact))
         continue;
       visited.Set(nbrCompact);
 
-      // mark as within radius
       uint32_t nextDepth = nd.depth + 1;
       if (nextDepth <= radius) {
         marked.Set(nbrCompact);

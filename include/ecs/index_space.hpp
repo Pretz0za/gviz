@@ -1,35 +1,39 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include <typeindex>
 #include <unordered_map>
-#include <vector>
 
 #include "entity.hpp"
+
+template <typename T> class DenseComponentPool;
 
 class IDenseStorageListener {
 public:
   virtual ~IDenseStorageListener() = default;
   virtual void OnAdd() = 0;
-  virtual void OnRemove(uint32_t index) = 0;
 };
 
 class IndexSpace {
 public:
   IndexSpace() = default;
+  IndexSpace(const IndexSpace &) = delete;
+  IndexSpace &operator=(const IndexSpace &) = delete;
+  IndexSpace(IndexSpace &&) = default;
+  IndexSpace &operator=(IndexSpace &&) = default;
 
-  uint32_t Add(EntityID id);
-  void Remove(EntityID id);
-
-  uint32_t CompactIndex(EntityID id) const;
-  EntityID Owner(uint32_t index) const;
+  EntityID Create();
 
   size_t Size() const;
 
-  void RegisterListener(IDenseStorageListener *listener);
+  template <typename T> DenseComponentPool<T> &GetPool();
 
 private:
-  std::vector<EntityID> m_dense;
-  std::vector<IDenseStorageListener *> m_listeners;
-  // TODO: can i make this not be a map?
-  std::unordered_map<EntityID, uint32_t> m_sparse;
+  uint32_t m_size = 0;
+  std::unordered_map<std::type_index, std::unique_ptr<IDenseStorageListener>>
+      m_pools;
 };
+
+#include "index_space.tpp"
+#include "components.hpp"
