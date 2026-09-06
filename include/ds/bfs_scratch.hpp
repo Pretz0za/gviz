@@ -13,12 +13,12 @@ public:
 
   void InitNew();
 
-  void Visit(NodeID node);
+  void Visit(DenseNodeID node);
   void Push(NodeID node, uint32_t depth);
   FoundNode Pop();
 
   bool Empty() const;
-  bool IsVisited(NodeID node) const;
+  bool IsVisited(DenseNodeID node) const;
 
 private:
   BitSet m_visited;

@@ -6,7 +6,7 @@
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/filtration/mis_filtration.hpp"
-#include "layout/randomizer/randomizer.tpp"
+#include "ecs/exceptions.hpp"
 #include <cstdint>
 
 template <GraphLike G>
@@ -17,51 +17,48 @@ MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
     throw MissingResourceException<DimensionResource>();
   m_dimension = *dim;
 
-  BFSScratch *scratch = m_graph->template GetResource<BFSScratch>();
-  if (scratch == nullptr) {
-    m_scratch = &m_graph->template SetResource<BFSScratch>(m_graph->Size());
-  } else {
-    m_scratch = scratch;
-  }
+  m_scratch = m_graph->template GetResource<BFSScratch>();
+  if (m_scratch == nullptr)
+    throw MissingResourceException<BFSScratch>();
+
+  m_output = m_graph->template GetResource<NestedFiltrationResult>();
+  if (m_output == nullptr)
+    m_output = &m_graph->template SetResource<NestedFiltrationResult>();
+
+  m_output->m_layerCount = 0xFFFFFFFF;
 }
 
-template <GraphLike G>
-void MisFiltrationSystem<G>::Tick(NestedFiltrationResult &out) {
-  out.m_filtration.reserve(m_graph->Size());
-  out.m_filtration.clear();
-  out.m_borders.clear();
-  out.m_layerCount = 0;
-  BuildFiltration(out);
+template <GraphLike G> void MisFiltrationSystem<G>::Tick() {
+  m_output->m_filtration.resize(m_graph->Size());
+  m_output->m_borders.clear();
+  m_output->m_layerCount = 0;
+  BuildFiltration();
 }
 
-template <GraphLike G>
-void MisFiltrationSystem<G>::BuildFiltration(NestedFiltrationResult &out) {
+template <GraphLike G> void MisFiltrationSystem<G>::BuildFiltration() {
   size_t nvertices = m_graph->Size();
 
   // layer 0, full graph
   BitSet currLayer{m_graph->Size(), 1};
-  out.m_borders.push_back(m_graph->Size());
-  out.m_layerCount = 1;
+  m_output->m_borders.push_back(m_graph->Size());
+  m_output->m_layerCount = 1;
 
-  while (BuildNextLayer(out, currLayer)) {
+  while (BuildNextLayer(currLayer)) {
   }
 
   // write the final layer
   size_t k = 0;
   for (size_t vtx : currLayer)
-    out.m_filtration[k++] = vtx;
+    m_output->m_filtration[k++] = vtx;
 
-  // while (out.m_borders[out.m_layerCount - 1] <
-  // static_cast<uint8_t>(m_dimension) + 1) {
-  //   if (!MigrateOneToFinalLayer(out.m_layerCount + 1))
-  //     break;
-  // }
+  // ensures last layer has enough for a simplex
+  m_output->m_borders[m_output->m_layerCount - 1] =
+      static_cast<uint8_t>(m_dimension) + 1;
 }
 
 template <GraphLike G>
-bool MisFiltrationSystem<G>::BuildNextLayer(NestedFiltrationResult &out,
-                                            BitSet &lastLayer) {
-  uint32_t i = out.m_layerCount;
+bool MisFiltrationSystem<G>::BuildNextLayer(BitSet &lastLayer) {
+  uint32_t i = m_output->m_layerCount;
   uint32_t count = 0;
   size_t nvertices = m_graph->Size();
   BitSet newLayer(nvertices, 0);
@@ -75,22 +72,22 @@ bool MisFiltrationSystem<G>::BuildNextLayer(NestedFiltrationResult &out,
 
     newLayer.Set(node);
     count++;
-    // marked.Set(curr);
 
-    MarkVerticesWithinRadius(m_graph->MapToSparse(NodeID(node)), radius, marked);
+    MarkVerticesWithinRadius(m_graph->MapToSparse(DenseNodeID(node)), radius,
+                             marked);
   }
 
-  size_t writePos = out.m_borders[i - 1] - 1;
+  size_t writePos = m_output->m_borders[i - 1] - 1;
   for (size_t curr : lastLayer) {
     if (!newLayer.Test(curr)) {
-      out.m_filtration[writePos--] = curr;
+      m_output->m_filtration[writePos--] = curr;
     }
   }
 
   bool cont = count > static_cast<uint8_t>(m_dimension) + 1;
 
-  out.m_borders.push_back(count);
-  out.m_layerCount++;
+  m_output->m_borders.push_back(count);
+  m_output->m_layerCount++;
   // NOTE: look into this copy
   lastLayer = newLayer;
   return cont;
@@ -111,7 +108,7 @@ void MisFiltrationSystem<G>::MarkVerticesWithinRadius(NodeID source,
 
     for (AdjEntry adj : m_graph->OutNeighbors(nd.node)) {
 
-      NodeID nbrCompact = m_graph->MapToDense(adj.other);
+      DenseNodeID nbrCompact = m_graph->MapToDense(adj.other);
 
       if (m_scratch->IsVisited(nbrCompact))
         continue;

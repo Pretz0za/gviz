@@ -9,14 +9,14 @@ void BFSScratch::InitNew() {
   m_queue.clear();
 }
 
-void BFSScratch::Visit(NodeID node) { m_visited.Set(node.Raw()); }
+void BFSScratch::Visit(DenseNodeID node) { m_visited.Set(node.Raw()); }
 void BFSScratch::Push(NodeID node, uint32_t depth) {
   m_queue.push_back(FoundNode{node, depth});
 }
 
 bool BFSScratch::Empty() const { return m_queue.empty(); }
 
-bool BFSScratch::IsVisited(NodeID node) const {
+bool BFSScratch::IsVisited(DenseNodeID node) const {
   return m_visited.Test(node.Raw());
 }
 

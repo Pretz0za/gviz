@@ -8,16 +8,16 @@
 #include <random>
 #include <sys/types.h>
 
-template <GraphLike G> class PositionRandomizerSystem {
+template <GraphLike G> class PositionRandomized {
 public:
-  PositionRandomizerSystem(G &graph);
-  PositionRandomizerSystem(G &graph, uint32_t seed);
-  ~PositionRandomizerSystem() = default;
+  PositionRandomized(G &graph);
+  PositionRandomized(G &graph, uint32_t seed);
+  ~PositionRandomized() = default;
 
   void SetBoundingBox(uint32_t width);
   void SetSeed(uint32_t seed);
 
-  void Tick();
+  void PlaceAll();
 
 private:
   uint32_t m_bboxWidth;
@@ -28,4 +28,4 @@ private:
   G *m_graph;
 };
 
-#include "layout/randomizer/randomizer.tpp"
+#include "layout/placement/randomized.tpp"

@@ -12,6 +12,7 @@ public:
   ~DenseComponentPool() override = default;
 
   void OnAdd() override;
+  void Set(EntityID id, T data);
 
   T *Find(EntityID id);
   const T *Find(EntityID id) const;

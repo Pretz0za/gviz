@@ -48,8 +48,8 @@ public:
            std::views::transform([](uint32_t i) { return EdgeID(i); });
   }
 
-  constexpr NodeID MapToSparse(NodeID id) const { return id; };
-  constexpr NodeID MapToDense(NodeID id) const { return id; };
+  constexpr NodeID MapToSparse(DenseNodeID id) const { return NodeID(id.Raw()); };
+  constexpr DenseNodeID MapToDense(NodeID id) const { return DenseNodeID(id.Raw()); };
 
   uint32_t Size() const;
 

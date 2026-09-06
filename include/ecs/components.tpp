@@ -1,10 +1,15 @@
 #pragma once
 
 #include "ecs/components.hpp"
+#include "ecs/entity.hpp"
 #include <utility>
 
 template <typename T> void DenseComponentPool<T>::OnAdd() {
   m_data.emplace_back();
+}
+
+template <typename T> void DenseComponentPool<T>::Set(EntityID id, T data) {
+	m_data[id] = data;
 }
 
 template <typename T> const T *DenseComponentPool<T>::Find(EntityID id) const {
@@ -17,7 +22,8 @@ template <typename T> T *DenseComponentPool<T>::Find(EntityID id) {
   return const_cast<T *>(std::as_const(*this).Find(id));
 }
 
-template <typename T> const std::vector<T> &DenseComponentPool<T>::Data() const {
+template <typename T>
+const std::vector<T> &DenseComponentPool<T>::Data() const {
   return m_data;
 }
 

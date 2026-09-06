@@ -4,11 +4,12 @@
 
 Subgraph::Subgraph(Graph &parent)
     : m_parent(&parent), m_nodeSet(m_parent->Size(), 0),
-      m_mapToDense{m_parent->Size(), INVALID_NODE_ID}, m_compactNodeSpace() {}
+      m_mapToDense{m_parent->Size(), INVALID_DENSE_NODE_ID},
+      m_compactNodeSpace() {}
 
 void Subgraph::AddNode(NodeID id) {
   m_nodeSet.Set(id.Raw());
-  NodeID compactID = NodeID(m_compactNodeSpace.Create());
+  DenseNodeID compactID = DenseNodeID(m_compactNodeSpace.Create());
   m_mapToDense[id.Raw()] = compactID;
   m_mapToSparse.push_back(id);
   m_size++;

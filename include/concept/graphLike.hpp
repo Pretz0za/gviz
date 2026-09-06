@@ -26,7 +26,7 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
 
   { cgraph.HasNode(nid) } -> std::convertible_to<bool>;
   { cgraph.HasEdge(eid) } -> std::convertible_to<bool>;
-  { cgraph.MapToSparse(nid) } -> std::same_as<NodeID>;
-  { cgraph.MapToDense(nid) } -> std::same_as<NodeID>;
+  { cgraph.MapToSparse(DenseNodeID{}) } -> std::same_as<NodeID>;
+  { cgraph.MapToDense(nid) } -> std::same_as<DenseNodeID>;
   { graph.NodeSpace() } -> std::same_as<IndexSpace &>;
 };

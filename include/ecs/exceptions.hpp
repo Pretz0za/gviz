@@ -1,11 +1,23 @@
+#pragma once
+
 #include "ecs/entity.hpp"
 #include <stdexcept>
 #include <string>
 
-template <typename T> class MissingResourceException : public std::runtime_error {
+template <typename T>
+class MissingResourceException : public std::runtime_error {
 public:
   explicit MissingResourceException()
-      : std::runtime_error(std::string("Resource ") + typeid(T).name() + " not found in ECS") {};
+      : std::runtime_error(std::string("Resource ") + typeid(T).name() +
+                           " not found in ECS") {};
+};
+
+template <typename T>
+class UinitializedResourceException : public std::runtime_error {
+public:
+  explicit UinitializedResourceException()
+      : std::runtime_error(std::string("Resource ") + typeid(T).name() +
+                           " found in ECS but unintialized") {};
 };
 
 template <typename T>

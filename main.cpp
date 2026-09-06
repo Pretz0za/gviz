@@ -3,8 +3,9 @@
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
 #include "layout/filtration/mis_filtration.hpp"
-#include "layout/randomizer/randomizer.hpp"
+#include "layout/placement/randomized.hpp"
 #include "layout/types.hpp"
+#include <cassert>
 #include <cstdio>
 
 Graph BuildRectMesh(size_t length, size_t width) {
@@ -54,7 +55,7 @@ int main() {
   Subgraph sg{g};
 
   for (NodeID nid : g.Nodes()) {
-	  sg.AddNode(nid);
+    sg.AddNode(nid);
   }
 
   // InitializePositionComponents(g);
@@ -71,8 +72,10 @@ int main() {
   // }
 
   MisFiltrationSystem filtration(sg);
-  NestedFiltrationResult result{};
-  filtration.Tick(result);
+  filtration.Tick();
+
+  assert(sg.GetResource<NestedFiltrationResult>() != nullptr);
+  NestedFiltrationResult result = *sg.GetResource<NestedFiltrationResult>();
 
   printf("layer count: %d\n", result.m_layerCount);
 

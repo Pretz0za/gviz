@@ -43,11 +43,11 @@ public:
 
   // auto Edges() const;
 
-  constexpr NodeID MapToDense(NodeID id) const {
+  constexpr DenseNodeID MapToDense(NodeID id) const {
     return m_mapToDense[id.Raw()];
   };
 
-  constexpr NodeID MapToSparse(NodeID id) const {
+  constexpr NodeID MapToSparse(DenseNodeID id) const {
 	return m_mapToSparse[id.Raw()];
   }
 
@@ -71,7 +71,7 @@ private:
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
 
-  std::vector<NodeID>
+  std::vector<DenseNodeID>
       m_mapToDense; // parent graph index -> compact index in subgraph's pools
   std::vector<NodeID> m_mapToSparse; // compact index -> parent graph index
 };

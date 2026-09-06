@@ -10,17 +10,18 @@
 template <GraphLike G> class MisFiltrationSystem {
 public:
   explicit MisFiltrationSystem(G &graph);
-  void Tick(NestedFiltrationResult &out);
+  void Tick();
 
 private:
-  void BuildFiltration(NestedFiltrationResult &out);
-  void BuildFirstLayer(NestedFiltrationResult &out, BitSet &vertices);
-  bool BuildNextLayer(NestedFiltrationResult &out, BitSet &lastLayer);
+  void BuildFiltration();
+  void BuildFirstLayer(BitSet &vertices);
+  bool BuildNextLayer(BitSet &lastLayer);
   void MarkVerticesWithinRadius(NodeID source, uint32_t radius, BitSet &marked);
 
   BFSScratch *m_scratch;
   G *m_graph;
   DimensionResource m_dimension;
+  NestedFiltrationResult *m_output;
 };
 
 #include "layout/filtration/mis_filtration.tpp"

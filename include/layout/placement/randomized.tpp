@@ -2,7 +2,7 @@
 
 #include "ecs/exceptions.hpp"
 #include "layout/components/position.hpp"
-#include "layout/randomizer/randomizer.hpp"
+#include "layout/placement/randomized.hpp"
 #include <cstdint>
 #include <ctime>
 #include <random>
@@ -10,7 +10,7 @@
 #define DEFAULT_BBOX_WIDTH 1000
 
 template <GraphLike G>
-PositionRandomizerSystem<G>::PositionRandomizerSystem(G &graph)
+PositionRandomized<G>::PositionRandomized(G &graph)
     : m_positionPool{&graph.NodeSpace().template GetPool<PositionComponent>()},
       m_bboxWidth(DEFAULT_BBOX_WIDTH), m_graph(&graph), m_dist{-1, 1},
       m_rng{std::random_device{}()} {
@@ -21,16 +21,16 @@ PositionRandomizerSystem<G>::PositionRandomizerSystem(G &graph)
 }
 
 template <GraphLike G>
-void PositionRandomizerSystem<G>::SetSeed(uint32_t seed) {
+void PositionRandomized<G>::SetSeed(uint32_t seed) {
   m_rng.seed(seed);
 };
 
 template <GraphLike G>
-void PositionRandomizerSystem<G>::SetBoundingBox(uint32_t width) {
+void PositionRandomized<G>::SetBoundingBox(uint32_t width) {
   m_bboxWidth = width;
 };
 
-template <GraphLike G> void PositionRandomizerSystem<G>::Tick() {
+template <GraphLike G> void PositionRandomized<G>::PlaceAll() {
   for (auto &c : m_positionPool->Data()) {
     for (uint8_t d = 0; d < static_cast<uint8_t>(m_dimension); d++)
       c.pos[d] = m_bboxWidth * m_dist(m_rng);
