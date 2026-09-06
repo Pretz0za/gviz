@@ -8,10 +8,10 @@
 #include "layout/filtration/mis_filtration.hpp"
 #include "layout/randomizer/randomizer.tpp"
 #include <cstdint>
-#include <deque>
 
 template <GraphLike G>
-MisFiltrationSystem<G>::MisFiltrationSystem(G &graph) : m_graph(&graph), m_scratch(nullptr) {
+MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
+    : m_graph(&graph), m_scratch(nullptr) {
   DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
@@ -21,7 +21,7 @@ MisFiltrationSystem<G>::MisFiltrationSystem(G &graph) : m_graph(&graph), m_scrat
   if (scratch == nullptr) {
     m_scratch = &m_graph->template SetResource<BFSScratch>(m_graph->Size());
   } else {
-	m_scratch = scratch;
+    m_scratch = scratch;
   }
 }
 
@@ -77,7 +77,7 @@ bool MisFiltrationSystem<G>::BuildNextLayer(NestedFiltrationResult &out,
     count++;
     // marked.Set(curr);
 
-    MarkVerticesWithinRadius(node, radius, marked);
+    MarkVerticesWithinRadius(m_graph->MapToSparse(NodeID(node)), radius, marked);
   }
 
   size_t writePos = out.m_borders[i - 1] - 1;
@@ -97,11 +97,11 @@ bool MisFiltrationSystem<G>::BuildNextLayer(NestedFiltrationResult &out,
 }
 
 template <GraphLike G>
-void MisFiltrationSystem<G>::MarkVerticesWithinRadius(uint32_t source,
+void MisFiltrationSystem<G>::MarkVerticesWithinRadius(NodeID source,
                                                       uint32_t radius,
                                                       BitSet &marked) {
   m_scratch->InitNew();
-  m_scratch->Push(NodeID(source), 0);
+  m_scratch->Push(source, 0);
 
   while (!m_scratch->Empty()) {
     FoundNode nd = m_scratch->Pop();
@@ -111,18 +111,18 @@ void MisFiltrationSystem<G>::MarkVerticesWithinRadius(uint32_t source,
 
     for (AdjEntry adj : m_graph->OutNeighbors(nd.node)) {
 
-      uint32_t nbrCompact = adj.other.Raw();
+      NodeID nbrCompact = m_graph->MapToDense(adj.other);
 
-      if (m_scratch->IsVisited(adj.other))
+      if (m_scratch->IsVisited(nbrCompact))
         continue;
-	  m_scratch->Visit(adj.other);
+      m_scratch->Visit(nbrCompact);
 
       uint32_t nextDepth = nd.depth + 1;
       if (nextDepth <= radius) {
-        marked.Set(nbrCompact);
+        marked.Set(nbrCompact.Raw());
       }
 
-	  m_scratch->Push(adj.other, nextDepth);
+      m_scratch->Push(adj.other, nextDepth);
     }
   }
 }

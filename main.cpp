@@ -1,4 +1,5 @@
 #include "graph/graph.hpp"
+#include "graph/subgraph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
 #include "layout/filtration/mis_filtration.hpp"
@@ -49,10 +50,15 @@ void PrintPositions(Graph &g) {
 
 int main() {
 
-  Graph g = BuildRectMesh(1000, 1000);
+  Graph g = BuildRectMesh(50, 50);
+  Subgraph sg{g};
+
+  for (NodeID nid : g.Nodes()) {
+	  sg.AddNode(nid);
+  }
 
   // InitializePositionComponents(g);
-  g.SetResource<DimensionResource>(DimensionResource::D2);
+  sg.SetResource<DimensionResource>(DimensionResource::D2);
   // PositionRandomizerSystem Randomizer{g};
 
   // printf("initial positions:\n");
@@ -64,7 +70,7 @@ int main() {
   //   PrintPositions(g);
   // }
 
-  MisFiltrationSystem filtration(g);
+  MisFiltrationSystem filtration(sg);
   NestedFiltrationResult result{};
   filtration.Tick(result);
 
@@ -78,7 +84,7 @@ int main() {
 
   printf("\nborders: ");
 
-  for(size_t i = 0; i < result.m_layerCount; i++){
+  for (size_t i = 0; i < result.m_layerCount; i++) {
     printf("%d, ", result.m_borders[i]);
   }
 

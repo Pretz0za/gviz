@@ -48,7 +48,8 @@ public:
            std::views::transform([](uint32_t i) { return EdgeID(i); });
   }
 
-  constexpr NodeID ComponentIndex(NodeID id) const { return id; };
+  constexpr NodeID MapToSparse(NodeID id) const { return id; };
+  constexpr NodeID MapToDense(NodeID id) const { return id; };
 
   uint32_t Size() const;
 

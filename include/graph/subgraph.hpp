@@ -4,7 +4,10 @@
 #include "ecs/index_space.hpp"
 #include "graph/components/edge.hpp"
 #include "graph/graph.hpp"
+#include "graph/types.hpp"
+#include <cstdint>
 #include <ranges>
+#include <vector>
 
 class Subgraph {
 public:
@@ -40,9 +43,15 @@ public:
 
   // auto Edges() const;
 
-  constexpr NodeID ComponentIndex(NodeID id) const { return m_map[id.Raw()]; };
+  constexpr NodeID MapToDense(NodeID id) const {
+    return m_mapToDense[id.Raw()];
+  };
 
-  uint32_t Size() const;
+  constexpr NodeID MapToSparse(NodeID id) const {
+	return m_mapToSparse[id.Raw()];
+  }
+
+  uint32_t Size() const { return m_size; };
 
   IndexSpace &NodeSpace();
 
@@ -55,10 +64,19 @@ public:
   template <typename T> bool HasResource() const;
 
 private:
+  uint32_t m_size = 0;
   IndexSpace m_compactNodeSpace;
   Graph *m_parent;
   BitSet m_nodeSet;
+  std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
+      m_resources;
 
   std::vector<NodeID>
-      m_map; // parent graph index -> compact index in subgraph's pools
+      m_mapToDense; // parent graph index -> compact index in subgraph's pools
+  std::vector<NodeID> m_mapToSparse; // compact index -> parent graph index
 };
+
+#include "graph/subgraph.tpp"
+
+#include "concept/graphLike.hpp"
+static_assert(GraphLike<Subgraph>);

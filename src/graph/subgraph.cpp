@@ -4,12 +4,14 @@
 
 Subgraph::Subgraph(Graph &parent)
     : m_parent(&parent), m_nodeSet(m_parent->Size(), 0),
-      m_map{m_parent->Size(), INVALID_NODE_ID}, m_compactNodeSpace() {}
+      m_mapToDense{m_parent->Size(), INVALID_NODE_ID}, m_compactNodeSpace() {}
 
 void Subgraph::AddNode(NodeID id) {
   m_nodeSet.Set(id.Raw());
   NodeID compactID = NodeID(m_compactNodeSpace.Create());
-  m_map[id.Raw()] = compactID;
+  m_mapToDense[id.Raw()] = compactID;
+  m_mapToSparse.push_back(id);
+  m_size++;
 }
 
 bool Subgraph::HasNode(NodeID id) const {
@@ -32,12 +34,11 @@ EdgeComponent Subgraph::GetEdge(EdgeID id) const {
   return INVALID_EDGE;
 }
 
+// TODO:
 uint32_t Subgraph::OutDegree(NodeID id) const { return 0xFFFFFFFF; }
 uint32_t Subgraph::InDegree(NodeID id) const { return 0xFFFFFFFF; }
 
 // auto Subgraph::Edges() const {}
-
-uint32_t Subgraph::Size() const {}
 
 IndexSpace &Subgraph::NodeSpace() { return m_compactNodeSpace; }
 // IndexSpace &Subgraph::EdgeSpace() {}
