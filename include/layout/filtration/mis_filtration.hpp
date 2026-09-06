@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "ds/bfs_scratch.hpp"
 #include "ds/bitset.hpp"
 #include "layout/filtration/types.hpp"
 #include "layout/types.hpp"
@@ -16,6 +17,7 @@ private:
   bool BuildNextLayer(NestedFiltrationResult &out, BitSet &lastLayer);
   void MarkVerticesWithinRadius(uint32_t source, uint32_t radius, BitSet &marked);
 
+  BFSScratch *m_scratch;
   G *m_graph;
   DimensionResource m_dimension;
 };

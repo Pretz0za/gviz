@@ -24,8 +24,8 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
 
   { cgraph.Size() } -> std::convertible_to<uint32_t>;
 
-  { cgraph.ToCompact(nid) } -> std::convertible_to<uint32_t>;
   { cgraph.HasNode(nid) } -> std::convertible_to<bool>;
   { cgraph.HasEdge(eid) } -> std::convertible_to<bool>;
+  { cgraph.ComponentIndex(nid) } -> std::same_as<NodeID>;
   { graph.NodeSpace() } -> std::same_as<IndexSpace &>;
 };

@@ -22,6 +22,8 @@ add_library(gviz ${GVIZ_LIB_TYPE}
 	src/ecs/index_space.cpp
 
 	src/graph/graph.cpp
+
+	src/ds/bfs_scratch.cpp
 )
 
 target_include_directories(gviz

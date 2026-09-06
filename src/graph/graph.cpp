@@ -2,6 +2,9 @@
 
 #include "graph/components/edge.hpp"
 #include "graph/components/weight.hpp"
+#include "graph/types.hpp"
+#include <cstdint>
+#include <limits>
 
 Graph::Graph()
     : m_inAdjPool(&m_nodeSpace.GetPool<InAdjacencyComponent>()),
@@ -45,7 +48,7 @@ std::pair<EdgeID, EdgeID> Graph::AddUndirectedEdge(NodeID a, NodeID b) {
 }
 
 std::pair<EdgeID, EdgeID> Graph::AddUndirectedEdge(NodeID a, NodeID b,
-                                                    float weight) {
+                                                   float weight) {
   EdgeID ab = AddEdge(a, b, weight);
   EdgeID ba = AddEdge(b, a, weight);
   return {ab, ba};
@@ -55,14 +58,10 @@ bool Graph::HasEdge(EdgeID id) const {
   return m_edgePool->Find(id.Raw()) != nullptr;
 }
 
-NodeID Graph::Source(EdgeID id) const {
+EdgeComponent Graph::GetEdge(EdgeID id) const {
   auto *edge = m_edgePool->Find(id.Raw());
-  return edge ? edge->from : NodeID{};
-}
-
-NodeID Graph::Target(EdgeID id) const {
-  auto *edge = m_edgePool->Find(id.Raw());
-  return edge ? edge->to : NodeID{};
+  return edge ? *edge
+              : INVALID_EDGE;
 }
 
 const std::vector<AdjEntry> &Graph::OutNeighbors(NodeID id) const {
@@ -84,8 +83,6 @@ uint32_t Graph::OutDegree(NodeID id) const {
 uint32_t Graph::InDegree(NodeID id) const {
   return static_cast<uint32_t>(InNeighbors(id).size());
 }
-
-uint32_t Graph::ToCompact(NodeID id) const { return id.Raw(); }
 
 uint32_t Graph::Size() const {
   return static_cast<uint32_t>(m_nodeSpace.Size());

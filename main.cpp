@@ -49,7 +49,7 @@ void PrintPositions(Graph &g) {
 
 int main() {
 
-  Graph g = BuildRectMesh(50, 50);
+  Graph g = BuildRectMesh(1000, 1000);
 
   // InitializePositionComponents(g);
   g.SetResource<DimensionResource>(DimensionResource::D2);

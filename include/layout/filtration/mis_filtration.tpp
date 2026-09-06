@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "ds/bfs_scratch.hpp"
 #include "ds/bitset.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
@@ -10,11 +11,18 @@
 #include <deque>
 
 template <GraphLike G>
-MisFiltrationSystem<G>::MisFiltrationSystem(G &graph) : m_graph(&graph) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
+MisFiltrationSystem<G>::MisFiltrationSystem(G &graph) : m_graph(&graph), m_scratch(nullptr) {
+  DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
   m_dimension = *dim;
+
+  BFSScratch *scratch = m_graph->template GetResource<BFSScratch>();
+  if (scratch == nullptr) {
+    m_scratch = &m_graph->template SetResource<BFSScratch>(m_graph->Size());
+  } else {
+	m_scratch = scratch;
+  }
 }
 
 template <GraphLike G>
@@ -92,19 +100,11 @@ template <GraphLike G>
 void MisFiltrationSystem<G>::MarkVerticesWithinRadius(uint32_t source,
                                                       uint32_t radius,
                                                       BitSet &marked) {
-  typedef struct {
-    NodeID node;
-    uint32_t depth;
-  } FoundNode;
+  m_scratch->InitNew();
+  m_scratch->Push(NodeID(source), 0);
 
-  auto queue = std::deque<FoundNode>{};
-  queue.push_back(FoundNode{NodeID(source), 0});
-
-  BitSet visited(m_graph->Size(), 0);
-
-  while (!queue.empty()) {
-    FoundNode nd = queue.front();
-    queue.pop_front();
+  while (!m_scratch->Empty()) {
+    FoundNode nd = m_scratch->Pop();
 
     if (radius && nd.depth >= radius)
       continue;
@@ -113,16 +113,16 @@ void MisFiltrationSystem<G>::MarkVerticesWithinRadius(uint32_t source,
 
       uint32_t nbrCompact = adj.other.Raw();
 
-      if (visited.Test(nbrCompact))
+      if (m_scratch->IsVisited(adj.other))
         continue;
-      visited.Set(nbrCompact);
+	  m_scratch->Visit(adj.other);
 
       uint32_t nextDepth = nd.depth + 1;
       if (nextDepth <= radius) {
         marked.Set(nbrCompact);
       }
 
-      queue.push_back(FoundNode{adj.other, nextDepth});
+	  m_scratch->Push(adj.other, nextDepth);
     }
   }
 }

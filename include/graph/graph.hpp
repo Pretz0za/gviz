@@ -29,8 +29,7 @@ public:
   std::pair<EdgeID, EdgeID> AddUndirectedEdge(NodeID a, NodeID b);
   std::pair<EdgeID, EdgeID> AddUndirectedEdge(NodeID a, NodeID b, float weight);
   bool HasEdge(EdgeID id) const;
-  NodeID Source(EdgeID id) const;
-  NodeID Target(EdgeID id) const;
+  EdgeComponent GetEdge(EdgeID id) const;
 
   const std::vector<AdjEntry> &OutNeighbors(NodeID id) const;
   const std::vector<AdjEntry> &InNeighbors(NodeID id) const;
@@ -49,7 +48,7 @@ public:
            std::views::transform([](uint32_t i) { return EdgeID(i); });
   }
 
-  uint32_t ToCompact(NodeID id) const;
+  constexpr NodeID ComponentIndex(NodeID id) const { return id; };
 
   uint32_t Size() const;
 
