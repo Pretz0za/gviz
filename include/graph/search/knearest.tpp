@@ -38,7 +38,7 @@ std::vector<FoundNode> KNearestSearch<G>::Find(NodeID id, uint32_t k) {
 
 template <GraphLike G>
 std::vector<FoundNode> KNearestSearch<G>::Find(NodeID id, uint32_t k,
-                                               BitSet filter) {
+                                               DenseNodeSet filter) {
   std::vector<FoundNode> knearset{};
   m_scratch->InitNew();
   m_scratch->Push(id, 0);
@@ -52,7 +52,7 @@ std::vector<FoundNode> KNearestSearch<G>::Find(NodeID id, uint32_t k,
         continue;
       m_scratch->Visit(nbrCompact);
 
-      if (filter.Test(nbrCompact.Raw())) {
+      if (filter.Test(nbrCompact)) {
         knearset.push_back({adj.other, nd.depth + 1});
         if (knearset.size() >= k)
           return knearset;

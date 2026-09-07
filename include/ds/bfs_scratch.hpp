@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ds/bitset.hpp"
 #include "graph/search/types.hpp"
 #include "graph/types.hpp"
 #include <cstddef>
@@ -21,6 +20,6 @@ public:
   bool IsVisited(DenseNodeID node) const;
 
 private:
-  BitSet m_visited;
+  DenseNodeSet m_visited;
   std::deque<FoundNode> m_queue;
 };

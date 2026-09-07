@@ -1,7 +1,6 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
-#include "ds/bitset.hpp"
 #include "ecs/components.hpp"
 #include "graph/search/knearest.hpp"
 #include "graph/search/types.hpp"
@@ -17,7 +16,7 @@ public:
   // NOTE: this currently only iterates out neighbors.
   void PlaceBetweenNeighbors(NodeID id);
   void PlaceBetweenKNearest(NodeID id, uint32_t k);
-  void PlaceBetweenKNearest(NodeID id, uint32_t k, BitSet &filter);
+  void PlaceBetweenKNearest(NodeID id, uint32_t k, DenseNodeSet &filter);
 
 private:
   void placeBetweenFound(NodeID id, std::vector<FoundNode> found);

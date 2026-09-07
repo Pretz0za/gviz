@@ -8,16 +8,14 @@ Subgraph::Subgraph(Graph &parent)
       m_compactNodeSpace() {}
 
 void Subgraph::AddNode(NodeID id) {
-  m_nodeSet.Set(id.Raw());
+  m_nodeSet.Set(id);
   DenseNodeID compactID = DenseNodeID(m_compactNodeSpace.Create());
   m_mapToDense[id.Raw()] = compactID;
   m_mapToSparse.push_back(id);
   m_size++;
 }
 
-bool Subgraph::HasNode(NodeID id) const {
-  return m_nodeSet.Test(static_cast<size_t>(id.Raw()));
-}
+bool Subgraph::HasNode(NodeID id) const { return m_nodeSet.Test(id); }
 
 bool Subgraph::HasEdge(EdgeID id) const {
   const EdgeComponent edge = m_parent->GetEdge(id);

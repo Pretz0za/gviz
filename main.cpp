@@ -1,6 +1,7 @@
 #include "graph/graph.hpp"
 #include "graph/subgraph.hpp"
 #include "graph/types.hpp"
+#include "layout/algorithms/grip.hpp"
 #include "layout/components/position.hpp"
 #include "layout/filtration/mis_filtration.hpp"
 #include "layout/placement/randomized.hpp"
@@ -49,9 +50,24 @@ void PrintPositions(Graph &g) {
   }
 }
 
+// Prints "(x1,y1),(x2,y2),..." for every node's position -- paste directly
+// into a Desmos expression to plot the list as points.
+void PrintPositionsDesmos(Graph &g) {
+  auto &pool = g.NodeSpace().GetPool<PositionComponent>();
+  bool first = true;
+  for (NodeID nid : g.Nodes()) {
+    PositionComponent *c = pool.Find(nid.Raw());
+    if (!first)
+      printf(",");
+    printf("(%f,%f)", c->pos[0], c->pos[1]);
+    first = false;
+  }
+  printf("\n");
+}
+
 int main() {
 
-  Graph g = BuildRectMesh(50, 50);
+  Graph g = BuildRectMesh(10, 10);
   Subgraph sg{g};
 
   for (NodeID nid : g.Nodes()) {
@@ -60,6 +76,7 @@ int main() {
 
   // InitializePositionComponents(g);
   sg.SetResource<DimensionResource>(DimensionResource::D2);
+  g.SetResource<DimensionResource>(DimensionResource::D2);
   // PositionRandomizerSystem Randomizer{g};
 
   // printf("initial positions:\n");
@@ -71,18 +88,26 @@ int main() {
   //   PrintPositions(g);
   // }
 
-  MisFiltrationSystem filtration(sg);
-  filtration.Tick();
+  GRIPLayoutAlgorithm grip{g};
+  grip.RunFiltration();
 
-  assert(sg.GetResource<NestedFiltrationResult>() != nullptr);
-  NestedFiltrationResult result = *sg.GetResource<NestedFiltrationResult>();
+  NestedFiltrationResult result = *g.GetResource<NestedFiltrationResult>();
+  for (int i = 0; i < result.m_layerCount; i++)
+    grip.Tick();
+
+  PrintPositionsDesmos(g);
+
+  // MisFiltrationSystem filtration(sg);
+  // filtration.Tick();
+
+  // assert(sg.GetResource<NestedFiltrationResult>() != nullptr);
 
   printf("layer count: %d\n", result.m_layerCount);
 
   printf("last 10 in filtration: ");
   for (size_t i = 0; i < 10; i++) {
     size_t idx = g.Size() - 1 - i;
-    printf("%d, ", result.m_filtration[idx]);
+    printf("%d, ", result.m_filtration[idx].Raw());
   }
 
   printf("\nborders: ");

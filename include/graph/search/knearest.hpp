@@ -2,7 +2,6 @@
 
 #include "concept/graphLike.hpp"
 #include "ds/bfs_scratch.hpp"
-#include "ds/bitset.hpp"
 #include "graph/search/types.hpp"
 #include "graph/types.hpp"
 #include <cstdint>
@@ -12,7 +11,7 @@ public:
   KNearestSearch(G &graph);
 
   std::vector<FoundNode> Find(NodeID id, uint32_t k);
-  std::vector<FoundNode> Find(NodeID id, uint32_t k, BitSet filter);
+  std::vector<FoundNode> Find(NodeID id, uint32_t k, DenseNodeSet filter);
 
 private:
   G *m_graph;

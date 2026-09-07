@@ -5,5 +5,5 @@
 typedef struct {
   uint32_t m_layerCount;
   std::vector<uint32_t> m_borders;
-  std::vector<uint32_t> m_filtration; // stores dense index
+  std::vector<DenseNodeID> m_filtration; // stores dense index
 } NestedFiltrationResult;

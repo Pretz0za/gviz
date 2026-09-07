@@ -2,11 +2,10 @@
 
 #include "concept/graphLike.hpp"
 #include "ds/bfs_scratch.hpp"
-#include "ds/bitset.hpp"
+#include "ecs/exceptions.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/filtration/mis_filtration.hpp"
-#include "ecs/exceptions.hpp"
 #include <cstdint>
 
 template <GraphLike G>
@@ -17,10 +16,6 @@ MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
     throw MissingResourceException<DimensionResource>();
   m_dimension = *dim;
 
-  m_scratch = m_graph->template GetResource<BFSScratch>();
-  if (m_scratch == nullptr)
-    throw MissingResourceException<BFSScratch>();
-
   m_output = m_graph->template GetResource<NestedFiltrationResult>();
   if (m_output == nullptr)
     m_output = &m_graph->template SetResource<NestedFiltrationResult>();
@@ -29,6 +24,10 @@ MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
 }
 
 template <GraphLike G> void MisFiltrationSystem<G>::Tick() {
+  m_scratch = m_graph->template GetResource<BFSScratch>();
+  if (m_scratch == nullptr)
+    throw MissingResourceException<BFSScratch>();
+
   m_output->m_filtration.resize(m_graph->Size());
   m_output->m_borders.clear();
   m_output->m_layerCount = 0;
@@ -39,7 +38,7 @@ template <GraphLike G> void MisFiltrationSystem<G>::BuildFiltration() {
   size_t nvertices = m_graph->Size();
 
   // layer 0, full graph
-  BitSet currLayer{m_graph->Size(), 1};
+  DenseNodeSet currLayer{m_graph->Size(), 1};
   m_output->m_borders.push_back(m_graph->Size());
   m_output->m_layerCount = 1;
 
@@ -48,7 +47,7 @@ template <GraphLike G> void MisFiltrationSystem<G>::BuildFiltration() {
 
   // write the final layer
   size_t k = 0;
-  for (size_t vtx : currLayer)
+  for (DenseNodeID vtx : currLayer)
     m_output->m_filtration[k++] = vtx;
 
   // ensures last layer has enough for a simplex
@@ -57,28 +56,27 @@ template <GraphLike G> void MisFiltrationSystem<G>::BuildFiltration() {
 }
 
 template <GraphLike G>
-bool MisFiltrationSystem<G>::BuildNextLayer(BitSet &lastLayer) {
+bool MisFiltrationSystem<G>::BuildNextLayer(DenseNodeSet &lastLayer) {
   uint32_t i = m_output->m_layerCount;
   uint32_t count = 0;
   size_t nvertices = m_graph->Size();
-  BitSet newLayer(nvertices, 0);
-  BitSet marked(nvertices, 0);
+  DenseNodeSet newLayer(nvertices, 0);
+  DenseNodeSet marked(nvertices, 0);
 
   uint32_t radius = uint32_t{1} << (i - 1);
 
-  for (size_t node : lastLayer) {
+  for (DenseNodeID node : lastLayer) {
     if (marked.Test(node))
       continue;
 
     newLayer.Set(node);
     count++;
 
-    MarkVerticesWithinRadius(m_graph->MapToSparse(DenseNodeID(node)), radius,
-                             marked);
+    MarkVerticesWithinRadius(m_graph->MapToSparse(node), radius, marked);
   }
 
   size_t writePos = m_output->m_borders[i - 1] - 1;
-  for (size_t curr : lastLayer) {
+  for (DenseNodeID curr : lastLayer) {
     if (!newLayer.Test(curr)) {
       m_output->m_filtration[writePos--] = curr;
     }
@@ -96,7 +94,7 @@ bool MisFiltrationSystem<G>::BuildNextLayer(BitSet &lastLayer) {
 template <GraphLike G>
 void MisFiltrationSystem<G>::MarkVerticesWithinRadius(NodeID source,
                                                       uint32_t radius,
-                                                      BitSet &marked) {
+                                                      DenseNodeSet &marked) {
   m_scratch->InitNew();
   m_scratch->Push(source, 0);
 
@@ -116,7 +114,7 @@ void MisFiltrationSystem<G>::MarkVerticesWithinRadius(NodeID source,
 
       uint32_t nextDepth = nd.depth + 1;
       if (nextDepth <= radius) {
-        marked.Set(nbrCompact.Raw());
+        marked.Set(nbrCompact);
       }
 
       m_scratch->Push(adj.other, nextDepth);

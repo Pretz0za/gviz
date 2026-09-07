@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ds/bitset.hpp"
 #include "ecs/index_space.hpp"
 #include "graph/components/edge.hpp"
 #include "graph/graph.hpp"
@@ -36,9 +35,7 @@ public:
   uint32_t InDegree(NodeID id) const;
 
   auto Nodes() const {
-    return m_nodeSet | std::views::transform([](size_t i) {
-             return NodeID(static_cast<EntityID>(i));
-           });
+    return std::ranges::subrange(m_nodeSet.begin(), m_nodeSet.end());
   }
 
   // auto Edges() const;
@@ -67,7 +64,7 @@ private:
   uint32_t m_size = 0;
   IndexSpace m_compactNodeSpace;
   Graph *m_parent;
-  BitSet m_nodeSet;
+  SparseNodeSet m_nodeSet;
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
 

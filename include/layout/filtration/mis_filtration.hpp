@@ -2,7 +2,6 @@
 
 #include "concept/graphLike.hpp"
 #include "ds/bfs_scratch.hpp"
-#include "ds/bitset.hpp"
 #include "graph/types.hpp"
 #include "layout/filtration/types.hpp"
 #include "layout/types.hpp"
@@ -14,9 +13,10 @@ public:
 
 private:
   void BuildFiltration();
-  void BuildFirstLayer(BitSet &vertices);
-  bool BuildNextLayer(BitSet &lastLayer);
-  void MarkVerticesWithinRadius(NodeID source, uint32_t radius, BitSet &marked);
+  void BuildFirstLayer(DenseNodeSet &vertices);
+  bool BuildNextLayer(DenseNodeSet &lastLayer);
+  void MarkVerticesWithinRadius(NodeID source, uint32_t radius,
+                                DenseNodeSet &marked);
 
   BFSScratch *m_scratch;
   G *m_graph;
