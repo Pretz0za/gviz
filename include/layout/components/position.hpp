@@ -3,5 +3,5 @@
 #include "ecs/components.hpp"
 
 struct PositionComponent : Component {
-	double pos[3];
+	double pos[3] {0, 0, 0};
 };

@@ -20,7 +20,7 @@ private:
 
   BFSScratch *m_scratch;
   G *m_graph;
-  DimensionResource m_dimension;
+  uint8_t m_dimension;
   NestedFiltrationResult *m_output;
 };
 

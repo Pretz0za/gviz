@@ -18,7 +18,7 @@ PositionBarrycentric<G>::PositionBarrycentric(G &graph)
   if (dim == nullptr) {
     throw MissingResourceException<DimensionResource>();
   }
-  m_dimension = *dim;
+  m_dimension = static_cast<uint8_t>(*dim);
 }
 
 template <GraphLike G>
@@ -34,11 +34,11 @@ void PositionBarrycentric<G>::PlaceBetweenNeighbors(NodeID id) {
       throw MissingComponentException<PositionComponent>(adj.other.Raw());
 
     count++;
-    for (size_t i = 0; i < static_cast<uint8_t>(m_dimension); i++)
+    for (size_t i = 0; i < m_dimension; i++)
       acc.pos[i] += nbrPos->pos[i];
   }
 
-  for (size_t i = 0; i < static_cast<uint8_t>(m_dimension); i++)
+  for (size_t i = 0; i < m_dimension; i++)
     acc.pos[i] /= static_cast<double>(count);
 
   m_positions->Set(m_graph->MapToDense(id).Raw(), acc);
@@ -69,7 +69,7 @@ void PositionBarrycentric<G>::placeBetweenFound(NodeID id,
     if (knnPos == nullptr)
       throw MissingComponentException<PositionComponent>(nd.node.Raw());
 
-    for (size_t i = 0; i < static_cast<uint8_t>(m_dimension); i++)
+    for (size_t i = 0; i < m_dimension; i++)
       acc.pos[i] += (knnPos->pos[i] / static_cast<double>(found.size()));
   }
 

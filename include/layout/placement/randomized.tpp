@@ -17,7 +17,7 @@ PositionRandomized<G>::PositionRandomized(G &graph)
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
-  m_dimension = *dim;
+  m_dimension = static_cast<uint8_t>(*dim);
 }
 
 template <GraphLike G>
@@ -32,7 +32,7 @@ void PositionRandomized<G>::SetBoundingBox(uint32_t width) {
 
 template <GraphLike G> void PositionRandomized<G>::PlaceAll() {
   for (auto &c : m_positionPool->Data()) {
-    for (uint8_t d = 0; d < static_cast<uint8_t>(m_dimension); d++)
+    for (uint8_t d = 0; d < m_dimension; d++)
       c.pos[d] = m_bboxWidth * m_dist(m_rng);
   }
 };

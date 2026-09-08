@@ -5,6 +5,8 @@
 #include "layout/placement/barrycenter.hpp"
 #include "layout/types.hpp"
 
+// implementation of the GRIP algorithm by Gajer and Kobourov
+// https://www2.cs.arizona.edu/~kobourov/grip_demo.pdf.
 template <GraphLike G> class GRIPLayoutAlgorithm {
 public:
   GRIPLayoutAlgorithm(G &graph);
@@ -18,7 +20,7 @@ private:
 
   uint32_t m_currLayer;
   DenseNodeSet *m_visible;
-  DimensionResource m_dimension;
+  uint8_t m_dimension;
   G *m_graph;
   NestedFiltrationResult *m_filtrationOutput;
   MisFiltrationSystem<G> m_filtrationSystem;

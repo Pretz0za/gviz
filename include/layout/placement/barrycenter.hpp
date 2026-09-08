@@ -22,7 +22,7 @@ private:
   void placeBetweenFound(NodeID id, std::vector<FoundNode> found);
 
   G *m_graph;
-  DimensionResource m_dimension;
+  uint8_t m_dimension;
   DenseComponentPool<PositionComponent> *m_positions;
   KNearestSearch<G> m_knnSystem;
 };

@@ -23,7 +23,7 @@ private:
   uint32_t m_bboxWidth;
   std::mt19937 m_rng;
   std::uniform_real_distribution<double> m_dist;
-  DimensionResource m_dimension;
+  uint8_t m_dimension;
   DenseComponentPool<PositionComponent> *m_positionPool;
   G *m_graph;
 };

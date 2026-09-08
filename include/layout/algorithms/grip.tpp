@@ -11,7 +11,8 @@
 template <GraphLike G>
 GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph)
     : m_graph(&graph),
-      m_visible(&graph.template SetResource<VisibleNodes>(graph.Size(), 0)),
+      m_visible(
+          &graph.template SetResource<VisibleNodesResource>(graph.Size(), 0)),
       m_placementSystem(graph),
       m_filtrationOutput(&graph.template SetResource<NestedFiltrationResult>()),
       m_filtrationSystem(graph) {
@@ -19,7 +20,7 @@ GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph)
   DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
-  m_dimension = *dim;
+  m_dimension = static_cast<uint8_t>(*dim);
 
   BFSScratch *scratch =
       &m_graph->template SetResource<BFSScratch>(m_graph->Size());
@@ -40,6 +41,7 @@ template <GraphLike G> uint32_t GRIPLayoutAlgorithm<G>::TransitionState() {
   if (m_currLayer == 0)
     return 0;
   placeLayer();
+  // TODO: add updateknns to force system here
   return m_currLayer;
 }
 
@@ -49,31 +51,27 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::Tick() {
     throw UinitializedResourceException<NestedFiltrationResult>();
   }
 
-  placeLayer();
-
-  // TODO: placement and refinement
+  // TODO: refinement
 }
 
 template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {
   auto filtration = m_filtrationOutput;
   m_currLayer--;
-  if (m_currLayer == filtration->m_layerCount - 1) {
-    // TODO: simplex
 
-    std::vector<double> simplex(static_cast<uint8_t>(m_dimension) *
-                                (static_cast<uint8_t>(m_dimension) + 1));
-    RegularSimplexPoints(static_cast<uint8_t>(m_dimension), 100000.0,
-                         simplex.data());
+  if (m_currLayer == filtration->m_layerCount - 1) {
+    std::vector<double> simplex(m_dimension * (m_dimension + 1));
+    RegularSimplexPoints(m_dimension, 100000.0, simplex.data());
 
     DenseComponentPool<PositionComponent> &positions =
         m_graph->NodeSpace().template GetPool<PositionComponent>();
 
-    for (uint32_t i = 0; i < filtration->m_borders[m_currLayer]; i++) {
-      PositionComponent pos{{}, {simplex[2 * i + 0], simplex[2 * i + 1], 0.0}};
-      positions.Set(filtration->m_filtration[i].Raw(), pos);
-      m_visible->Set(filtration->m_filtration[i]);
-    }
+    PositionComponent simplexPositions[filtration->m_borders[m_currLayer]];
+    FromDenseCoordinateArray(simplex, simplexPositions, m_dimension,
+                             filtration->m_borders[m_currLayer]);
 
+    for (uint32_t i = 0; i < filtration->m_borders[m_currLayer]; i++) {
+      positions.Set(filtration->m_filtration[i].Raw(), simplexPositions[i]);
+    }
     return;
   }
 
@@ -81,6 +79,9 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {
        i < filtration->m_borders[m_currLayer]; i++) {
     m_placementSystem.PlaceBetweenKNearest(
         m_graph->MapToSparse(filtration->m_filtration[i]), 10, *m_visible);
+  }
+  for (uint32_t i = filtration->m_borders[m_currLayer + 1];
+       i < filtration->m_borders[m_currLayer]; i++) {
     m_visible->Set(filtration->m_filtration[i]);
   }
 }

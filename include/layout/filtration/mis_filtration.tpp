@@ -10,11 +10,12 @@
 
 template <GraphLike G>
 MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
-    : m_graph(&graph), m_scratch(&graph.template SetResource<BFSScratch>(graph.Size())) {
+    : m_graph(&graph),
+      m_scratch(&graph.template SetResource<BFSScratch>(graph.Size())) {
   DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
-  m_dimension = *dim;
+  m_dimension = static_cast<uint8_t>(*dim);
 
   m_output = m_graph->template GetResource<NestedFiltrationResult>();
   if (m_output == nullptr)
@@ -47,8 +48,7 @@ template <GraphLike G> void MisFiltrationSystem<G>::BuildFiltration() {
     m_output->m_filtration[k++] = vtx;
 
   // ensures last layer has enough for a simplex
-  m_output->m_borders[m_output->m_layerCount - 1] =
-      static_cast<uint8_t>(m_dimension) + 1;
+  m_output->m_borders[m_output->m_layerCount - 1] = m_dimension + 1;
 }
 
 template <GraphLike G>
@@ -78,7 +78,7 @@ bool MisFiltrationSystem<G>::BuildNextLayer(DenseNodeSet &lastLayer) {
     }
   }
 
-  bool cont = count > static_cast<uint8_t>(m_dimension) + 1;
+  bool cont = count > m_dimension + 1;
 
   m_output->m_borders.push_back(count);
   m_output->m_layerCount++;
@@ -93,6 +93,7 @@ void MisFiltrationSystem<G>::MarkVerticesWithinRadius(NodeID source,
                                                       DenseNodeSet &marked) {
   m_scratch->InitNew();
   m_scratch->Push(source, 0);
+  m_scratch->Visit(m_graph->MapToDense(source));
 
   while (!m_scratch->Empty()) {
     FoundNode nd = m_scratch->Pop();
