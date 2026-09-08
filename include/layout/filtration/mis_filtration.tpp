@@ -10,7 +10,7 @@
 
 template <GraphLike G>
 MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
-    : m_graph(&graph), m_scratch(nullptr) {
+    : m_graph(&graph), m_scratch(&graph.template SetResource<BFSScratch>(graph.Size())) {
   DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
@@ -24,10 +24,6 @@ MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
 }
 
 template <GraphLike G> void MisFiltrationSystem<G>::Tick() {
-  m_scratch = m_graph->template GetResource<BFSScratch>();
-  if (m_scratch == nullptr)
-    throw MissingResourceException<BFSScratch>();
-
   m_output->m_filtration.resize(m_graph->Size());
   m_output->m_borders.clear();
   m_output->m_layerCount = 0;

@@ -92,8 +92,9 @@ int main() {
   grip.RunFiltration();
 
   NestedFiltrationResult result = *g.GetResource<NestedFiltrationResult>();
+
   for (int i = 0; i < result.m_layerCount; i++)
-    grip.Tick();
+	  grip.TransitionState();
 
   PrintPositionsDesmos(g);
 

@@ -25,6 +25,8 @@ add_library(gviz ${GVIZ_LIB_TYPE}
 	src/graph/subgraph.cpp
 
 	src/ds/bfs_scratch.cpp
+
+	src/layout/placement/helpers.cpp
 )
 
 target_include_directories(gviz

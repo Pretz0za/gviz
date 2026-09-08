@@ -10,14 +10,14 @@ public:
   GRIPLayoutAlgorithm(G &graph);
 
   void RunFiltration();
+  uint32_t TransitionState();
   void Tick();
 
 private:
   void placeLayer();
 
   uint32_t m_currLayer;
-  DenseNodeSet m_placed;
-
+  DenseNodeSet *m_visible;
   DimensionResource m_dimension;
   G *m_graph;
   NestedFiltrationResult *m_filtrationOutput;

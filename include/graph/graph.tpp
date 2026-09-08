@@ -5,8 +5,12 @@
 #include <utility>
 
 template <typename T, typename... Args> T &Graph::SetResource(Args &&...args) {
+  auto out = GetResource<T>();
+  if (out != nullptr)
+    return *out;
   auto key = std::type_index(typeid(T));
-  auto holder = std::make_unique<ResourceHolder<T>>(std::forward<Args>(args)...);
+  auto holder =
+      std::make_unique<ResourceHolder<T>>(std::forward<Args>(args)...);
   auto *raw = holder.get();
   m_resources[key] = std::move(holder);
   return raw->m_value;
