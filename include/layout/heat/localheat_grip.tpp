@@ -9,8 +9,8 @@
 
 template <GraphLike G>
 LocalHeatGrip<G>::LocalHeatGrip(G &graph)
-    : m_heatPool(&graph.NodeSpace().template GetPool<LocalHeatComponent>()),
-      m_physicsPool(&graph.NodeSpace().template GetPool<PhysicsComponent>()),
+    : m_heatPool(graph.NodeSpace().template GetPool<LocalHeatComponent>()),
+      m_physicsPool(graph.NodeSpace().template GetPool<PhysicsComponent>()),
       m_dimension(0) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)

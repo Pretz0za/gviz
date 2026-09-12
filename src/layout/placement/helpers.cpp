@@ -1,5 +1,8 @@
 #include "layout/placement/helpers.hpp"
+#include <algorithm>
 #include <cassert>
+#include <cmath>
+#include <cstring>
 
 void RegularSimplexPoints(uint32_t dim, double sideLength, double *out) {
   std::fill(out, out + (dim + 1) * dim, 0.0);
@@ -45,12 +48,8 @@ void RegularSimplexPoints(uint32_t dim, double sideLength, double *out) {
     out[i] *= scale;
 }
 
-void FromDenseCoordinateArray(double *in, PositionComponent *out, uint32_t dim,
+void FromDenseCoordinateArray(double *in, double *out, uint32_t dim,
                               uint32_t n) {
   assert(dim == 2 || dim == 3);
-  int d3 = dim == 3;
-  for (uint32_t i = 0; i < n; i++) {
-    out[i] = {{},
-              {in[dim * i + 0], in[dim * i + 1], d3 ? in[dim * i + 2] : 0.0}};
-  }
+  std::memcpy(out, in, sizeof(double) * dim * n);
 }

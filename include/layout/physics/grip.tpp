@@ -13,11 +13,11 @@
 
 template <GraphLike G>
 GRIPPhysicsSystem<G>::GRIPPhysicsSystem(G &graph)
-    : m_graph(&graph), m_knnSystem(graph), m_kkForces(graph), m_frForces(graph),
-      m_knearest(&graph.NodeSpace().template GetPool<KNearestComponent<32>>()),
-      m_positions(&graph.NodeSpace().template GetPool<PositionComponent()>),
-      m_physics(&graph.NodeSpace().template GetPool<PhysicsComponent()>),
-      m_heat(&graph.NodeSpace().template GetPool<LocalHeatComponent()>),
+    : m_graph(&graph), m_knnSystem(graph), m_kkForces(graph), m_frForces(),
+      m_knearest(graph.NodeSpace().template GetPool<KNearestComponent>()),
+      m_positions(graph.NodeSpace().template GetPool<PositionComponent>()),
+      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
+      m_heat(graph.NodeSpace().template GetPool<LocalHeatComponent>()),
       m_filtration(graph.template GetResource<NestedFiltrationResult>()),
       m_visible(graph.template GetResource<VisibleNodesResource>()),
       m_heatsystem(graph) {
@@ -61,6 +61,7 @@ template <GraphLike G> void GRIPPhysicsSystem<G>::Tick() {
 
   for (uint32_t i = 0; i < end; i++) {
     DenseNodeID denseID = m_filtration->m_filtration[i];
+    ZeroOut(physics[denseID.Raw()].disp, m_dimension);
     if (false) // if (m_currLayer == 0)
       ;
     else {

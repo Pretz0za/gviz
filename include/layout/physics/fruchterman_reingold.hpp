@@ -13,7 +13,7 @@ public:
   void Tick(DenseNodeID v, DenseNodeID u);
 
 private:
-  DenseComponentPool<KNearestComponent<32>> *m_knn;
+  DenseComponentPool<KNearestComponent> *m_knn;
 };
 
 #include "layout/physics/fruchterman_reingold.tpp"

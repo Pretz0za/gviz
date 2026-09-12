@@ -7,10 +7,10 @@
 #include <limits>
 
 Graph::Graph()
-    : m_inAdjPool(&m_nodeSpace.GetPool<InAdjacencyComponent>()),
-      m_outAdjPool(&m_nodeSpace.GetPool<OutAdjacencyComponent>()),
-      m_edgePool(&m_edgeSpace.GetPool<EdgeComponent>()),
-      m_weightPool(&m_edgeSpace.GetPool<WeightComponent>()) {}
+    : m_inAdjPool(m_nodeSpace.SetPool<InAdjacencyComponent>()),
+      m_outAdjPool(m_nodeSpace.SetPool<OutAdjacencyComponent>()),
+      m_edgePool(m_edgeSpace.SetPool<EdgeComponent>()),
+      m_weightPool(m_edgeSpace.SetPool<WeightComponent>()) {}
 
 NodeID Graph::AddNode() { return NodeID(m_nodeSpace.Create()); }
 

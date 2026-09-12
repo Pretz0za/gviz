@@ -28,7 +28,7 @@ private:
   LocalHeatGrip<G> m_heatsystem;
   NestedFiltrationResult *m_filtration;
   VisibleNodesResource *m_visible;
-  DenseComponentPool<KNearestComponent<32>> *m_knearest;
+  DenseComponentPool<KNearestComponent> *m_knearest;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<PhysicsComponent> *m_physics;
   DenseComponentPool<LocalHeatComponent> *m_heat;

@@ -11,7 +11,7 @@
 
 template <GraphLike G>
 PositionRandomized<G>::PositionRandomized(G &graph)
-    : m_positionPool{&graph.NodeSpace().template GetPool<PositionComponent>()},
+    : m_positionPool{graph.NodeSpace().template GetPool<PositionComponent>()},
       m_bboxWidth(DEFAULT_BBOX_WIDTH), m_graph(&graph), m_dist{-1, 1},
       m_rng{std::random_device{}()} {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();

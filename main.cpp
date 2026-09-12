@@ -33,19 +33,19 @@ Graph BuildRectMesh(size_t length, size_t width) {
 }
 
 void InitializePositionComponents(Graph &g) {
-  auto &pool = g.NodeSpace().GetPool<PositionComponent>();
+  auto *pool = g.NodeSpace().GetPool<PositionComponent>();
   for (NodeID nid : g.Nodes()) {
-    PositionComponent &c = *pool.Find(nid.Raw());
-    c.pos[0] = 0;
-    c.pos[1] = 0;
-    c.pos[2] = 0;
+    PositionComponent *c = pool->Find(nid.Raw());
+    c->pos[0] = 0;
+    c->pos[1] = 0;
+    c->pos[2] = 0;
   }
 }
 
 void PrintPositions(Graph &g) {
-  auto &pool = g.NodeSpace().GetPool<PositionComponent>();
+  auto *pool = g.NodeSpace().GetPool<PositionComponent>();
   for (NodeID nid : g.Nodes()) {
-    PositionComponent *c = pool.Find(nid.Raw());
+    PositionComponent *c = pool->Find(nid.Raw());
     printf("node %u: (%f, %f)\n", nid.Raw(), c->pos[0], c->pos[1]);
   }
 }
@@ -53,10 +53,10 @@ void PrintPositions(Graph &g) {
 // Prints "(x1,y1),(x2,y2),..." for every node's position -- paste directly
 // into a Desmos expression to plot the list as points.
 void PrintPositionsDesmos(Graph &g) {
-  auto &pool = g.NodeSpace().GetPool<PositionComponent>();
+  auto *pool = g.NodeSpace().GetPool<PositionComponent>();
   bool first = true;
   for (NodeID nid : g.Nodes()) {
-    PositionComponent *c = pool.Find(nid.Raw());
+    PositionComponent *c = pool->Find(nid.Raw());
     if (!first)
       printf(",");
     printf("(%f,%f)", c->pos[0], c->pos[1]);
