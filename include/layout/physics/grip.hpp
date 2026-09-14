@@ -3,7 +3,6 @@
 #include "concept/graphLike.hpp"
 #include "ecs/components.hpp"
 #include "graph/search/knearest.hpp"
-#include "graph/types.hpp"
 #include "layout/components/heat.hpp"
 #include "layout/components/knearest.hpp"
 #include "layout/filtration/mis_filtration.hpp"

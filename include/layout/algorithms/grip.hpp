@@ -2,8 +2,8 @@
 
 #include "concept/graphLike.hpp"
 #include "layout/filtration/mis_filtration.hpp"
+#include "layout/physics/grip.hpp"
 #include "layout/placement/barrycenter.hpp"
-#include "layout/types.hpp"
 #include <memory>
 
 // implementation of the GRIP algorithm by Gajer and Kobourov
@@ -26,6 +26,7 @@ private:
   NestedFiltrationResult *m_filtrationOutput;
   std::unique_ptr<MisFiltrationSystem<G>> m_filtrationSystem = nullptr;
   std::unique_ptr<PositionBarrycentric<G>> m_placementSystem = nullptr;
+  std::unique_ptr<GRIPPhysicsSystem<G>> m_physicsSystem = nullptr;
 };
 
 #include "layout/algorithms/grip.tpp"

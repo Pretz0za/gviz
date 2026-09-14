@@ -19,13 +19,10 @@ void GRIPKamadaKawai<G>::Tick(DenseNodeID v, DenseNodeID u,
                               uint32_t graphDist) {
   auto &physics = m_physics->Data();
   double out[m_dimension];
-  ZeroOut(out, m_dimension);
-  Scale(out,
-        (m_distanceCalc.BetweenNodes(v, u) /
-         (static_cast<double>(graphDist) * 10.0 * 10.0)) -
-            1,
-        m_dimension);
-
-  // NOTE: this is incorrect, overwrite not accumalte
-  Copy(out, physics[v.Raw()].disp, m_dimension);
+  m_distanceCalc.VecBetweenNodes(v, u, out);
+  // TODO : config
+  Vecaxpy((m_distanceCalc.BetweenNodes(v, u) /
+           (static_cast<double>(graphDist) * 10.0 * 10.0)) -
+              1,
+          out, physics[v.Raw()].disp, m_dimension);
 }

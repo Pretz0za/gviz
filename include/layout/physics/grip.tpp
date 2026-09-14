@@ -81,4 +81,10 @@ template <GraphLike G> void GRIPPhysicsSystem<G>::Tick() {
             m_dimension);
     }
   }
+
+  for (uint32_t i = 0; i < end; i++) {
+    DenseNodeID denseID = m_filtration->m_filtration[i];
+    Vecaxpy(1.0, physics[denseID.Raw()].disp, positions[denseID.Raw()].pos,
+            m_dimension);
+  }
 }

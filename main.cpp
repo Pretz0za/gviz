@@ -50,6 +50,16 @@ void PrintPositions(Graph &g) {
   }
 }
 
+void PrintGripLayerPositions(Graph *g, NestedFiltrationResult *filtration,
+                             uint8_t layer) {
+  auto *pool = g->NodeSpace().GetPool<PositionComponent>();
+  for (uint32_t i = 0; i < filtration->m_borders[layer]; i++) {
+    DenseNodeID nid = filtration->m_filtration[i];
+    PositionComponent *c = pool->Find(nid.Raw());
+    printf("node %u: (%f, %f)\n", nid.Raw(), c->pos[0], c->pos[1]);
+  }
+}
+
 // Prints "(x1,y1),(x2,y2),..." for every node's position -- paste directly
 // into a Desmos expression to plot the list as points.
 void PrintPositionsDesmos(Graph &g) {
@@ -93,8 +103,13 @@ int main() {
 
   NestedFiltrationResult result = *g.GetResource<NestedFiltrationResult>();
 
-  for (int i = 0; i < result.m_layerCount; i++)
-	  grip.TransitionState();
+  uint8_t layer = grip.TransitionState();
+  layer = grip.TransitionState();
+  for (uint32_t i = 0; i < 100; i++) {
+    printf("\n\n\nLAYER %u POSITIONS AT TICK %u\n", layer, i);
+    PrintGripLayerPositions(&g, &result, layer);
+    grip.Tick();
+  }
 
   PrintPositionsDesmos(g);
 

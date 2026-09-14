@@ -9,6 +9,7 @@
 #include "layout/components/physics.hpp"
 #include "layout/components/position.hpp"
 #include "layout/filtration/mis_filtration.hpp"
+#include "layout/physics/grip.hpp"
 #include "layout/placement/barrycenter.hpp"
 #include "layout/placement/helpers.hpp"
 #include <memory>
@@ -43,11 +44,9 @@ GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph)
                                              // based
 
   // systems grip uses
-  // TODO: initialize correctly
   m_placementSystem = std::make_unique<PositionBarrycentric<G>>(graph);
   m_filtrationSystem = std::make_unique<MisFiltrationSystem<G>>(graph);
-  // m_placementSystem = PositionBarrycentric<G>(graph);
-  // m_filtrationSystem = MisFiltrationSystem<G>(graph);
+  m_physicsSystem = std::make_unique<GRIPPhysicsSystem<G>>(graph);
 }
 
 template <GraphLike G> void GRIPLayoutAlgorithm<G>::RunFiltration() {
@@ -60,15 +59,19 @@ template <GraphLike G> uint32_t GRIPLayoutAlgorithm<G>::TransitionState() {
   if (m_currLayer == 0)
     return 0;
   placeLayer();
+  m_physicsSystem->RefreshKNearest(m_currLayer);
   // TODO: add updateknns to force system here
   return m_currLayer;
 }
 
 template <GraphLike G> void GRIPLayoutAlgorithm<G>::Tick() {
+
   if (m_filtrationOutput->m_layerCount == 0xFFFFFFFF) {
     // filtration not run
     throw UinitializedResourceException<NestedFiltrationResult>();
   }
+
+  m_physicsSystem->Tick();
 
   // TODO: refinement
 }

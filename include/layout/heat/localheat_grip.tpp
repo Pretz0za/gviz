@@ -23,9 +23,11 @@ template <GraphLike G> void LocalHeatGrip<G>::Tick(DenseNodeID id) {
   PhysicsComponent *physics = &m_physicsPool->Data()[id.Raw()];
 
   if (IsNan(physics->oldDisp, m_dimension)) {
-    // TODO: config edge length 
+    // no displacement history yet -- nothing to compare against.
+    // TODO: config edge length
     heat->heat = 10.0 / 6.0;
 	heat->oldCos = 0.0;
+    return;
   }
 
   double nrm = L2Norm(physics->disp, m_dimension);

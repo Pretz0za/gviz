@@ -33,7 +33,7 @@ inline void ZeroOut(double *vec, uint8_t dim) {
 inline void Vecaxpy(double alpha, const double *a, double *y,
                     uint8_t dimension) {
 	for (uint8_t i = 0; i < dimension; i++) {
-		y[i] = alpha * a[i];
+		y[i] = alpha * a[i] + y[i];
 	}
 }
 
@@ -73,11 +73,13 @@ inline void Subtract(const double *a, const double *b, double *out,
   case 2: {
     out[0] = a[0] - b[0];
     out[1] = a[1] - b[1];
+    return;
   }
   case 3: {
     out[0] = a[0] - b[0];
     out[1] = a[1] - b[1];
     out[2] = a[2] - b[2];
+    return;
   }
   default: {
     for (uint8_t i = 0; i < dim; i++) {
