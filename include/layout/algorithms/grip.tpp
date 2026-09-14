@@ -72,8 +72,6 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::Tick() {
   }
 
   m_physicsSystem->Tick();
-
-  // TODO: refinement
 }
 
 template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {

@@ -3,17 +3,23 @@
 #include "concept/graphLike.hpp"
 #include "ecs/components.hpp"
 #include "graph/types.hpp"
-#include "layout/components/knearest.hpp"
+#include "layout/components/physics.hpp"
+#include "layout/helpers/distance.hpp"
+#include <cstdint>
 class VanillaFruchtermanReingold {};
 
 template <GraphLike G> class GRIPFruchtermanReingold {
 public:
-  GRIPFruchtermanReingold();
+  enum MODE {ATTRACTIVE, REPULSIVE};
 
-  void Tick(DenseNodeID v, DenseNodeID u);
+  GRIPFruchtermanReingold(G &graph);
+
+  void Tick(DenseNodeID v, DenseNodeID u, MODE mode);
 
 private:
-  DenseComponentPool<KNearestComponent> *m_knn;
+  DenseComponentPool<PhysicsComponent> *m_physics;
+  DistanceCalculationSystem<G> m_distanceCalc;
+  uint8_t m_dimension;
 };
 
 #include "layout/physics/fruchterman_reingold.tpp"

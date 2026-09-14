@@ -7,6 +7,7 @@
 #include "layout/placement/randomized.hpp"
 #include "layout/types.hpp"
 #include <cassert>
+#include <cstdint>
 #include <cstdio>
 
 Graph BuildRectMesh(size_t length, size_t width) {
@@ -77,7 +78,7 @@ void PrintPositionsDesmos(Graph &g) {
 
 int main() {
 
-  Graph g = BuildRectMesh(10, 10);
+  Graph g = BuildRectMesh(5, 5);
   Subgraph sg{g};
 
   for (NodeID nid : g.Nodes()) {
@@ -105,11 +106,19 @@ int main() {
 
   uint8_t layer = grip.TransitionState();
   layer = grip.TransitionState();
-  for (uint32_t i = 0; i < 100; i++) {
-    printf("\n\n\nLAYER %u POSITIONS AT TICK %u\n", layer, i);
-    PrintGripLayerPositions(&g, &result, layer);
-    grip.Tick();
+
+  for (uint32_t i = 0; i < result.m_layerCount; i++) {
+	grip.TransitionState();
+	for(uint32_t j = 0; j < 100; j++) {
+		grip.Tick();
+	}
   }
+
+  // for (uint32_t i = 0; i < 100; i++) {
+  //   printf("\n\n\nLAYER %u POSITIONS AT TICK %u\n", layer, i);
+  //   PrintGripLayerPositions(&g, &result, layer);
+  //   grip.Tick();
+  // }
 
   PrintPositionsDesmos(g);
 

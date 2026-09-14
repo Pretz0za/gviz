@@ -3,6 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "ds/vector.hpp"
 #include "ecs/exceptions.hpp"
+#include "graph/components/adjacency.hpp"
 #include "graph/search/types.hpp"
 #include "graph/types.hpp"
 #include "layout/components/knearest.hpp"
@@ -13,7 +14,7 @@
 
 template <GraphLike G>
 GRIPPhysicsSystem<G>::GRIPPhysicsSystem(G &graph)
-    : m_graph(&graph), m_knnSystem(graph), m_kkForces(graph), m_frForces(),
+    : m_graph(&graph), m_knnSystem(graph), m_kkForces(graph), m_frForces(graph),
       m_knearest(graph.NodeSpace().template GetPool<KNearestComponent>()),
       m_positions(graph.NodeSpace().template GetPool<PositionComponent>()),
       m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
@@ -62,14 +63,26 @@ template <GraphLike G> void GRIPPhysicsSystem<G>::Tick() {
   for (uint32_t i = 0; i < end; i++) {
     DenseNodeID denseID = m_filtration->m_filtration[i];
     ZeroOut(physics[denseID.Raw()].disp, m_dimension);
-    if (false) // if (m_currLayer == 0)
-      ;
-    else {
+
+    if (m_currLayer == 0) {
+      NodeID sparseID = m_graph->MapToSparse(denseID);
+      for (AdjEntry adj : m_graph->OutNeighbors(sparseID)) {
+        m_frForces.Tick(denseID, m_graph->MapToDense(adj.other),
+                        m_frForces.ATTRACTIVE);
+      }
+      for (uint32_t j = 0; j < knns[denseID.Raw()].size; j++) {
+        FoundNode fn = knns[denseID.Raw()].nearest[j];
+        m_frForces.Tick(denseID, m_graph->MapToDense(fn.node),
+                        m_frForces.REPULSIVE);
+      }
+
+    } else {
       for (uint32_t j = 0; j < knns[denseID.Raw()].size; j++) {
         FoundNode fn = knns[denseID.Raw()].nearest[j];
         m_kkForces.Tick(denseID, m_graph->MapToDense(fn.node), fn.depth);
       }
     }
+
     m_heatsystem.Tick(denseID);
 
     Copy(physics[denseID.Raw()].disp, physics[denseID.Raw()].oldDisp,
