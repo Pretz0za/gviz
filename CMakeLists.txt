@@ -51,3 +51,80 @@ add_executable(main main.cpp)
 set_target_properties(main PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/)
 target_link_libraries(main PRIVATE gviz)
+
+option(GVIZ_BUILD_RENDER "Build the WebGPU/GLFW graph renderer + demo" OFF)
+
+if(GVIZ_BUILD_RENDER)
+    if(APPLE)
+        enable_language(OBJC)
+        enable_language(OBJCXX)
+    endif()
+
+    set(GVIZ_WGPU_NATIVE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/wgpu-native" CACHE PATH
+        "Path to extracted wgpu-native release (must contain include/ and lib/)")
+    if(NOT EXISTS "${GVIZ_WGPU_NATIVE_DIR}/include/webgpu/webgpu.h")
+        message(FATAL_ERROR
+            "wgpu-native not found at ${GVIZ_WGPU_NATIVE_DIR}.\n"
+            "Run ./scripts/setup-deps.sh once, or set -DGVIZ_WGPU_NATIVE_DIR=...")
+    endif()
+
+    add_library(wgpu_native STATIC IMPORTED)
+    if(WIN32)
+        set_target_properties(wgpu_native PROPERTIES
+            IMPORTED_LOCATION "${GVIZ_WGPU_NATIVE_DIR}/lib/wgpu_native.lib")
+    else()
+        set_target_properties(wgpu_native PROPERTIES
+            IMPORTED_LOCATION "${GVIZ_WGPU_NATIVE_DIR}/lib/libwgpu_native.a")
+    endif()
+    target_include_directories(wgpu_native INTERFACE "${GVIZ_WGPU_NATIVE_DIR}/include")
+
+    if(APPLE)
+        target_link_libraries(wgpu_native INTERFACE
+            "-framework CoreFoundation"
+            "-framework QuartzCore"
+            "-framework Metal"
+        )
+    elseif(WIN32)
+        target_link_libraries(wgpu_native INTERFACE
+            d3dcompiler ws2_32 userenv bcrypt ntdll opengl32 Propsys RuntimeObject)
+    else()
+        target_link_libraries(wgpu_native INTERFACE m dl)
+    endif()
+
+    set(GVIZ_GLFW_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/glfw" CACHE PATH
+        "Path to GLFW source tree")
+    if(NOT EXISTS "${GVIZ_GLFW_DIR}/CMakeLists.txt")
+        message(FATAL_ERROR
+            "GLFW not found at ${GVIZ_GLFW_DIR}.\n"
+            "Run ./scripts/setup-deps.sh once, or set -DGVIZ_GLFW_DIR=...")
+    endif()
+
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+    add_subdirectory("${GVIZ_GLFW_DIR}" glfw-build EXCLUDE_FROM_ALL)
+
+    add_library(gvizRender STATIC
+        src/render/renderer.cpp
+    )
+    if(APPLE)
+        target_sources(gvizRender PRIVATE src/render/surface_cocoa.mm)
+        target_link_libraries(gvizRender PRIVATE "-framework AppKit")
+    endif()
+
+    target_include_directories(gvizRender
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/render
+    )
+    target_link_libraries(gvizRender
+        PUBLIC gviz wgpu_native
+        PRIVATE glfw
+    )
+    if(NOT MSVC)
+        target_compile_options(gvizRender PRIVATE -Wall -Wextra)
+    endif()
+
+    add_executable(renderDemo examples/renderDemo.cpp)
+    target_link_libraries(renderDemo PRIVATE gvizRender gviz)
+endif()

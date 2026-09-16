@@ -14,7 +14,7 @@ public:
 
   void RunFiltration();
   uint32_t TransitionState();
-  void Tick();
+  inline void Tick();
 
 private:
   void placeLayer();

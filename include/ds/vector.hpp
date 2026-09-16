@@ -16,11 +16,20 @@ inline bool IsNan(const double *vec, uint8_t dim) {
 }
 
 inline bool IsZero(const double *vec, uint8_t dim) {
-  for (uint8_t i = 0; i < dim; i++) {
-    if (std::fabs(vec[i]) > EPSILON)
-      return false;
+  switch (dim) {
+  case 2:
+    return IsZero(vec[0]) && IsZero(vec[1]);
+  case 3:
+    return IsZero(vec[0]) && IsZero(vec[1] && IsZero(vec[2]));
+  case 4:
+    return IsZero(vec[0]) && IsZero(vec[1] && IsZero(vec[2]) && IsZero(vec[3]));
+  default:
+    for (uint8_t i = 0; i < dim; i++) {
+      if (std::fabs(vec[i]) > EPSILON)
+        return false;
+    }
+    return true;
   }
-  return true;
 }
 
 inline void ZeroOut(double *vec, uint8_t dim) {
@@ -30,11 +39,31 @@ inline void ZeroOut(double *vec, uint8_t dim) {
 }
 
 // y = ax + y
-inline void Vecaxpy(double alpha, const double *a, double *y,
+inline void Vecaxpy(double alpha, const double *x, double *y,
                     uint8_t dimension) {
-	for (uint8_t i = 0; i < dimension; i++) {
-		y[i] = alpha * a[i] + y[i];
-	}
+  switch (dimension) {
+  case 2:
+    y[0] += alpha * x[0];
+    y[1] += alpha * x[1];
+    return;
+  case 3:
+    y[0] += alpha * x[0];
+    y[1] += alpha * x[1];
+    y[2] += alpha * x[2];
+    return;
+  case 4:
+    y[0] += alpha * x[0];
+    y[1] += alpha * x[1];
+    y[2] += alpha * x[2];
+    y[3] += alpha * x[3];
+    return;
+  default: {
+    for (uint8_t i = 0; i < dimension; i++) {
+      y[i] += alpha * x[i];
+    }
+    return;
+  }
+  }
 }
 
 inline void Copy(const double *src, double *dst, uint8_t dim) {

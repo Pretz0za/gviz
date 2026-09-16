@@ -9,13 +9,13 @@ template <GraphLike G> class DistanceCalculationSystem {
 public:
   DistanceCalculationSystem(G &graph);
 
-  double BetweenNodes(DenseNodeID v, DenseNodeID u);
+  inline double BetweenNodes(DenseNodeID v, DenseNodeID u);
 
   // u - v -> out
-  void VecBetweenNodes(DenseNodeID v, DenseNodeID u, double *out);
+  inline void VecBetweenNodes(DenseNodeID v, DenseNodeID u, double *out);
 
 private:
-  DenseComponentPool<PositionComponent> *m_positionPool;
+  PositionSpan &m_positionData;
   uint8_t m_dimension;
 };
 

@@ -1,20 +1,182 @@
 [
 {
-  "directory": "/Users/abdulaziz.alahmadi/refactor/build",
-  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -g -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/ecs/index_space.cpp",
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/ecs/index_space.cpp",
   "file": "/Users/abdulaziz.alahmadi/refactor/src/ecs/index_space.cpp",
   "output": "CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o"
 },
 {
-  "directory": "/Users/abdulaziz.alahmadi/refactor/build",
-  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -g -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/graph/graph.cpp",
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/graph/graph.cpp",
   "file": "/Users/abdulaziz.alahmadi/refactor/src/graph/graph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/graph.cpp.o"
 },
 {
-  "directory": "/Users/abdulaziz.alahmadi/refactor/build",
-  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -g -std=gnu++20 -arch arm64 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /Users/abdulaziz.alahmadi/refactor/main.cpp",
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/graph/subgraph.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/graph/subgraph.cpp",
+  "output": "CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/ds/bfs_scratch.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/ds/bfs_scratch.cpp",
+  "output": "CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIC -o CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/layout/placement/helpers.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/layout/placement/helpers.cpp",
+  "output": "CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /Users/abdulaziz.alahmadi/refactor/main.cpp",
   "file": "/Users/abdulaziz.alahmadi/refactor/main.cpp",
   "output": "CMakeFiles/main.dir/main.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -I/Users/abdulaziz.alahmadi/refactor/src/render -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -isystem /Users/abdulaziz.alahmadi/refactor/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o -c /Users/abdulaziz.alahmadi/refactor/src/render/renderer.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/render/renderer.cpp",
+  "output": "CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -I/Users/abdulaziz.alahmadi/refactor/src/render -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -isystem /Users/abdulaziz.alahmadi/refactor/third-party/wgpu-native/include -x objective-c++ -O3 -DNDEBUG -std=gnu++2a -arch arm64 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/surface_cocoa.mm.o -c /Users/abdulaziz.alahmadi/refactor/src/render/surface_cocoa.mm",
+  "file": "/Users/abdulaziz.alahmadi/refactor/src/render/surface_cocoa.mm",
+  "output": "CMakeFiles/gvizRender.dir/src/render/surface_cocoa.mm.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render",
+  "command": "/usr/bin/c++  -I/Users/abdulaziz.alahmadi/refactor/include -isystem /Users/abdulaziz.alahmadi/refactor/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -arch arm64 -fPIE -o CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o -c /Users/abdulaziz.alahmadi/refactor/examples/renderDemo.cpp",
+  "file": "/Users/abdulaziz.alahmadi/refactor/examples/renderDemo.cpp",
+  "output": "CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/context.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/context.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/context.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/context.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/init.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/init.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/init.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/init.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/input.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/input.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/input.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/input.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/monitor.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/monitor.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/monitor.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/monitor.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/platform.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/platform.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/platform.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/platform.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/vulkan.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/vulkan.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/vulkan.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/vulkan.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/window.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/window.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/window.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/window.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/egl_context.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/egl_context.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/egl_context.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/egl_context.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/osmesa_context.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/osmesa_context.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/osmesa_context.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/osmesa_context.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/null_init.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_init.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_init.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/null_init.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/null_monitor.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_monitor.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_monitor.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/null_monitor.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/null_window.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_window.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_window.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/null_window.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/null_joystick.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_joystick.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/null_joystick.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/null_joystick.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_time.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_time.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_time.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/cocoa_time.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_module.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/posix_module.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/posix_module.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/posix_module.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_thread.c.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/posix_thread.c",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/posix_thread.c",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/posix_thread.c.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -x objective-c -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_init.m.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_init.m",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_init.m",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/cocoa_init.m.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -x objective-c -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_joystick.m.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_joystick.m",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_joystick.m",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -x objective-c -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_monitor.m.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_monitor.m",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_monitor.m",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -x objective-c -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_window.m.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_window.m",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/cocoa_window.m",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/cocoa_window.m.o"
+},
+{
+  "directory": "/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src",
+  "command": "/usr/bin/cc -D_GLFW_COCOA -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/include -I/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src -I/Users/abdulaziz.alahmadi/refactor/build-render/glfw-build/src -x objective-c -O3 -DNDEBUG -std=c99 -arch arm64 -fPIC -Wall -o CMakeFiles/glfw.dir/nsgl_context.m.o -c /Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/nsgl_context.m",
+  "file": "/Users/abdulaziz.alahmadi/refactor/third-party/glfw/src/nsgl_context.m",
+  "output": "glfw-build/src/CMakeFiles/glfw.dir/nsgl_context.m.o"
 }
 ]

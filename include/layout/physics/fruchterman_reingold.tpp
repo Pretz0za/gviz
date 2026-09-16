@@ -19,17 +19,21 @@ GRIPFruchtermanReingold<G>::GRIPFruchtermanReingold(G &graph)
 
 template <GraphLike G>
 void GRIPFruchtermanReingold<G>::Tick(DenseNodeID v, DenseNodeID u, MODE mode) {
+  auto &data = m_physics->Data();
   if (mode == ATTRACTIVE) {
     double out[m_dimension];
     m_distanceCalc.VecBetweenNodes(v, u, out);
     if (IsZero(out, m_dimension))
       return;
-    Vecaxpy((pow(m_distanceCalc.BetweenNodes(v, u), 2.0) / (10.0 * 10.0)), out, m_physics->Find(v.Raw())->disp, m_dimension);
+    Vecaxpy((pow(m_distanceCalc.BetweenNodes(v, u), 2.0) / (10.0 * 10.0)), out,
+            data[v.Raw()].disp, m_dimension);
   } else {
     double out[m_dimension];
     m_distanceCalc.VecBetweenNodes(u, v, out);
     if (IsZero(out, m_dimension))
       return;
-    Vecaxpy((0.05 * (10.0 * 10.0) / pow(m_distanceCalc.BetweenNodes(v, u), 2.0)), out, m_physics->Find(v.Raw())->disp, m_dimension);
+    Vecaxpy(
+        (0.05 * (10.0 * 10.0) / pow(m_distanceCalc.BetweenNodes(v, u), 2.0)),
+        out, data[v.Raw()].disp, m_dimension);
   }
 }

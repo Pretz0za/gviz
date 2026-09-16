@@ -17,7 +17,7 @@ public:
 
   void RefreshKNearest(uint32_t currLayer);
 
-  void Tick();
+  inline void Tick();
 
 private:
   G *m_graph;
