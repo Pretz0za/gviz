@@ -27,6 +27,13 @@ int main() {
   Graph g = BuildRectMesh(10, 10);
   g.SetResource<DimensionResource>(DimensionResource::D2);
 
+  auto radii = g.NodeSpace().SetPool<RadiusComponent>();
+  for (uint32_t i = 0; i < radii->Size(); i++) {
+    if (i % 2) {
+      radii->Data()[i].radius *= 4;
+    }
+  }
+
   GRIPLayoutAlgorithm grip{g};
   grip.RunFiltration();
 

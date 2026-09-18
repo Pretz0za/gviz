@@ -33,6 +33,6 @@ template <typename T> std::vector<T> &DenseComponentPool<T>::Data() {
   return m_data;
 }
 
-template <typename T> size_t DenseComponentPool<T>::Size() const {
+template <typename T> uint32_t DenseComponentPool<T>::Size() const {
   return m_data.size();
 }

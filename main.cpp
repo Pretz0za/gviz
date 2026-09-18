@@ -3,6 +3,7 @@
 #include "graph/types.hpp"
 #include "layout/algorithms/grip.hpp"
 #include "layout/components/position.hpp"
+#include "layout/components/radius.hpp"
 #include "layout/filtration/mis_filtration.hpp"
 #include "layout/placement/randomized.hpp"
 #include "layout/types.hpp"
@@ -108,10 +109,10 @@ int main() {
   layer = grip.TransitionState();
 
   for (uint32_t i = 0; i < result.m_layerCount; i++) {
-	grip.TransitionState();
-	for(uint32_t j = 0; j < 100; j++) {
-		grip.Tick();
-	}
+    grip.TransitionState();
+    for (uint32_t j = 0; j < 100; j++) {
+      grip.Tick();
+    }
   }
 
   // for (uint32_t i = 0; i < 100; i++) {

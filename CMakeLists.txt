@@ -111,6 +111,8 @@ if(GVIZ_BUILD_RENDER)
     if(APPLE)
         target_sources(gvizRender PRIVATE src/render/surface_cocoa.mm)
         target_link_libraries(gvizRender PRIVATE "-framework AppKit")
+    elseif(UNIX)
+        target_sources(gvizRender PRIVATE src/render/surface_linux.cpp)
     endif()
 
     target_include_directories(gvizRender

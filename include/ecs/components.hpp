@@ -20,7 +20,7 @@ public:
   inline std::vector<T> &Data();
   inline const std::vector<T> &Data() const;
 
-  size_t Size() const;
+  uint32_t Size() const;
 
 private:
   std::vector<T> m_data;
