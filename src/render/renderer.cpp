@@ -17,14 +17,15 @@
 #include <cstring>
 #include <limits>
 #include <vector>
+#include <webgpu/webgpu.h>
 
 namespace {
 
 struct GlobalsUBO {
   float viewProj[16];
   float viewport[2];
-  float radiusPx;
   float edgeWidthPx;
+  float _pad0; // WGSL aligns nodeColor (vec4f) to 16 bytes
   float nodeColor[4];
   float edgeColor[4];
 };
@@ -78,18 +79,20 @@ struct Renderer::Impl {
   WGPUBuffer positionsBuf = nullptr;
   WGPUBuffer nodeIdsBuf = nullptr;
   WGPUBuffer edgesBuf = nullptr;
+  WGPUBuffer radiusBuf = nullptr;
   WGPUBindGroup bindGroup = nullptr;
 
   size_t positionsCapacity = 0;
   size_t nodeIdsCapacity = 0;
   size_t edgesCapacity = 0;
+  size_t radiusCapacity = 0;
   bool bindGroupDirty = true;
 
   std::vector<float> positionsStaging;
   std::vector<uint32_t> nodeIdsStaging;
   std::vector<uint32_t> edgesStaging;
+  std::vector<float> radiusStaging;
 
-  float nodeRadiusPx = DEFAULT_RADIUS;
   float edgeWidthPx = 2.0f;
   float nodeColor[4] = {0.85f, 0.85f, 0.95f, 1.0f};
   float edgeColor[4] = {0.45f, 0.5f, 0.6f, 0.8f};
@@ -116,6 +119,8 @@ Renderer::Impl::~Impl() {
     wgpuBufferRelease(nodeIdsBuf);
   if (positionsBuf)
     wgpuBufferRelease(positionsBuf);
+  if (radiusBuf)
+    wgpuBufferRelease(radiusBuf);
   if (globalsBuf)
     wgpuBufferRelease(globalsBuf);
   if (edgePipeline)
@@ -178,13 +183,13 @@ bool Renderer::Impl::CreatePipelines() {
   if (!shaderModule)
     return false;
 
-  WGPUBindGroupLayoutEntry entries[4] = {};
+  WGPUBindGroupLayoutEntry entries[5] = {};
   entries[0] = WGPUBindGroupLayoutEntry{
       .binding = 0,
       .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
       .buffer = {.type = WGPUBufferBindingType_Uniform},
   };
-  for (uint32_t i = 1; i < 4; i++) {
+  for (uint32_t i = 1; i < 5; i++) {
     entries[i] = WGPUBindGroupLayoutEntry{
         .binding = i,
         .visibility = WGPUShaderStage_Vertex,
@@ -195,7 +200,7 @@ bool Renderer::Impl::CreatePipelines() {
   bindGroupLayout = wgpuDeviceCreateBindGroupLayout(
       device, WgpuPtr(WGPUBindGroupLayoutDescriptor{
                   .label = {"render bgl", WGPU_STRLEN},
-                  .entryCount = 4,
+                  .entryCount = 5,
                   .entries = entries,
               }));
   pipelineLayout = wgpuDeviceCreatePipelineLayout(
@@ -256,7 +261,7 @@ void Renderer::Impl::RebuildBindGroup() {
   if (bindGroup)
     wgpuBindGroupRelease(bindGroup);
 
-  WGPUBindGroupEntry entries[4] = {};
+  WGPUBindGroupEntry entries[5] = {};
   entries[0] = WGPUBindGroupEntry{
       .binding = 0, .buffer = globalsBuf, .size = sizeof(GlobalsUBO)};
   entries[1] = WGPUBindGroupEntry{
@@ -265,12 +270,14 @@ void Renderer::Impl::RebuildBindGroup() {
       .binding = 2, .buffer = nodeIdsBuf, .size = nodeIdsCapacity};
   entries[3] = WGPUBindGroupEntry{
       .binding = 3, .buffer = edgesBuf, .size = edgesCapacity};
+  entries[4] = WGPUBindGroupEntry{
+      .binding = 4, .buffer = radiusBuf, .size = radiusCapacity};
 
   bindGroup = wgpuDeviceCreateBindGroup(
       device, WgpuPtr(WGPUBindGroupDescriptor{
                   .label = {"render bind group", WGPU_STRLEN},
                   .layout = bindGroupLayout,
-                  .entryCount = 4,
+                  .entryCount = 5,
                   .entries = entries,
               }));
   bindGroupDirty = false;
@@ -280,10 +287,16 @@ void Renderer::Impl::RecomputeFrameData(Graph &graph) {
   positionsStaging.clear();
   nodeIdsStaging.clear();
   edgesStaging.clear();
+  radiusStaging.clear();
 
   auto *posPool = graph.NodeSpace().GetPool<PositionComponent>();
   if (!posPool)
     return;
+
+  bool useDefaultRadius = false;
+  auto *radiusPool = graph.NodeSpace().GetPool<RadiusComponent>();
+  if (!radiusPool)
+    useDefaultRadius = true;
 
   const VisibleNodesResource *visible =
       graph.HasResource<VisibleNodesResource>()
@@ -291,18 +304,26 @@ void Renderer::Impl::RecomputeFrameData(Graph &graph) {
           : nullptr;
 
   positionsStaging.reserve(graph.Size() * 2);
-  for (NodeID nid : graph.Nodes()) {
-    const PositionComponent *c = posPool->Find(nid.Raw());
+  radiusStaging.reserve(graph.Size());
+  for (uint32_t i = 0; i < graph.Size(); i++) {
+    DenseNodeID denseID{i};
+
+    const PositionComponent *c = posPool->Find(denseID.Raw());
     float x = c ? static_cast<float>(c->pos[0]) : 0.0f;
     float y = c ? static_cast<float>(c->pos[1]) : 0.0f;
     positionsStaging.push_back(x);
     positionsStaging.push_back(y);
 
-    DenseNodeID did = graph.MapToDense(nid);
+    radiusStaging.push_back(
+        useDefaultRadius
+            ? DEFAULT_RADIUS
+            : static_cast<float>(radiusPool->Find(denseID.Raw())->radius));
+
     bool isVisible =
-        visible ? (did.Raw() < visible->Size() && visible->Test(did)) : true;
+        visible ? (denseID.Raw() < visible->Size() && visible->Test(denseID))
+                : true;
     if (isVisible)
-      nodeIdsStaging.push_back(did.Raw());
+      nodeIdsStaging.push_back(denseID.Raw());
   }
 
   for (EdgeID eid : graph.Edges()) {
@@ -412,10 +433,6 @@ Renderer::Renderer(uint32_t width, uint32_t height, const std::string &title)
 
 Renderer::~Renderer() = default;
 
-void Renderer::SetNodeRadiusPixels(float radius) {
-  m_impl->nodeRadiusPx = radius;
-}
-
 void Renderer::SetEdgeWidthPixels(float width) { m_impl->edgeWidthPx = width; }
 
 void Renderer::SetNodeColor(float r, float g, float b, float a) {
@@ -465,6 +482,8 @@ bool Renderer::Frame(Graph &graph) {
       std::max<size_t>(r.nodeIdsStaging.size() * sizeof(uint32_t), 1);
   size_t edgeBytes =
       std::max<size_t>(r.edgesStaging.size() * sizeof(uint32_t), 1);
+  size_t radiusBytes =
+      std::max<size_t>(r.radiusStaging.size() * sizeof(float), 1);
 
   r.EnsureBuffer(r.positionsBuf, r.positionsCapacity, posBytes,
                  WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
@@ -475,6 +494,9 @@ bool Renderer::Frame(Graph &graph) {
   r.EnsureBuffer(r.edgesBuf, r.edgesCapacity, edgeBytes,
                  WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
                  "render edges");
+  r.EnsureBuffer(r.radiusBuf, r.radiusCapacity, radiusBytes,
+                 WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+                 "render radius");
 
   if (!r.positionsStaging.empty())
     wgpuQueueWriteBuffer(r.queue, r.positionsBuf, 0, r.positionsStaging.data(),
@@ -485,6 +507,10 @@ bool Renderer::Frame(Graph &graph) {
   if (!r.edgesStaging.empty())
     wgpuQueueWriteBuffer(r.queue, r.edgesBuf, 0, r.edgesStaging.data(),
                          r.edgesStaging.size() * sizeof(uint32_t));
+  if (!r.radiusStaging.empty()) {
+    wgpuQueueWriteBuffer(r.queue, r.radiusBuf, 0, r.radiusStaging.data(),
+                         r.radiusStaging.size() * sizeof(float));
+  }
 
   if (r.bindGroupDirty)
     r.RebuildBindGroup();
@@ -526,7 +552,6 @@ bool Renderer::Frame(Graph &graph) {
   OrthoViewProj(globals.viewProj, cx, cy, halfW, halfH);
   globals.viewport[0] = static_cast<float>(fbw);
   globals.viewport[1] = static_cast<float>(fbh);
-  globals.radiusPx = r.nodeRadiusPx;
   globals.edgeWidthPx = r.edgeWidthPx;
   std::memcpy(globals.nodeColor, r.nodeColor, sizeof(globals.nodeColor));
   std::memcpy(globals.edgeColor, r.edgeColor, sizeof(globals.edgeColor));

@@ -29,7 +29,7 @@ int main() {
 
   auto radii = g.NodeSpace().SetPool<RadiusComponent>();
   for (uint32_t i = 0; i < radii->Size(); i++) {
-    if (i % 2) {
+    if (i % 5 == 7) {
       radii->Data()[i].radius *= 4;
     }
   }
