@@ -1,0 +1,9 @@
+CompileFlags:
+  Add: [-Iinclude, -std=gnu++20, -Wall]
+  Compiler: c++
+
+---
+If:
+  PathMatch: .*\.tpp
+CompileFlags:
+  Add: [-xc++-header]
