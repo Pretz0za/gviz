@@ -1,5 +1,6 @@
 #include "render/renderer.hpp"
 
+#include "layout/components/radius.hpp"
 #include "render_internal.hpp"
 #include "shaders.hpp"
 
@@ -29,7 +30,7 @@ struct GlobalsUBO {
 };
 
 void OrthoViewProj(float outMat[16], float cx, float cy, float halfW,
-                    float halfH) {
+                   float halfH) {
   std::fill(outMat, outMat + 16, 0.0f);
   outMat[0] = 1.0f / halfW;
   outMat[5] = 1.0f / halfH;
@@ -40,19 +41,19 @@ void OrthoViewProj(float outMat[16], float cx, float cy, float halfW,
 }
 
 void OnAdapterRequest(WGPURequestAdapterStatus, WGPUAdapter adapter,
-                       WGPUStringView, void *userdata1, void *) {
+                      WGPUStringView, void *userdata1, void *) {
   *static_cast<WGPUAdapter *>(userdata1) = adapter;
 }
 
-void OnDeviceRequest(WGPURequestDeviceStatus, WGPUDevice device,
-                      WGPUStringView, void *userdata1, void *) {
+void OnDeviceRequest(WGPURequestDeviceStatus, WGPUDevice device, WGPUStringView,
+                     void *userdata1, void *) {
   *static_cast<WGPUDevice *>(userdata1) = device;
 }
 
-void OnUncapturedError(WGPUDevice const *, WGPUErrorType, WGPUStringView message,
-                       void *, void *) {
+void OnUncapturedError(WGPUDevice const *, WGPUErrorType,
+                       WGPUStringView message, void *, void *) {
   std::fprintf(stderr, "[render] uncaptured WGPU error: %.*s\n",
-              (int)message.length, message.data);
+               (int)message.length, message.data);
 }
 
 } // namespace
@@ -88,7 +89,7 @@ struct Renderer::Impl {
   std::vector<uint32_t> nodeIdsStaging;
   std::vector<uint32_t> edgesStaging;
 
-  float nodeRadiusPx = 32.0f;
+  float nodeRadiusPx = DEFAULT_RADIUS;
   float edgeWidthPx = 2.0f;
   float nodeColor[4] = {0.85f, 0.85f, 0.95f, 1.0f};
   float edgeColor[4] = {0.45f, 0.5f, 0.6f, 0.8f};
@@ -144,12 +145,11 @@ Renderer::Impl::~Impl() {
 
 WGPUBuffer Renderer::Impl::CreateBuffer(size_t size, WGPUBufferUsage usage,
                                         const char *label) {
-  return wgpuDeviceCreateBuffer(
-      device, WgpuPtr(WGPUBufferDescriptor{
-                  .label = {label, WGPU_STRLEN},
-                  .usage = usage,
-                  .size = size,
-              }));
+  return wgpuDeviceCreateBuffer(device, WgpuPtr(WGPUBufferDescriptor{
+                                            .label = {label, WGPU_STRLEN},
+                                            .usage = usage,
+                                            .size = size,
+                                        }));
 }
 
 bool Renderer::Impl::EnsureBuffer(WGPUBuffer &buf, size_t &capacity,
@@ -167,14 +167,14 @@ bool Renderer::Impl::EnsureBuffer(WGPUBuffer &buf, size_t &capacity,
 
 bool Renderer::Impl::CreatePipelines() {
   shaderModule = wgpuDeviceCreateShaderModule(
-      device, WgpuPtr(WGPUShaderModuleDescriptor{
-                  .nextInChain = (WGPUChainedStruct *)WgpuPtr(
-                      WGPUShaderSourceWGSL{
-                          .chain = {.sType = WGPUSType_ShaderSourceWGSL},
-                          .code = {kRenderWgslSource, WGPU_STRLEN},
-                      }),
-                  .label = {"render shaders", WGPU_STRLEN},
-              }));
+      device,
+      WgpuPtr(WGPUShaderModuleDescriptor{
+          .nextInChain = (WGPUChainedStruct *)WgpuPtr(WGPUShaderSourceWGSL{
+              .chain = {.sType = WGPUSType_ShaderSourceWGSL},
+              .code = {kRenderWgslSource, WGPU_STRLEN},
+          }),
+          .label = {"render shaders", WGPU_STRLEN},
+      }));
   if (!shaderModule)
     return false;
 
@@ -233,7 +233,7 @@ bool Renderer::Impl::CreatePipelines() {
             .label = {labels[i], WGPU_STRLEN},
             .layout = pipelineLayout,
             .vertex = {.module = shaderModule,
-                      .entryPoint = {vsEntries[i], WGPU_STRLEN}},
+                       .entryPoint = {vsEntries[i], WGPU_STRLEN}},
             .primitive = {.topology = WGPUPrimitiveTopology_TriangleList,
                           .cullMode = WGPUCullMode_None},
             .multisample = {.count = 1, .mask = 0xFFFFFFFF},
@@ -340,7 +340,8 @@ bool Renderer::Impl::Init(uint32_t width, uint32_t height,
     return false;
 
   wgpuInstanceRequestAdapter(
-      instance, WgpuPtr(WGPURequestAdapterOptions{.compatibleSurface = surface}),
+      instance,
+      WgpuPtr(WGPURequestAdapterOptions{.compatibleSurface = surface}),
       WGPURequestAdapterCallbackInfo{.callback = OnAdapterRequest,
                                      .userdata1 = &adapter});
   if (!adapter)
@@ -466,14 +467,14 @@ bool Renderer::Frame(Graph &graph) {
       std::max<size_t>(r.edgesStaging.size() * sizeof(uint32_t), 1);
 
   r.EnsureBuffer(r.positionsBuf, r.positionsCapacity, posBytes,
-                WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
-                "render positions");
+                 WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+                 "render positions");
   r.EnsureBuffer(r.nodeIdsBuf, r.nodeIdsCapacity, nodeIdBytes,
-                WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
-                "render node ids");
+                 WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+                 "render node ids");
   r.EnsureBuffer(r.edgesBuf, r.edgesCapacity, edgeBytes,
-                WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
-                "render edges");
+                 WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+                 "render edges");
 
   if (!r.positionsStaging.empty())
     wgpuQueueWriteBuffer(r.queue, r.positionsBuf, 0, r.positionsStaging.data(),
@@ -542,10 +543,11 @@ bool Renderer::Frame(Graph &graph) {
     return true;
   }
 
-  WGPUTextureView frame = wgpuTextureCreateView(surfaceTexture.texture, nullptr);
+  WGPUTextureView frame =
+      wgpuTextureCreateView(surfaceTexture.texture, nullptr);
   WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(
-      r.device, WgpuPtr(WGPUCommandEncoderDescriptor{
-                    .label = {"render", WGPU_STRLEN}}));
+      r.device,
+      WgpuPtr(WGPUCommandEncoderDescriptor{.label = {"render", WGPU_STRLEN}}));
 
   WGPURenderPassColorAttachment colorAttachment{
       .view = frame,

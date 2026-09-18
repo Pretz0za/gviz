@@ -20,9 +20,9 @@ inline bool IsZero(const double *vec, uint8_t dim) {
   case 2:
     return IsZero(vec[0]) && IsZero(vec[1]);
   case 3:
-    return IsZero(vec[0]) && IsZero(vec[1] && IsZero(vec[2]));
+    return IsZero(vec[0]) && IsZero(vec[1]) && IsZero(vec[2]);
   case 4:
-    return IsZero(vec[0]) && IsZero(vec[1] && IsZero(vec[2]) && IsZero(vec[3]));
+    return IsZero(vec[0]) && IsZero(vec[1]) && IsZero(vec[2]) && IsZero(vec[3]);
   default:
     for (uint8_t i = 0; i < dim; i++) {
       if (std::fabs(vec[i]) > EPSILON)

@@ -14,11 +14,11 @@ public:
   void OnAdd() override;
   void Set(EntityID id, T data);
 
-  T *Find(EntityID id);
-  const T *Find(EntityID id) const;
+  inline T *Find(EntityID id);
+  inline const T *Find(EntityID id) const;
 
-  std::vector<T> &Data();
-  const std::vector<T> &Data() const;
+  inline std::vector<T> &Data();
+  inline const std::vector<T> &Data() const;
 
   size_t Size() const;
 
