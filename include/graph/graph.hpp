@@ -48,10 +48,15 @@ public:
            std::views::transform([](uint32_t i) { return EdgeID(i); });
   }
 
-  constexpr NodeID MapToSparse(DenseNodeID id) const { return NodeID(id.Raw()); };
-  constexpr DenseNodeID MapToDense(NodeID id) const { return DenseNodeID(id.Raw()); };
+  constexpr NodeID MapToSparse(DenseNodeID id) const {
+    return NodeID(id.Raw());
+  };
+  constexpr DenseNodeID MapToDense(NodeID id) const {
+    return DenseNodeID(id.Raw());
+  };
 
   uint32_t Size() const;
+  inline uint64_t Version() const { return m_version; };
 
   IndexSpace &NodeSpace();
   IndexSpace &EdgeSpace();
@@ -69,6 +74,7 @@ private:
   DenseComponentPool<WeightComponent> *m_weightPool;
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
+  uint64_t m_version = 0;
 };
 
 #include "graph/graph.tpp"

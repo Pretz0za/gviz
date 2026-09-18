@@ -45,10 +45,12 @@ public:
   };
 
   constexpr NodeID MapToSparse(DenseNodeID id) const {
-	return m_mapToSparse[id.Raw()];
+    return m_mapToSparse[id.Raw()];
   }
 
   uint32_t Size() const { return m_size; };
+  // NOTE: since subgraph only has AddNode to mutate, we return size
+  inline uint64_t Version() const { return m_size; }
 
   IndexSpace &NodeSpace();
 

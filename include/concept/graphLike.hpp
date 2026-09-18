@@ -29,4 +29,5 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   { cgraph.MapToSparse(DenseNodeID{}) } -> std::same_as<NodeID>;
   { cgraph.MapToDense(nid) } -> std::same_as<DenseNodeID>;
   { graph.NodeSpace() } -> std::same_as<IndexSpace &>;
+  { cgraph.Version() } -> std::convertible_to<uint64_t>;
 };
