@@ -20,12 +20,22 @@ Graph BuildRectMesh(size_t length, size_t width) {
     }
   }
 
+  g.AddUndirectedEdge(NodeID(0), NodeID((length - 1) * width + width - 1),
+                      1.0f);
+  g.AddUndirectedEdge(NodeID(0), NodeID((length - 1) * width),
+                      1.0f);
+  g.AddUndirectedEdge(NodeID(0), NodeID(width - 1),
+                      1.0f);
+  g.AddUndirectedEdge(NodeID(width - 1), NodeID((length - 1) * width), 1.0);
+  g.AddUndirectedEdge(NodeID(width - 1), NodeID((length - 1) * width + width -1), 1.0);
+  g.AddUndirectedEdge(NodeID((length - 1) * width), NodeID((length - 1) * width + width -1), 1.0);
+
   return g;
 }
 
 int main() {
-  Graph g = BuildRectMesh(1000, 1000);
-  g.SetResource<DimensionResource>(DimensionResource::D2);
+  Graph g = BuildRectMesh(100, 100);
+  g.SetResource<DimensionResource>(DimensionResource::D3);
 
   auto radii = g.NodeSpace().SetPool<RadiusComponent>();
   for (uint32_t i = 0; i < radii->Size(); i++) {
@@ -36,16 +46,17 @@ int main() {
 
   GRIPLayoutAlgorithm grip{g};
   grip.RunFiltration();
-
-  NestedFiltrationResult result = *g.GetResource<NestedFiltrationResult>();
-  for (uint32_t i = 0; i < result.m_layerCount; i++) {
-    grip.TransitionState();
-    for (uint32_t j = 0; j < 100; j++)
-      grip.Tick();
-  }
+  uint32_t iteration = 0;
+  grip.TransitionState();
 
   Renderer renderer(1280, 720, "gviz renderDemo", g);
   while (renderer.Frame(g)) {
+    if(iteration >= 500) {
+      grip.TransitionState();
+      iteration = 0;
+    }
+    grip.Tick();
+    iteration++;
   }
 
   return 0;

@@ -3,9 +3,7 @@
 #include "graph/types.hpp"
 #include "layout/algorithms/grip.hpp"
 #include "layout/components/position.hpp"
-#include "layout/components/radius.hpp"
 #include "layout/filtration/mis_filtration.hpp"
-#include "layout/placement/randomized.hpp"
 #include "layout/types.hpp"
 #include <cassert>
 #include <cstdint>
