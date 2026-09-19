@@ -1,211 +1,229 @@
 [
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /home/aziz/Projects/gviz/src/ecs/index_space.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /home/aziz/Projects/gviz/src/ecs/index_space.cpp",
   "file": "/home/aziz/Projects/gviz/src/ecs/index_space.cpp",
   "output": "CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /home/aziz/Projects/gviz/src/graph/graph.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /home/aziz/Projects/gviz/src/graph/graph.cpp",
   "file": "/home/aziz/Projects/gviz/src/graph/graph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/graph.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o -c /home/aziz/Projects/gviz/src/graph/subgraph.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o -c /home/aziz/Projects/gviz/src/graph/subgraph.cpp",
   "file": "/home/aziz/Projects/gviz/src/graph/subgraph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o -c /home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o -c /home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
   "file": "/home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
   "output": "CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o -c /home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o -c /home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
   "file": "/home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
   "output": "CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -std=gnu++20 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /home/aziz/Projects/gviz/main.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /home/aziz/Projects/gviz/main.cpp",
   "file": "/home/aziz/Projects/gviz/main.cpp",
   "output": "CMakeFiles/main.dir/main.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o -c /home/aziz/Projects/gviz/src/render/renderer.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o -c /home/aziz/Projects/gviz/src/render/renderer.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/renderer.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/surface_linux.cpp.o -c /home/aziz/Projects/gviz/src/render/surface_linux.cpp",
-  "file": "/home/aziz/Projects/gviz/src/render/surface_linux.cpp",
-  "output": "CMakeFiles/gvizRender.dir/src/render/surface_linux.cpp.o"
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/device.cpp",
+  "file": "/home/aziz/Projects/gviz/src/render/gpu/device.cpp",
+  "output": "CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -std=gnu++20 -fPIE -o CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o -c /home/aziz/Projects/gviz/examples/renderDemo.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o -c /home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
+  "file": "/home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
+  "output": "CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o -c /home/aziz/Projects/gviz/src/render/frame/frame.cpp",
+  "file": "/home/aziz/Projects/gviz/src/render/frame/frame.cpp",
+  "output": "CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
+  "file": "/home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
+  "output": "CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIE -o CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o -c /home/aziz/Projects/gviz/examples/renderDemo.cpp",
   "file": "/home/aziz/Projects/gviz/examples/renderDemo.cpp",
   "output": "CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/context.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/context.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/context.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/context.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/init.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/init.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/init.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/init.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/input.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/input.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/input.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/input.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/input.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/input.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/monitor.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/monitor.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/monitor.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/monitor.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/platform.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/platform.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/platform.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/platform.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/platform.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/platform.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/vulkan.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/vulkan.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/vulkan.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/vulkan.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/vulkan.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/vulkan.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/window.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/window.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/window.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/window.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/egl_context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/egl_context.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/egl_context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/egl_context.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/egl_context.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/egl_context.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/osmesa_context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/osmesa_context.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/osmesa_context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/osmesa_context.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/osmesa_context.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/osmesa_context.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_init.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_init.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/null_init.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/null_init.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_monitor.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_monitor.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/null_monitor.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/null_monitor.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_window.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_window.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/null_window.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/null_window.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_joystick.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_joystick.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/null_joystick.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/null_joystick.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/null_joystick.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/null_joystick.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_module.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_module.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_module.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_module.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/posix_module.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/posix_module.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_time.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_time.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_time.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_time.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/posix_time.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/posix_time.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_thread.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_thread.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_thread.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_thread.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/posix_thread.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/posix_thread.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/x11_init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/x11_init.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/x11_init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/x11_init.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/x11_init.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/x11_init.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/x11_monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/x11_monitor.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/x11_monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/x11_monitor.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/x11_monitor.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/x11_monitor.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/x11_window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/x11_window.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/x11_window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/x11_window.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/x11_window.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/x11_window.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/xkb_unicode.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/xkb_unicode.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/xkb_unicode.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/xkb_unicode.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/xkb_unicode.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/xkb_unicode.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/glx_context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/glx_context.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/glx_context.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/glx_context.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/glx_context.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/glx_context.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/wl_init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/wl_init.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/wl_init.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/wl_init.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/wl_init.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/wl_init.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/wl_monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/wl_monitor.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/wl_monitor.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/wl_monitor.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/wl_monitor.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/wl_monitor.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/wl_window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/wl_window.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/wl_window.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/wl_window.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/wl_window.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/wl_window.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/linux_joystick.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/linux_joystick.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/linux_joystick.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/linux_joystick.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/linux_joystick.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/linux_joystick.c.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_poll.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_poll.c",
+  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I/home/aziz/Projects/gviz/third-party/glfw/include -I/home/aziz/Projects/gviz/third-party/glfw/src -I/home/aziz/Projects/gviz/build-render/glfw-build/src -O3 -DNDEBUG -std=c99 -fPIC -Wall -o CMakeFiles/glfw.dir/posix_poll.c.o -c /home/aziz/Projects/gviz/third-party/glfw/src/posix_poll.c",
   "file": "/home/aziz/Projects/gviz/third-party/glfw/src/posix_poll.c",
   "output": "glfw-build/src/CMakeFiles/glfw.dir/posix_poll.c.o"
 }

@@ -38,7 +38,10 @@ public:
     return std::ranges::subrange(m_nodeSet.begin(), m_nodeSet.end());
   }
 
-  // auto Edges() const;
+  auto Edges() const {
+    return m_parent->Edges() |
+           std::views::filter([this](EdgeID id) { return HasEdge(id); });
+  }
 
   constexpr DenseNodeID MapToDense(NodeID id) const {
     return m_mapToDense[id.Raw()];

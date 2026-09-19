@@ -34,8 +34,8 @@ Graph BuildRectMesh(size_t length, size_t width) {
 }
 
 int main() {
-  Graph g = BuildRectMesh(100, 100);
-  g.SetResource<DimensionResource>(DimensionResource::D3);
+  Graph g = BuildRectMesh(10, 10);
+  g.SetResource<DimensionResource>(DimensionResource::D2);
 
   auto radii = g.NodeSpace().SetPool<RadiusComponent>();
   for (uint32_t i = 0; i < radii->Size(); i++) {
@@ -51,7 +51,7 @@ int main() {
 
   Renderer renderer(1280, 720, "gviz renderDemo", g);
   while (renderer.Frame(g)) {
-    if(iteration >= 500) {
+    if(iteration >= 50) {
       grip.TransitionState();
       iteration = 0;
     }

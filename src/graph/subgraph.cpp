@@ -37,7 +37,5 @@ EdgeComponent Subgraph::GetEdge(EdgeID id) const {
 uint32_t Subgraph::OutDegree(NodeID id) const { return 0xFFFFFFFF; }
 uint32_t Subgraph::InDegree(NodeID id) const { return 0xFFFFFFFF; }
 
-// auto Subgraph::Edges() const {}
-
 IndexSpace &Subgraph::NodeSpace() { return m_compactNodeSpace; }
 // IndexSpace &Subgraph::EdgeSpace() {}

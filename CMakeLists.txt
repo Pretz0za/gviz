@@ -107,12 +107,15 @@ if(GVIZ_BUILD_RENDER)
 
     add_library(gvizRender STATIC
         src/render/renderer.cpp
+        src/render/gpu/device.cpp
+        src/render/camera/camera_control.cpp
+        src/render/frame/frame.cpp
     )
     if(APPLE)
-        target_sources(gvizRender PRIVATE src/render/surface_cocoa.mm)
+        target_sources(gvizRender PRIVATE src/render/gpu/surface_cocoa.mm)
         target_link_libraries(gvizRender PRIVATE "-framework AppKit")
     elseif(UNIX)
-        target_sources(gvizRender PRIVATE src/render/surface_linux.cpp)
+        target_sources(gvizRender PRIVATE src/render/gpu/surface_linux.cpp)
     endif()
 
     target_include_directories(gvizRender

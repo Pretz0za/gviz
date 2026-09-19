@@ -1,32 +1,37 @@
 #pragma once
 
-#include "graph/graph.hpp"
+#include "render/graph_query.hpp"
 #include <cstdint>
 #include <memory>
 #include <string>
 
 class Renderer {
 public:
-  // Reads DimensionResource from `graph` once, at construction, to decide
-  // whether the camera runs in 2D (pan + zoom) or 3D (orbit + pan + zoom)
-  // mode. Throws MissingResourceException<DimensionResource> if the graph
-  // has no DimensionResource set.
+  template <GraphLike G>
   Renderer(uint32_t width, uint32_t height, const std::string &title,
-           Graph &graph);
+           G &graph);
   ~Renderer();
 
   Renderer(const Renderer &) = delete;
   Renderer &operator=(const Renderer &) = delete;
 
-  bool Frame(Graph &graph);
+  template <GraphLike G> bool Frame(G &graph);
 
-  void SetNodeRadiusPixels(float radius);
   void SetEdgeWidthPixels(float width);
   void SetNodeColor(float r, float g, float b, float a);
   void SetEdgeColor(float r, float g, float b, float a);
   void SetBackgroundColor(float r, float g, float b, float a);
 
 private:
+  Renderer(uint32_t width, uint32_t height, const std::string &title,
+           bool is3D);
+
+  bool Is3D() const;
+  FrameData &FrameBuffer();
+  bool ApplyFrame(const FrameData &fd);
+
   struct Impl;
   std::unique_ptr<Impl> m_impl;
 };
+
+#include "render/renderer.tpp"
