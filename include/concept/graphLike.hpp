@@ -35,6 +35,9 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
 
   { cgraph.Size() } -> std::convertible_to<uint32_t>;
 
+  { cgraph.OutDegree(nid) } -> std::convertible_to<uint32_t>;
+  { cgraph.Degree(nid) } -> std::convertible_to<uint32_t>;
+  { cgraph.InDegree(nid) } -> std::convertible_to<uint32_t>;
   { cgraph.HasNode(nid) } -> std::convertible_to<bool>;
   { cgraph.HasEdge(eid) } -> std::convertible_to<bool>;
   { cgraph.GetEdge(eid) } -> std::same_as<EdgeComponent>;

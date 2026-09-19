@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 
 constexpr double EPSILON = 1e-7;

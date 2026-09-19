@@ -17,6 +17,11 @@ public:
   inline void RepulsiveTick(DenseNodeID v, DenseNodeID u);
 
 private:
+  uint8_t m_dimension;
+  double m_edgeLength = 10.0;
+  DistanceCalculationSystem<G> m_distanceCalc;
+  DenseComponentPool<PositionComponent> *m_positions;
+  DenseComponentPool<PhysicsComponent> *m_physics;
 };
 
 template <GraphLike G> class GRIPFruchtermanReingold {

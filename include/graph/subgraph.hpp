@@ -1,6 +1,8 @@
 #pragma once
 
+#include "ecs/components.hpp"
 #include "ecs/index_space.hpp"
+#include "graph/components/degree.hpp"
 #include "graph/components/edge.hpp"
 #include "graph/graph.hpp"
 #include "graph/types.hpp"
@@ -33,6 +35,7 @@ public:
 
   uint32_t OutDegree(NodeID id) const;
   uint32_t InDegree(NodeID id) const;
+  uint32_t Degree(NodeID id) const;
 
   auto Nodes() const {
     return std::ranges::subrange(m_nodeSet.begin(), m_nodeSet.end());
@@ -66,16 +69,18 @@ public:
   template <typename T> bool HasResource() const;
 
 private:
+
+  void incrementDegrees(NodeID id);
+  
   uint32_t m_size = 0;
-  IndexSpace m_compactNodeSpace;
   Graph *m_parent;
+  IndexSpace m_compactNodeSpace;
   SparseNodeSet m_nodeSet;
+  DenseComponentPool<DegreeComponent> *m_degrees;
+  std::vector<DenseNodeID> m_mapToDense; // parent graph -> compact index
+  std::vector<NodeID> m_mapToSparse;     // compact index -> parent graph index
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
-
-  std::vector<DenseNodeID>
-      m_mapToDense; // parent graph index -> compact index in subgraph's pools
-  std::vector<NodeID> m_mapToSparse; // compact index -> parent graph index
 };
 
 #include "graph/subgraph.tpp"

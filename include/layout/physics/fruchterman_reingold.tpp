@@ -7,6 +7,40 @@
 #include <cmath>
 
 template <GraphLike G>
+VanillaFruchtermanReingold<G>::VanillaFruchtermanReingold(G &graph)
+    : m_distanceCalc(graph),
+      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
+      m_positions(graph.NodeSpace().template GetPool<PositionComponent>()) {
+  DimensionResource *dim = graph.template GetResource<DimensionResource>();
+  if (dim == nullptr) {
+    throw MissingResourceException<DimensionResource>();
+  }
+  m_dimension = static_cast<uint8_t>(*dim);
+}
+
+template <GraphLike G>
+void VanillaFruchtermanReingold<G>::AttractiveTick(DenseNodeID v,
+                                                   DenseNodeID u) {
+  double out[m_dimension];
+  m_distanceCalc.VecBetweenNodes(v, u, out);
+  double dist = m_distanceCalc.BetweenNodes(v, u);
+
+  Vecaxpy(dist / m_edgeLength, out, m_positions->Find(v.Raw())->pos,
+          m_dimension);
+}
+
+template <GraphLike G>
+void VanillaFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v,
+                                                  DenseNodeID u) {
+  double out[m_dimension];
+  m_distanceCalc.VecBetweenNodes(v, u, out);
+  double dist = m_distanceCalc.BetweenNodes(v, u);
+
+  Vecaxpy(m_edgeLength * m_edgeLength / (dist * dist), out, m_positions->Find(v.Raw())->pos,
+          m_dimension);
+}
+
+template <GraphLike G>
 GRIPFruchtermanReingold<G>::GRIPFruchtermanReingold(G &graph)
     : m_distanceCalc(graph),
       m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()) {

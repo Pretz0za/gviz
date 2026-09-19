@@ -89,6 +89,10 @@ uint32_t Graph::InDegree(NodeID id) const {
   return static_cast<uint32_t>(InNeighbors(id).size());
 }
 
+uint32_t Graph::Degree(NodeID id) const {
+  return InDegree(id) + OutDegree(id);
+}
+
 uint32_t Graph::Size() const {
   return static_cast<uint32_t>(m_nodeSpace.Size());
 }

@@ -1,6 +1,7 @@
 #include "graph/graph.hpp"
 #include "graph/subgraph.hpp"
-#include "layout/algorithms/grip.hpp"
+#include "layout/algorithms/force_directed.hpp"
+#include "layout/physics/fruchterman_reingold.hpp"
 #include "layout/types.hpp"
 #include "render/renderer.hpp"
 
@@ -51,19 +52,12 @@ int main() {
     }
   }
 
-  GRIPLayoutAlgorithm grip{g};
-  grip.RunFiltration();
-  uint32_t iteration = 0;
-  grip.TransitionState();
+  ForceDirectedLayoutAlgorithm<Subgraph, VanillaFruchtermanReingold<Subgraph>>
+      forceDirected{g};
 
   Renderer renderer(1280, 720, "gviz renderDemo", g);
   while (renderer.Frame(g)) {
-    if (iteration >= 50) {
-      grip.TransitionState();
-      iteration = 0;
-    }
-    grip.Tick();
-    iteration++;
+    forceDirected.Tick();
   }
 
   return 0;

@@ -33,8 +33,10 @@ public:
 
   const std::vector<AdjEntry> &OutNeighbors(NodeID id) const;
   const std::vector<AdjEntry> &InNeighbors(NodeID id) const;
+
   uint32_t OutDegree(NodeID id) const;
   uint32_t InDegree(NodeID id) const;
+  uint32_t Degree(NodeID id) const;
 
   auto Nodes() const {
     return std::views::iota(uint32_t{0},
