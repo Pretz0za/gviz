@@ -67,13 +67,11 @@ template <GraphLike G> void GRIPPhysicsSystem<G>::Tick() {
     if (m_currLayer == 0) {
       NodeID sparseID = m_graph->MapToSparse(denseID);
       for (AdjEntry adj : m_graph->OutNeighbors(sparseID)) {
-        m_frForces.Tick(denseID, m_graph->MapToDense(adj.other),
-                        m_frForces.ATTRACTIVE);
+        m_frForces.AttractiveTick(denseID, m_graph->MapToDense(adj.other));
       }
       for (uint32_t j = 0; j < knns[denseID.Raw()].size; j++) {
         FoundNode fn = knns[denseID.Raw()].nearest[j];
-        m_frForces.Tick(denseID, m_graph->MapToDense(fn.node),
-                        m_frForces.REPULSIVE);
+        m_frForces.RepulsiveTick(denseID, m_graph->MapToDense(fn.node));
       }
 
     } else {

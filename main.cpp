@@ -77,7 +77,7 @@ void PrintPositionsDesmos(Graph &g) {
 
 int main() {
 
-  Graph g = BuildRectMesh(1000, 1000);
+  Graph g = BuildRectMesh(10, 100);
   Subgraph sg{g};
 
   for (NodeID nid : g.Nodes()) {

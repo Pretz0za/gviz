@@ -1,6 +1,6 @@
 #include "graph/graph.hpp"
+#include "graph/subgraph.hpp"
 #include "layout/algorithms/grip.hpp"
-#include "layout/filtration/mis_filtration.hpp"
 #include "layout/types.hpp"
 #include "render/renderer.hpp"
 
@@ -20,21 +20,28 @@ Graph BuildRectMesh(size_t length, size_t width) {
     }
   }
 
-  g.AddUndirectedEdge(NodeID(0), NodeID((length - 1) * width + width - 1),
-                      1.0f);
-  g.AddUndirectedEdge(NodeID(0), NodeID((length - 1) * width),
-                      1.0f);
-  g.AddUndirectedEdge(NodeID(0), NodeID(width - 1),
-                      1.0f);
-  g.AddUndirectedEdge(NodeID(width - 1), NodeID((length - 1) * width), 1.0);
-  g.AddUndirectedEdge(NodeID(width - 1), NodeID((length - 1) * width + width -1), 1.0);
-  g.AddUndirectedEdge(NodeID((length - 1) * width), NodeID((length - 1) * width + width -1), 1.0);
-
+  // g.AddUndirectedEdge(NodeID(0), NodeID((length - 1) * width + width - 1),
+  //                     1.0f);
+  // g.AddUndirectedEdge(NodeID(0), NodeID((length - 1) * width), 1.0f);
+  // g.AddUndirectedEdge(NodeID(0), NodeID(width - 1), 1.0f);
+  // g.AddUndirectedEdge(NodeID(width - 1), NodeID((length - 1) * width), 1.0);
+  // g.AddUndirectedEdge(NodeID(width - 1),
+  //                     NodeID((length - 1) * width + width - 1), 1.0);
+  // g.AddUndirectedEdge(NodeID((length - 1) * width),
+  //                     NodeID((length - 1) * width + width - 1), 1.0);
+  //
   return g;
 }
 
 int main() {
-  Graph g = BuildRectMesh(10, 10);
+  Graph parent = BuildRectMesh(10, 10);
+  Subgraph g(parent);
+  for (auto nid : parent.Nodes()) {
+
+    if (nid.Raw() % 7 != 1) {
+      g.AddNode(nid);
+    }
+  }
   g.SetResource<DimensionResource>(DimensionResource::D2);
 
   auto radii = g.NodeSpace().SetPool<RadiusComponent>();
@@ -51,7 +58,7 @@ int main() {
 
   Renderer renderer(1280, 720, "gviz renderDemo", g);
   while (renderer.Frame(g)) {
-    if(iteration >= 50) {
+    if (iteration >= 50) {
       grip.TransitionState();
       iteration = 0;
     }
