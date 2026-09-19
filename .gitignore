@@ -1,4 +1,5 @@
 /build/
+/build-release/
 /build-profile/
 /build-asan/
 /build-render/

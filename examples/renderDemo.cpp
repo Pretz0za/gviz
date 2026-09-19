@@ -24,7 +24,7 @@ Graph BuildRectMesh(size_t length, size_t width) {
 }
 
 int main() {
-  Graph g = BuildRectMesh(10, 10);
+  Graph g = BuildRectMesh(1000, 1000);
   g.SetResource<DimensionResource>(DimensionResource::D2);
 
   auto radii = g.NodeSpace().SetPool<RadiusComponent>();
@@ -44,7 +44,7 @@ int main() {
       grip.Tick();
   }
 
-  Renderer renderer(1280, 720, "gviz renderDemo");
+  Renderer renderer(1280, 720, "gviz renderDemo", g);
   while (renderer.Frame(g)) {
   }
 

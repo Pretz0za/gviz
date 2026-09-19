@@ -1,5 +1,6 @@
 #include "render/renderer.hpp"
 
+#include "ecs/exceptions.hpp"
 #include "layout/components/radius.hpp"
 #include "render_internal.hpp"
 #include "shaders.hpp"
@@ -25,9 +26,15 @@ struct GlobalsUBO {
   float viewProj[16];
   float viewport[2];
   float edgeWidthPx;
-  float _pad0; // WGSL aligns nodeColor (vec4f) to 16 bytes
+  float worldPerPixel; // world-space size of one screen pixel; used to keep
+                       // node antialiasing ~1px wide regardless of zoom
   float nodeColor[4];
   float edgeColor[4];
+  float cameraRight[3]; // billboard basis nodes are expanded along, in world
+                        // space, so node radius is a world-space size
+  float _padR;          // WGSL aligns the next vec3f to 16 bytes
+  float cameraUp[3];
+  float _padU; // WGSL rounds the struct size up to a multiple of 16 bytes
 };
 
 void OrthoViewProj(float outMat[16], float cx, float cy, float halfW,
@@ -40,6 +47,169 @@ void OrthoViewProj(float outMat[16], float cx, float cy, float halfW,
   outMat[13] = -cy / halfH;
   outMat[15] = 1.0f;
 }
+
+// column-major, out = a * b
+void Mat4Multiply(float out[16], const float a[16], const float b[16]) {
+  float r[16];
+  for (int col = 0; col < 4; col++) {
+    for (int row = 0; row < 4; row++) {
+      float sum = 0.0f;
+      for (int k = 0; k < 4; k++)
+        sum += a[k * 4 + row] * b[col * 4 + k];
+      r[col * 4 + row] = sum;
+    }
+  }
+  std::copy(r, r + 16, out);
+}
+
+// right-handed perspective projection, WebGPU depth range [0, 1]
+void PerspectiveProj(float outMat[16], float fovYRadians, float aspect,
+                     float nearZ, float farZ) {
+  std::fill(outMat, outMat + 16, 0.0f);
+  float f = 1.0f / std::tan(fovYRadians * 0.5f);
+  outMat[0] = f / aspect;
+  outMat[5] = f;
+  outMat[10] = farZ / (nearZ - farZ);
+  outMat[11] = -1.0f;
+  outMat[14] = (farZ * nearZ) / (nearZ - farZ);
+}
+
+void Vec3Sub(float out[3], const float a[3], const float b[3]) {
+  out[0] = a[0] - b[0];
+  out[1] = a[1] - b[1];
+  out[2] = a[2] - b[2];
+}
+
+void Vec3Cross(float out[3], const float a[3], const float b[3]) {
+  float r[3] = {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
+               a[0] * b[1] - a[1] * b[0]};
+  std::copy(r, r + 3, out);
+}
+
+float Vec3Dot(const float a[3], const float b[3]) {
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+
+void Vec3Normalize(float v[3]) {
+  float len = std::sqrt(Vec3Dot(v, v));
+  if (len < 1e-8f)
+    return;
+  v[0] /= len;
+  v[1] /= len;
+  v[2] /= len;
+}
+
+// right-handed look-at view matrix
+void LookAtRH(float outMat[16], const float eye[3], const float center[3],
+             const float up[3]) {
+  float f[3];
+  Vec3Sub(f, center, eye);
+  Vec3Normalize(f);
+  float s[3];
+  Vec3Cross(s, f, up);
+  Vec3Normalize(s);
+  float u[3];
+  Vec3Cross(u, s, f);
+
+  outMat[0] = s[0];
+  outMat[4] = s[1];
+  outMat[8] = s[2];
+  outMat[12] = -Vec3Dot(s, eye);
+
+  outMat[1] = u[0];
+  outMat[5] = u[1];
+  outMat[9] = u[2];
+  outMat[13] = -Vec3Dot(u, eye);
+
+  outMat[2] = -f[0];
+  outMat[6] = -f[1];
+  outMat[10] = -f[2];
+  outMat[14] = Vec3Dot(f, eye);
+
+  outMat[3] = 0.0f;
+  outMat[7] = 0.0f;
+  outMat[11] = 0.0f;
+  outMat[15] = 1.0f;
+}
+
+constexpr float kFovY = 0.6981317f; // 40 degrees
+constexpr float kMinOrbitDistance = 1e-3f;
+constexpr float kMinOrthoHalfHeight = 1e-3f;
+constexpr float kMaxPitch = 1.5533f; // ~89 degrees
+
+struct OrbitCamera {
+  bool is3D = false;
+  bool initialized = false;
+  float target[3] = {0.0f, 0.0f, 0.0f};
+  // 3D: orbit radius around target. 2D: half-height of the ortho view, in
+  // world units.
+  float distance = 1.0f;
+  // 3D only; unused (and locked) in 2D mode.
+  float yaw = -0.7f;
+  float pitch = 0.5f;
+
+  void Eye(float outEye[3]) const {
+    float cp = std::cos(pitch);
+    outEye[0] = target[0] + distance * cp * std::sin(yaw);
+    outEye[1] = target[1] + distance * std::sin(pitch);
+    outEye[2] = target[2] + distance * cp * std::cos(yaw);
+  }
+
+  void Orbit(float dYaw, float dPitch) {
+    yaw += dYaw;
+    pitch = std::clamp(pitch + dPitch, -kMaxPitch, kMaxPitch);
+  }
+
+  // Right/up basis nodes are billboarded against: the camera's actual right
+  // and up vectors in 3D, or the fixed world axes in 2D (there's no roll to
+  // account for).
+  void Basis(float outRight[3], float outUp[3]) const {
+    if (!is3D) {
+      outRight[0] = 1.0f;
+      outRight[1] = 0.0f;
+      outRight[2] = 0.0f;
+      outUp[0] = 0.0f;
+      outUp[1] = 1.0f;
+      outUp[2] = 0.0f;
+      return;
+    }
+    float eye[3];
+    Eye(eye);
+    float fwd[3];
+    Vec3Sub(fwd, target, eye);
+    Vec3Normalize(fwd);
+    float worldUp[3] = {0.0f, 1.0f, 0.0f};
+    Vec3Cross(outRight, fwd, worldUp);
+    Vec3Normalize(outRight);
+    Vec3Cross(outUp, outRight, fwd);
+  }
+
+  // World-space size of one screen pixel, at the target's distance from the
+  // camera. Used to size the pan drag and node antialiasing consistently
+  // with the current zoom level.
+  float WorldPerPixel(float viewportHeight) const {
+    return is3D ? 2.0f * distance * std::tan(kFovY * 0.5f) / viewportHeight
+               : 2.0f * distance / viewportHeight;
+  }
+
+  // Pans the target across the camera's right/up plane, so drag speed
+  // matches what's on screen.
+  void Pan(float dxPixels, float dyPixels, float viewportHeight) {
+    float right[3], up[3];
+    Basis(right, up);
+    float worldPerPixel = WorldPerPixel(viewportHeight);
+    for (int i = 0; i < 3; i++)
+      target[i] +=
+          (-right[i] * dxPixels + up[i] * dyPixels) * worldPerPixel;
+  }
+
+  void Zoom(float scrollY) {
+    float factor = std::pow(0.9f, scrollY);
+    distance *= factor;
+    float minDist = is3D ? kMinOrbitDistance : kMinOrthoHalfHeight;
+    distance = std::max(distance, minDist);
+  }
+};
 
 void OnAdapterRequest(WGPURequestAdapterStatus, WGPUAdapter adapter,
                       WGPUStringView, void *userdata1, void *) {
@@ -75,6 +245,10 @@ struct Renderer::Impl {
   WGPURenderPipeline nodePipeline = nullptr;
   WGPURenderPipeline edgePipeline = nullptr;
 
+  WGPUTextureFormat depthFormat = WGPUTextureFormat_Depth24Plus;
+  WGPUTexture depthTexture = nullptr;
+  WGPUTextureView depthView = nullptr;
+
   WGPUBuffer globalsBuf = nullptr;
   WGPUBuffer positionsBuf = nullptr;
   WGPUBuffer nodeIdsBuf = nullptr;
@@ -98,16 +272,36 @@ struct Renderer::Impl {
   float edgeColor[4] = {0.45f, 0.5f, 0.6f, 0.8f};
   float bgColor[4] = {0.08f, 0.09f, 0.11f, 1.0f};
 
+  OrbitCamera camera;
+
+  bool haveLastCursor = false;
+  double lastCursorX = 0.0;
+  double lastCursorY = 0.0;
+  bool orbitDragging = false; // left button: 3D orbit, no-op in 2D
+  bool panDragging = false;   // right/middle button: pan, both 2D and 3D
+
+  float bboxMin[3] = {0.0f, 0.0f, 0.0f};
+  float bboxMax[3] = {0.0f, 0.0f, 0.0f};
+  bool bboxValid = false;
+
   ~Impl();
 
   bool Init(uint32_t width, uint32_t height, const std::string &title);
   bool CreatePipelines();
+  bool CreateDepthTexture(uint32_t width, uint32_t height);
   WGPUBuffer CreateBuffer(size_t size, WGPUBufferUsage usage,
                           const char *label);
   bool EnsureBuffer(WGPUBuffer &buf, size_t &capacity, size_t neededBytes,
                     WGPUBufferUsage usage, const char *label);
   void RebuildBindGroup();
   void RecomputeFrameData(Graph &graph);
+  void FrameCameraIfNeeded();
+  void ComputeViewProj(float outMat[16], uint32_t fbw, uint32_t fbh) const;
+
+  static void OnMouseButton(GLFWwindow *window, int button, int action,
+                            int mods);
+  static void OnCursorPos(GLFWwindow *window, double x, double y);
+  static void OnScroll(GLFWwindow *window, double xoffset, double yoffset);
 };
 
 Renderer::Impl::~Impl() {
@@ -127,6 +321,10 @@ Renderer::Impl::~Impl() {
     wgpuRenderPipelineRelease(edgePipeline);
   if (nodePipeline)
     wgpuRenderPipelineRelease(nodePipeline);
+  if (depthView)
+    wgpuTextureViewRelease(depthView);
+  if (depthTexture)
+    wgpuTextureRelease(depthTexture);
   if (pipelineLayout)
     wgpuPipelineLayoutRelease(pipelineLayout);
   if (bindGroupLayout)
@@ -226,6 +424,17 @@ bool Renderer::Impl::CreatePipelines() {
       .writeMask = WGPUColorWriteMask_All,
   };
 
+  // LessEqual (not Less): nodes are drawn after edges and commonly share the
+  // exact same depth as an edge endpoint (e.g. every node in 2D, where z is
+  // always 0). With strict Less, the later draw at an equal depth loses the
+  // test and never appears, so edges would occlude the nodes sitting right
+  // on top of them.
+  const WGPUDepthStencilState depthStencil = {
+      .format = depthFormat,
+      .depthWriteEnabled = WGPUOptionalBool_True,
+      .depthCompare = WGPUCompareFunction_LessEqual,
+  };
+
   const char *labels[2] = {"render nodes", "render edges"};
   const char *vsEntries[2] = {"vsNode", "vsEdge"};
   const char *fsEntries[2] = {"fsNode", "fsEdge"};
@@ -241,6 +450,7 @@ bool Renderer::Impl::CreatePipelines() {
                        .entryPoint = {vsEntries[i], WGPU_STRLEN}},
             .primitive = {.topology = WGPUPrimitiveTopology_TriangleList,
                           .cullMode = WGPUCullMode_None},
+            .depthStencil = &depthStencil,
             .multisample = {.count = 1, .mask = 0xFFFFFFFF},
             .fragment = WgpuPtr(WGPUFragmentState{
                 .module = shaderModule,
@@ -255,6 +465,29 @@ bool Renderer::Impl::CreatePipelines() {
   nodePipeline = pipelines[0];
   edgePipeline = pipelines[1];
   return true;
+}
+
+bool Renderer::Impl::CreateDepthTexture(uint32_t width, uint32_t height) {
+  if (depthView)
+    wgpuTextureViewRelease(depthView);
+  if (depthTexture)
+    wgpuTextureRelease(depthTexture);
+
+  depthTexture = wgpuDeviceCreateTexture(
+      device, WgpuPtr(WGPUTextureDescriptor{
+                  .label = {"render depth", WGPU_STRLEN},
+                  .usage = WGPUTextureUsage_RenderAttachment,
+                  .dimension = WGPUTextureDimension_2D,
+                  .size = {width, height, 1},
+                  .format = depthFormat,
+                  .mipLevelCount = 1,
+                  .sampleCount = 1,
+              }));
+  if (!depthTexture)
+    return false;
+
+  depthView = wgpuTextureCreateView(depthTexture, nullptr);
+  return depthView != nullptr;
 }
 
 void Renderer::Impl::RebuildBindGroup() {
@@ -303,16 +536,27 @@ void Renderer::Impl::RecomputeFrameData(Graph &graph) {
           ? graph.GetResource<VisibleNodesResource>()
           : nullptr;
 
-  positionsStaging.reserve(graph.Size() * 2);
+  positionsStaging.reserve(graph.Size() * 3);
   radiusStaging.reserve(graph.Size());
+
+  float minB[3] = {std::numeric_limits<float>::max(),
+                   std::numeric_limits<float>::max(),
+                   std::numeric_limits<float>::max()};
+  float maxB[3] = {std::numeric_limits<float>::lowest(),
+                   std::numeric_limits<float>::lowest(),
+                   std::numeric_limits<float>::lowest()};
+  bool anyVisible = false;
+
   for (uint32_t i = 0; i < graph.Size(); i++) {
     DenseNodeID denseID{i};
 
     const PositionComponent *c = posPool->Find(denseID.Raw());
     float x = c ? static_cast<float>(c->pos[0]) : 0.0f;
     float y = c ? static_cast<float>(c->pos[1]) : 0.0f;
+    float z = (c && camera.is3D) ? static_cast<float>(c->pos[2]) : 0.0f;
     positionsStaging.push_back(x);
     positionsStaging.push_back(y);
+    positionsStaging.push_back(z);
 
     radiusStaging.push_back(
         useDefaultRadius
@@ -322,8 +566,22 @@ void Renderer::Impl::RecomputeFrameData(Graph &graph) {
     bool isVisible =
         visible ? (denseID.Raw() < visible->Size() && visible->Test(denseID))
                 : true;
-    if (isVisible)
+    if (isVisible) {
       nodeIdsStaging.push_back(denseID.Raw());
+      anyVisible = true;
+      minB[0] = std::min(minB[0], x);
+      minB[1] = std::min(minB[1], y);
+      minB[2] = std::min(minB[2], z);
+      maxB[0] = std::max(maxB[0], x);
+      maxB[1] = std::max(maxB[1], y);
+      maxB[2] = std::max(maxB[2], z);
+    }
+  }
+
+  if (anyVisible) {
+    std::copy(minB, minB + 3, bboxMin);
+    std::copy(maxB, maxB + 3, bboxMax);
+    bboxValid = true;
   }
 
   for (EdgeID eid : graph.Edges()) {
@@ -339,6 +597,111 @@ void Renderer::Impl::RecomputeFrameData(Graph &graph) {
       edgesStaging.push_back(b.Raw());
     }
   }
+}
+
+void Renderer::Impl::FrameCameraIfNeeded() {
+  if (camera.initialized || !bboxValid)
+    return;
+
+  float center[3];
+  for (int i = 0; i < 3; i++)
+    center[i] = (bboxMin[i] + bboxMax[i]) * 0.5f;
+  std::copy(center, center + 3, camera.target);
+
+  if (camera.is3D) {
+    float ext[3];
+    for (int i = 0; i < 3; i++)
+      ext[i] = bboxMax[i] - bboxMin[i];
+    float radius =
+        0.5f * std::sqrt(ext[0] * ext[0] + ext[1] * ext[1] + ext[2] * ext[2]);
+    radius = std::max(radius, 1e-3f);
+    camera.distance = radius / std::sin(kFovY * 0.5f) * 1.15f;
+  } else {
+    float halfW = std::max((bboxMax[0] - bboxMin[0]) * 0.5f, 1e-3f) * 1.15f;
+    float halfH = std::max((bboxMax[1] - bboxMin[1]) * 0.5f, 1e-3f) * 1.15f;
+    camera.distance = std::max(halfW, halfH);
+  }
+  camera.initialized = true;
+}
+
+void Renderer::Impl::ComputeViewProj(float outMat[16], uint32_t fbw,
+                                     uint32_t fbh) const {
+  float aspect = static_cast<float>(fbw) / static_cast<float>(fbh);
+
+  if (!camera.is3D) {
+    float halfH = std::max(camera.distance, kMinOrthoHalfHeight);
+    float halfW = halfH * aspect;
+    OrthoViewProj(outMat, camera.target[0], camera.target[1], halfW, halfH);
+    return;
+  }
+
+  float eye[3];
+  camera.Eye(eye);
+  const float up[3] = {0.0f, 1.0f, 0.0f};
+  float view[16];
+  LookAtRH(view, eye, camera.target, up);
+
+  float nearZ = std::max(0.01f, camera.distance * 0.01f);
+  float farZ = std::max(nearZ * 10.0f, camera.distance * 100.0f);
+  float proj[16];
+  PerspectiveProj(proj, kFovY, aspect, nearZ, farZ);
+
+  Mat4Multiply(outMat, proj, view);
+}
+
+namespace {
+constexpr float kOrbitSensitivity = 0.006f; // radians per pixel
+} // namespace
+
+void Renderer::Impl::OnMouseButton(GLFWwindow *window, int button, int action,
+                                   int) {
+  auto *impl = static_cast<Impl *>(glfwGetWindowUserPointer(window));
+  if (!impl)
+    return;
+  bool pressed = action == GLFW_PRESS;
+  if (button == GLFW_MOUSE_BUTTON_LEFT) {
+    impl->orbitDragging = pressed;
+  } else if (button == GLFW_MOUSE_BUTTON_RIGHT ||
+            button == GLFW_MOUSE_BUTTON_MIDDLE) {
+    impl->panDragging = pressed;
+  }
+  if (!pressed && !impl->orbitDragging && !impl->panDragging)
+    impl->haveLastCursor = false;
+}
+
+void Renderer::Impl::OnCursorPos(GLFWwindow *window, double x, double y) {
+  auto *impl = static_cast<Impl *>(glfwGetWindowUserPointer(window));
+  if (!impl)
+    return;
+  if (!impl->haveLastCursor) {
+    impl->lastCursorX = x;
+    impl->lastCursorY = y;
+    impl->haveLastCursor = true;
+    return;
+  }
+  float dx = static_cast<float>(x - impl->lastCursorX);
+  float dy = static_cast<float>(y - impl->lastCursorY);
+  impl->lastCursorX = x;
+  impl->lastCursorY = y;
+
+  int fbh = 0, fbw = 0;
+  glfwGetFramebufferSize(window, &fbw, &fbh);
+  if (fbh <= 0)
+    return;
+
+  if (impl->orbitDragging && impl->camera.is3D) {
+    impl->camera.Orbit(dx * kOrbitSensitivity, -dy * kOrbitSensitivity);
+  } else if (impl->panDragging ||
+            (impl->orbitDragging && !impl->camera.is3D)) {
+    impl->camera.Pan(dx, dy, static_cast<float>(fbh));
+  }
+}
+
+void Renderer::Impl::OnScroll(GLFWwindow *window, double, double yoffset) {
+  auto *impl = static_cast<Impl *>(glfwGetWindowUserPointer(window));
+  if (!impl)
+    return;
+  impl->camera.Zoom(static_cast<float>(yoffset));
 }
 
 bool Renderer::Impl::Init(uint32_t width, uint32_t height,
@@ -417,15 +780,30 @@ bool Renderer::Impl::Init(uint32_t width, uint32_t height,
 
   if (!CreatePipelines())
     return false;
+  if (!CreateDepthTexture(surfaceConfig.width, surfaceConfig.height))
+    return false;
 
   globalsBuf = CreateBuffer(sizeof(GlobalsUBO),
                             WGPUBufferUsage_Uniform | WGPUBufferUsage_CopyDst,
                             "render globals");
-  return globalsBuf != nullptr;
+  if (!globalsBuf)
+    return false;
+
+  glfwSetWindowUserPointer(window, this);
+  glfwSetMouseButtonCallback(window, OnMouseButton);
+  glfwSetCursorPosCallback(window, OnCursorPos);
+  glfwSetScrollCallback(window, OnScroll);
+  return true;
 }
 
-Renderer::Renderer(uint32_t width, uint32_t height, const std::string &title)
+Renderer::Renderer(uint32_t width, uint32_t height, const std::string &title,
+                   Graph &graph)
     : m_impl(std::make_unique<Impl>()) {
+  DimensionResource *dim = graph.GetResource<DimensionResource>();
+  if (dim == nullptr)
+    throw MissingResourceException<DimensionResource>();
+  m_impl->camera.is3D = *dim == DimensionResource::D3;
+
   if (!m_impl->Init(width, height, title)) {
     std::fprintf(stderr, "[render] Renderer initialization failed\n");
   }
@@ -472,6 +850,7 @@ bool Renderer::Frame(Graph &graph) {
     r.surfaceConfig.width = static_cast<uint32_t>(fbw);
     r.surfaceConfig.height = static_cast<uint32_t>(fbh);
     wgpuSurfaceConfigure(r.surface, &r.surfaceConfig);
+    r.CreateDepthTexture(r.surfaceConfig.width, r.surfaceConfig.height);
   }
 
   r.RecomputeFrameData(graph);
@@ -515,44 +894,16 @@ bool Renderer::Frame(Graph &graph) {
   if (r.bindGroupDirty)
     r.RebuildBindGroup();
 
-  float minX = std::numeric_limits<float>::max();
-  float minY = std::numeric_limits<float>::max();
-  float maxX = std::numeric_limits<float>::lowest();
-  float maxY = std::numeric_limits<float>::lowest();
-  for (uint32_t id : r.nodeIdsStaging) {
-    float x = r.positionsStaging[id * 2];
-    float y = r.positionsStaging[id * 2 + 1];
-    minX = std::min(minX, x);
-    minY = std::min(minY, y);
-    maxX = std::max(maxX, x);
-    maxY = std::max(maxY, y);
-  }
-  if (minX > maxX) {
-    minX = -1.0f;
-    maxX = 1.0f;
-    minY = -1.0f;
-    maxY = 1.0f;
-  }
-
-  float cx = (minX + maxX) * 0.5f;
-  float cy = (minY + maxY) * 0.5f;
-  float worldW = std::max(maxX - minX, 1e-3f) * 1.15f;
-  float worldH = std::max(maxY - minY, 1e-3f) * 1.15f;
-  float viewportAspect = static_cast<float>(fbw) / static_cast<float>(fbh);
-  float halfW, halfH;
-  if (worldW / worldH > viewportAspect) {
-    halfW = worldW * 0.5f;
-    halfH = halfW / viewportAspect;
-  } else {
-    halfH = worldH * 0.5f;
-    halfW = halfH * viewportAspect;
-  }
+  r.FrameCameraIfNeeded();
 
   GlobalsUBO globals{};
-  OrthoViewProj(globals.viewProj, cx, cy, halfW, halfH);
+  r.ComputeViewProj(globals.viewProj, static_cast<uint32_t>(fbw),
+                    static_cast<uint32_t>(fbh));
   globals.viewport[0] = static_cast<float>(fbw);
   globals.viewport[1] = static_cast<float>(fbh);
   globals.edgeWidthPx = r.edgeWidthPx;
+  globals.worldPerPixel = r.camera.WorldPerPixel(static_cast<float>(fbh));
+  r.camera.Basis(globals.cameraRight, globals.cameraUp);
   std::memcpy(globals.nodeColor, r.nodeColor, sizeof(globals.nodeColor));
   std::memcpy(globals.edgeColor, r.edgeColor, sizeof(globals.edgeColor));
   wgpuQueueWriteBuffer(r.queue, r.globalsBuf, 0, &globals, sizeof(globals));
@@ -581,11 +932,18 @@ bool Renderer::Frame(Graph &graph) {
       .storeOp = WGPUStoreOp_Store,
       .clearValue = {r.bgColor[0], r.bgColor[1], r.bgColor[2], r.bgColor[3]},
   };
+  WGPURenderPassDepthStencilAttachment depthAttachment{
+      .view = r.depthView,
+      .depthLoadOp = WGPULoadOp_Clear,
+      .depthStoreOp = WGPUStoreOp_Store,
+      .depthClearValue = 1.0f,
+  };
   WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(
       encoder, WgpuPtr(WGPURenderPassDescriptor{
                    .label = {"render pass", WGPU_STRLEN},
                    .colorAttachmentCount = 1,
                    .colorAttachments = &colorAttachment,
+                   .depthStencilAttachment = &depthAttachment,
                }));
 
   wgpuRenderPassEncoderSetBindGroup(pass, 0, r.bindGroup, 0, nullptr);

@@ -7,7 +7,12 @@
 
 class Renderer {
 public:
-  Renderer(uint32_t width, uint32_t height, const std::string &title);
+  // Reads DimensionResource from `graph` once, at construction, to decide
+  // whether the camera runs in 2D (pan + zoom) or 3D (orbit + pan + zoom)
+  // mode. Throws MissingResourceException<DimensionResource> if the graph
+  // has no DimensionResource set.
+  Renderer(uint32_t width, uint32_t height, const std::string &title,
+           Graph &graph);
   ~Renderer();
 
   Renderer(const Renderer &) = delete;
