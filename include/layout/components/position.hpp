@@ -59,7 +59,7 @@ private:
 template <>
 class DenseComponentPool<PositionComponent> : public IDenseStorageListener {
 public:
-  DenseComponentPool(uint8_t dimension)
+  DenseComponentPool(const IndexSpace &admin, uint8_t dimension)
       : m_dim(dimension), m_data(m_storage, dimension) {
 	  }
   ~DenseComponentPool() override = default;

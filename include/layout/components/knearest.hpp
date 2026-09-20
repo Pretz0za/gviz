@@ -60,7 +60,7 @@ private:
 template <>
 class DenseComponentPool<KNearestComponent> : public IDenseStorageListener {
 public:
-  DenseComponentPool(uint32_t k) : m_k(k), m_data(m_storage, m_k) {}
+  DenseComponentPool(const IndexSpace &admin, uint32_t k) : m_k(k), m_data(m_storage, m_k) {}
   ~DenseComponentPool() override = default;
 
   // must be called before any entities are added to this pool.

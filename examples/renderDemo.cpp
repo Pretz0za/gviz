@@ -1,6 +1,7 @@
 #include "graph/graph.hpp"
 #include "graph/subgraph.hpp"
 #include "layout/algorithms/force_directed.hpp"
+#include "layout/components/radius.hpp"
 #include "layout/physics/fruchterman_reingold.hpp"
 #include "layout/types.hpp"
 #include "render/renderer.hpp"
@@ -35,17 +36,17 @@ Graph BuildRectMesh(size_t length, size_t width) {
 }
 
 int main() {
-  Graph parent = BuildRectMesh(10, 10);
+  Graph parent = BuildRectMesh(20, 50);
   Subgraph g(parent);
   for (auto nid : parent.Nodes()) {
 
-    if (nid.Raw() % 7 != 1) {
+    // if (nid.Raw() % 7 != 1) {
       g.AddNode(nid);
-    }
+    // }
   }
   g.SetResource<DimensionResource>(DimensionResource::D2);
 
-  auto radii = g.NodeSpace().SetPool<RadiusComponent>();
+  auto radii = g.NodeSpace().SetPool<RadiusComponent>(RadiusFunction::MICHEALIS_MENTEN);
   for (uint32_t i = 0; i < radii->Size(); i++) {
     if (i % 5 == 7) {
       radii->Data()[i].radius *= 4;
@@ -57,7 +58,8 @@ int main() {
 
   Renderer renderer(1280, 720, "gviz renderDemo", g);
   while (renderer.Frame(g)) {
-    forceDirected.Tick();
+    for (size_t i = 0; i < 20; i++)
+      forceDirected.Tick();
   }
 
   return 0;

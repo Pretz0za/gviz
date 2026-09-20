@@ -5,6 +5,7 @@
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/algorithms/force_directed.hpp"
+#include "layout/components/force_atlas_heat.hpp"
 #include "layout/components/physics.hpp"
 #include "layout/components/position.hpp"
 #include <memory>
@@ -17,13 +18,16 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
     throw MissingResourceException<DimensionResource>();
   m_dimension = static_cast<uint8_t>(*dim);
 
-  // pools the force model, gravity system, and randomizer all rely on
+  // pools the force model, gravity system, randomizer, and heat control all
+  // rely on
   graph.NodeSpace().template SetPool<PositionComponent>(m_dimension);
   graph.NodeSpace().template SetPool<PhysicsComponent>();
+  graph.NodeSpace().template SetPool<ForceAtlasHeatComponent>();
 
   m_forceModel = std::make_unique<F>(graph);
   m_gravity = std::make_unique<GravityForceSystem<G>>(graph);
   m_randomizer = std::make_unique<PositionRandomized<G>>(graph);
+  m_heat = std::make_unique<ForceAtlasHeat<G>>(graph);
 
   m_randomizer->PlaceAll();
 }
@@ -56,9 +60,19 @@ void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
     }
   }
 
-  m_gravity->Tick();
+  // observed before gravity so gravity doesn't skew the swinging/traction
+  // measurement
+  m_heat->BeginTick();
+  for (uint32_t i = 0; i < size; i++) {
+    m_heat->Observe(DenseNodeID{i}, physics->Find(i)->disp);
+  }
+  m_heat->UpdateGlobalSpeed(size);
+
+  // m_gravity->Tick();
 
   for (uint32_t i = 0; i < size; i++) {
-    Vecaxpy(1.0, physics->Find(i)->disp, positions->Find(i)->pos, m_dimension);
+    double *disp = physics->Find(i)->disp;
+    Scale(disp, m_heat->SpeedFactor(DenseNodeID{i}), m_dimension);
+    Vecaxpy(1.0, disp, positions->Find(i)->pos, m_dimension);
   }
 }

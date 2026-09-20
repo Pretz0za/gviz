@@ -18,7 +18,7 @@ private:
   DenseComponentPool<PhysicsComponent> *m_physics;
   DenseComponentPool<PositionComponent> *m_positions;
   uint8_t m_dimension;
-  double m_magnitude = 1.0;
+  double m_magnitude = 0.2;
 };
 #include "layout/physics/gravity.tpp"
 

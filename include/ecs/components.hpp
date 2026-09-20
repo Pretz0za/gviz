@@ -8,7 +8,7 @@
 
 template <typename T> class DenseComponentPool : public IDenseStorageListener {
 public:
-  DenseComponentPool() = default;
+  DenseComponentPool(const IndexSpace &admin);
   ~DenseComponentPool() override = default;
 
   void OnAdd() override;
@@ -22,8 +22,11 @@ public:
 
   uint32_t Size() const;
 
+  template <typename U> DenseComponentPool<U> Sibling() const;
+
 private:
   std::vector<T> m_data;
+  const IndexSpace &m_admin;
 };
 
 struct Component {};

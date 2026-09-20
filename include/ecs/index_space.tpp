@@ -10,7 +10,7 @@ DenseComponentPool<T> *IndexSpace::SetPool(Args &&...args) {
   auto it = m_pools.find(key);
   if (it == m_pools.end()) {
     auto pool =
-        std::make_unique<DenseComponentPool<T>>(std::forward<Args>(args)...);
+        std::make_unique<DenseComponentPool<T>>(*this, std::forward<Args>(args)...);
     for (uint32_t i = 0; i < m_size; i++)
       pool->OnAdd();
     auto *raw = pool.get();
@@ -20,7 +20,7 @@ DenseComponentPool<T> *IndexSpace::SetPool(Args &&...args) {
   return static_cast<DenseComponentPool<T> *>(it->second.get());
 }
 
-template <typename T> DenseComponentPool<T> *IndexSpace::GetPool() {
+template <typename T> DenseComponentPool<T> *IndexSpace::GetPool() const {
   auto key = std::type_index(typeid(T));
   auto it = m_pools.find(key);
   if (it == m_pools.end()) {

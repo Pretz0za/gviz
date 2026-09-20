@@ -2,14 +2,17 @@
 
 #include "ecs/components.hpp"
 #include "ecs/entity.hpp"
-#include <utility>
+
+template <typename T>
+DenseComponentPool<T>::DenseComponentPool(const IndexSpace &admin)
+    : m_admin(admin), m_data{} {}
 
 template <typename T> void DenseComponentPool<T>::OnAdd() {
   m_data.emplace_back();
 }
 
 template <typename T> void DenseComponentPool<T>::Set(EntityID id, T data) {
-	m_data[id] = data;
+  m_data[id] = data;
 }
 
 template <typename T> const T *DenseComponentPool<T>::Find(EntityID id) const {
@@ -35,4 +38,10 @@ template <typename T> std::vector<T> &DenseComponentPool<T>::Data() {
 
 template <typename T> uint32_t DenseComponentPool<T>::Size() const {
   return m_data.size();
+}
+
+template <typename T>
+template <typename U>
+DenseComponentPool<U> DenseComponentPool<T>::Sibling() const {
+  return m_admin.GetPool<U>();
 }

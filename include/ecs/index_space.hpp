@@ -28,7 +28,7 @@ public:
   size_t Size() const;
 
   template <typename T, typename... Args> DenseComponentPool<T> *SetPool(Args &&...args);
-  template <typename T> DenseComponentPool<T> *GetPool();
+  template <typename T> DenseComponentPool<T> *GetPool() const;
 
 private:
   uint32_t m_size = 0;
