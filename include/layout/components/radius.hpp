@@ -46,11 +46,11 @@ public:
     }
   }
 
-  RadiusComponent *Find(EntityID id) {
+  inline RadiusComponent *Find(EntityID id) {
     return const_cast<RadiusComponent *>(std::as_const(*this).Find(id));
   }
 
-  const RadiusComponent *Find(EntityID id) const {
+  inline const RadiusComponent *Find(EntityID id) const {
     if (m_function == MANUAL) {
       return &m_data[id];
     }
@@ -79,7 +79,7 @@ public:
   }
 
 private:
-  RadiusComponent *degreeToRadius(const DegreeComponent &degree) const {
+  inline RadiusComponent *degreeToRadius(const DegreeComponent &degree) const {
     switch (m_function) {
     case MICHEALIS_MENTEN: {
       double total =
