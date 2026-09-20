@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ds/vector.hpp"
+#include "memory/arena.hpp"
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -40,7 +41,7 @@ public:
   bool Insert(const T &data, Point p, double mass = 1);
   std::vector<QuadTreeNode> QueryRange(const AABB &range) const;
 
-  inline Point CenterOfMass() const {return m_com;}
+  inline Point CenterOfMass() const { return m_com; }
   inline QuadTree<T> *Quadrant(const QuadTreeQuadrant &quadrant);
 
 private:
@@ -48,7 +49,8 @@ private:
 
   inline QuadTreeQuadrant QuadrantFor(const Point &p);
 
-  std::vector<Point> m_points;
+  Memory::Arena m_arena;
+    std::vector<Point> m_points;
   std::vector<T> m_data;
   QuadTree<T> *m_northWest;
   QuadTree<T> *m_northEast;

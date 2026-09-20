@@ -1,0 +1,100 @@
+#pragma once
+
+#include <algorithm>
+#include <concepts>
+#include <memory>
+#include <new>
+#include <numeric>
+#include <span>
+#include <string>
+#include <vector>
+
+using std::constructible_from;
+using std::span;
+using std::string;
+using std::unique_ptr;
+
+namespace Memory {
+class Arena {
+public:
+  constexpr explicit Arena(size_t blockCapacity) : m_blockCapacity{blockCapacity} {}
+
+  template <typename T, typename... Args>
+    requires constructible_from<T, Args...>
+  constexpr T *Allocate(Args &&...args) {
+    auto it =
+        std::find_if(m_storage.begin(), m_storage.end(),
+                     [](const Block &block) { return block.CanAllocate<T>(); });
+
+    if (it == m_storage.end()) {
+      m_storage.emplace_back(m_blockCapacity);
+      return m_storage.back().Allocate<T>(std::forward<Args>(args)...);
+    }
+    else {
+      return it->template Allocate<T>(std::forward<Args>(args)...);
+    }
+  }
+
+  constexpr void reset() noexcept {
+    for (auto &block : m_storage)
+      block.Reset();
+  }
+
+  constexpr size_t remaining() const noexcept {
+    return std::accumulate(
+        m_storage.begin(), m_storage.end(), size_t{0},
+        [](size_t acc, const Block &block) { return acc + block.Remaining(); });
+  }
+
+private:
+  class Block {
+  private:
+    unique_ptr<std::byte[]> storage;
+    size_t capacity;
+    size_t offset;
+
+    constexpr void *AllocateBytes(size_t size, size_t alignment) {
+      void *ptr = storage.get() + offset;
+      size_t space = capacity - offset;
+      if (!std::align(alignment, size, ptr, space)) {
+        throw std::bad_alloc();
+      }
+      offset = capacity - space + size;
+      return ptr;
+    }
+
+  public:
+    constexpr explicit Block(size_t capacity)
+        : storage{std::make_unique<std::byte[]>(capacity)}, capacity{capacity},
+          offset{0} {}
+
+    constexpr ~Block() = default;
+    constexpr Block(Block &&) noexcept = default;
+    constexpr Block &operator=(Block &&) noexcept = default;
+
+    constexpr Block(const Block &) = delete;
+    constexpr Block &operator=(const Block &) = delete;
+
+    template <typename T, typename... Args>
+      requires constructible_from<T, Args...>
+    constexpr T *Allocate(Args &&...args) {
+      void *mem = AllocateBytes(sizeof(T), alignof(T));
+      return std::construct_at(static_cast<T *>(mem),
+                               std::forward<Args>(args)...);
+    }
+
+    template <typename T> constexpr bool CanAllocate() const {
+      void *ptr = storage.get() + offset;
+      size_t space = capacity - offset;
+      return std::align(alignof(T), sizeof(T), ptr, space) != nullptr;
+    }
+
+    constexpr void Reset() noexcept { offset = 0; }
+
+    constexpr size_t Remaining() const noexcept { return capacity - offset; }
+  };
+
+  const size_t m_blockCapacity;
+  std::vector<Block> m_storage;
+};
+}; // namespace Memory

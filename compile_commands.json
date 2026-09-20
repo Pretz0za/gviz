@@ -1,73 +1,73 @@
 [
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /home/aziz/Projects/gviz/src/ecs/index_space.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /home/aziz/Projects/gviz/src/ecs/index_space.cpp",
   "file": "/home/aziz/Projects/gviz/src/ecs/index_space.cpp",
   "output": "CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /home/aziz/Projects/gviz/src/graph/graph.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /home/aziz/Projects/gviz/src/graph/graph.cpp",
   "file": "/home/aziz/Projects/gviz/src/graph/graph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/graph.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o -c /home/aziz/Projects/gviz/src/graph/subgraph.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o -c /home/aziz/Projects/gviz/src/graph/subgraph.cpp",
   "file": "/home/aziz/Projects/gviz/src/graph/subgraph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o -c /home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o -c /home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
   "file": "/home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
   "output": "CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIC -o CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o -c /home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o -c /home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
   "file": "/home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
   "output": "CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -O3 -DNDEBUG -std=gnu++20 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /home/aziz/Projects/gviz/main.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -g -O3 -DNDEBUG -std=gnu++23 -fPIE -o CMakeFiles/main.dir/main.cpp.o -c /home/aziz/Projects/gviz/main.cpp",
   "file": "/home/aziz/Projects/gviz/main.cpp",
   "output": "CMakeFiles/main.dir/main.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o -c /home/aziz/Projects/gviz/src/render/renderer.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o -c /home/aziz/Projects/gviz/src/render/renderer.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/renderer.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/device.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/device.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/gpu/device.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o -c /home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o -c /home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o -c /home/aziz/Projects/gviz/src/render/frame/frame.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o -c /home/aziz/Projects/gviz/src/render/frame/frame.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/frame/frame.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -O3 -DNDEBUG -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -O3 -DNDEBUG -std=gnu++20 -fPIE -o CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o -c /home/aziz/Projects/gviz/examples/renderDemo.cpp",
+  "command": "/usr/bin/c++  -I/home/aziz/Projects/gviz/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -O3 -DNDEBUG -std=gnu++23 -fPIE -o CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o -c /home/aziz/Projects/gviz/examples/renderDemo.cpp",
   "file": "/home/aziz/Projects/gviz/examples/renderDemo.cpp",
   "output": "CMakeFiles/renderDemo.dir/examples/renderDemo.cpp.o"
 },
