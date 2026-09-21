@@ -5,83 +5,83 @@
 
 namespace SpacialIndex {
 
-template <typename T>
-QuadTree<T>::QuadTree(uint32_t nodeCapacity, const AABB &aabb)
-    : m_nodeCapacity(nodeCapacity), m_northEast(nullptr), m_northWest(nullptr),
-      m_mass(0), m_southEast(nullptr), m_southWest(nullptr), m_bounds(aabb),
-      m_com{0, 0} {}
+template <typename T, uint32_t S>
+QuadTree<T, S>::QuadTree(const AABB &aabb) : QuadTree(aabb, nullptr) {}
 
-template <typename T> QuadTree<T>::~QuadTree() {
-  if (m_northWest)
-    delete m_northWest;
-  if (m_northEast)
-    delete m_northEast;
-  if (m_southWest)
-    delete m_southWest;
-  if (m_southEast)
-    delete m_southEast;
-}
+template <typename T, uint32_t S>
+QuadTree<T, S>::QuadTree(const AABB &aabb, Memory::Arena *arena)
+    : m_ownedArena(arena ? nullptr : std::make_unique<Memory::Arena>(8192)),
+      m_arena(arena ? arena : m_ownedArena.get()), m_northWest(nullptr),
+      m_northEast(nullptr), m_southWest(nullptr), m_southEast(nullptr),
+      m_bounds(aabb), m_com{0, 0}, m_mass(0) {}
 
-template <typename T> void QuadTree<T>::Subdivide() {
+template <typename T, uint32_t S> void QuadTree<T, S>::Subdivide() {
   if (m_northWest)
     return;
   double quarterLength = m_bounds.halfLength / 2.0;
   double cx = m_bounds.center[0];
-  double cy = m_bounds.center[0];
-  m_northWest = new QuadTree<T>{
-      m_nodeCapacity,
-      AABB{{cx - quarterLength, cy + quarterLength}, quarterLength}};
-  m_northEast = new QuadTree<T>{
-      m_nodeCapacity,
-      AABB{{cx + quarterLength, cy + quarterLength}, quarterLength}};
-  m_southWest = new QuadTree<T>{
-      m_nodeCapacity,
-      AABB{{cx - quarterLength, cy - quarterLength}, quarterLength}};
-  m_southEast = new QuadTree<T>{
-      m_nodeCapacity,
-      AABB{{cx + quarterLength, cy - quarterLength}, quarterLength}};
+  double cy = m_bounds.center[1];
+  m_northWest = m_arena->Allocate<QuadTree<T, S>>(
+
+      AABB{{cx - quarterLength, cy + quarterLength}, quarterLength}, m_arena);
+  m_northEast = m_arena->Allocate<QuadTree<T, S>>(
+
+      AABB{{cx + quarterLength, cy + quarterLength}, quarterLength}, m_arena);
+  m_southWest = m_arena->Allocate<QuadTree<T, S>>(
+
+      AABB{{cx - quarterLength, cy - quarterLength}, quarterLength}, m_arena);
+  m_southEast = m_arena->Allocate<QuadTree<T, S>>(
+
+      AABB{{cx + quarterLength, cy - quarterLength}, quarterLength}, m_arena);
 }
 
-template <typename T>
-bool QuadTree<T>::Insert(const T &data, Point p, double mass) {
+template <typename T, uint32_t S>
+bool QuadTree<T, S>::Insert(const T &data, Point p, double mass) {
   if (!m_bounds.contains(p))
     return false;
 
   double newMass = m_mass + mass;
   m_com[0] = (m_com[0] * m_mass + p[0] * mass) / newMass;
   m_com[1] = (m_com[1] * m_mass + p[1] * mass) / newMass;
-  mass = newMass;
+  m_mass = newMass;
 
-  if (m_points.size() < m_nodeCapacity && !m_northWest) {
-    m_points.push_back(p);
-    m_data.push_back(data);
+  if (m_pointCount < S && !m_northWest) {
+    ::new (pointPtr(m_pointCount)) Point(p);
+    ::new (dataPtr(m_pointCount)) T(data);
+    m_pointCount++;
     return true;
   }
 
   if (!m_northWest) {
     Subdivide();
 
-    size_t s = m_data.size();
+    size_t s = m_pointCount;
     for (size_t i = 0; i < s; i++) {
-      Point pt = m_points[i];
-      T d = m_data[i];
+      Point pt = *pointPtr(i);
+      T d = *dataPtr(i);
+      pointPtr(i)->~Point();
+      dataPtr(i)->~T();
 
-      auto child = QuadrantFor(pt);
-      child->Insert(d, pt);
+      auto child = Quadrant(QuadrantFor(pt));
+      assert(child->Insert(d, pt));
     }
-    m_data.clear();
-    m_points.clear();
+    m_pointCount = 0;
   }
 
-  auto child = QuadrantFor(p);
+  auto child = Quadrant(QuadrantFor(p));
   if (child->Insert(data, p))
     return true;
 
   assert(false);
 }
 
-template <typename T>
-QuadTreeQuadrant QuadTree<T>::QuadrantFor(const Point &p) {
+template <typename T, uint32_t S> void QuadTree<T, S>::Reset() {
+  if (IsRoot())
+    m_ownedArena->Reset();
+}
+
+template <typename T, uint32_t S>
+QuadTreeQuadrant QuadTree<T, S>::QuadrantFor(const Point &p) {
   bool north = p[1] - m_bounds.center[1] > 0;
   bool east = p[0] - m_bounds.center[0] > 0;
   if (north)
@@ -89,8 +89,8 @@ QuadTreeQuadrant QuadTree<T>::QuadrantFor(const Point &p) {
   return east ? SE : SW;
 }
 
-template <typename T>
-QuadTree<T> *QuadTree<T>::Quadrant(const QuadTreeQuadrant &quadrant) {
+template <typename T, uint32_t S>
+QuadTree<T, S> *QuadTree<T, S>::Quadrant(const QuadTreeQuadrant &quadrant) {
   switch (quadrant) {
   case NW:
     return m_northWest;
@@ -103,18 +103,18 @@ QuadTree<T> *QuadTree<T>::Quadrant(const QuadTreeQuadrant &quadrant) {
   }
 }
 
-template <typename T>
-std::vector<typename QuadTree<T>::QuadTreeNode>
-QuadTree<T>::QueryRange(const AABB &range) const {
+template <typename T, uint32_t S>
+std::vector<typename QuadTree<T, S>::QuadTreeNode>
+QuadTree<T, S>::QueryRange(const AABB &range) const {
   std::vector<QuadTreeNode> found;
 
   if (!m_bounds.intersects(range))
     return found;
 
   if (!m_northWest) {
-    size_t s = m_points.size();
+    size_t s = m_pointCount;
     for (size_t i = 0; i < s; i++) {
-      found.emplace_back(m_points[i], m_data[i]);
+      found.emplace_back(*pointPtr(i), *dataPtr(i));
     }
     return found;
   }
