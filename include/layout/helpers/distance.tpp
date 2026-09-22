@@ -52,3 +52,15 @@ void DistanceCalculationSystem<G>::VecBetweenNodes(DenseNodeID v, DenseNodeID u,
       dist - m_radius->Find(v.Raw())->radius - m_radius->Find(u.Raw())->radius;
   Scale(out, gap / dist, m_dimension);
 }
+
+template <GraphLike G>
+double *DistanceCalculationSystem<G>::VecToPoint(DenseNodeID v, double *p,
+                                                 double *out) {
+  PositionComponent vPos = m_positionData[v.Raw()];
+  return Subtract(p, vPos.pos, out, m_dimension);
+}
+template <GraphLike G>
+double DistanceCalculationSystem<G>::DistanceToPoint(DenseNodeID v, double *p) {
+  PositionComponent vPos = m_positionData[v.Raw()];
+  return Distance(vPos.pos, p, m_dimension);
+}

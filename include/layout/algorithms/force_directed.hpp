@@ -1,6 +1,10 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "ds/quadtree.hpp"
+#include "ecs/components.hpp"
+#include "layout/algorithms/types.hpp"
+#include "layout/components/position.hpp"
 #include "layout/concept/force_model.hpp"
 #include "layout/heat/force_atlas.hpp"
 #include "layout/physics/gravity.hpp"
@@ -15,11 +19,14 @@ public:
   void Tick();
 
 private:
+  void RepulsiveTick(SpacialIndex::QuadTree<DenseNodeID, 1> *node, DenseNodeID v);
   G *m_graph;
+  DenseComponentPool<PositionComponent> *m_positions;
   std::unique_ptr<F> m_forceModel;
   std::unique_ptr<GravityForceSystem<G>> m_gravity;
   std::unique_ptr<PositionRandomized<G>> m_randomizer;
   std::unique_ptr<ForceAtlasHeat<G>> m_heat;
+  QuadTreeResource *m_quadtree;
   uint8_t m_dimension;
 };
 

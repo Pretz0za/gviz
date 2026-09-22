@@ -15,6 +15,9 @@ public:
   // u - v -> out
   inline void VecBetweenNodes(DenseNodeID v, DenseNodeID u, double *out);
 
+  inline double *VecToPoint(DenseNodeID v, double *p, double *out);
+  inline double DistanceToPoint(DenseNodeID v, double *p);
+
 private:
   DenseComponentPool<RadiusComponent> *m_radius;
   PositionSpan &m_positionData;

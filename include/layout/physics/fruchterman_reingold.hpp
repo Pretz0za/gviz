@@ -5,6 +5,7 @@
 #include "graph/graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/physics.hpp"
+#include "layout/components/position.hpp"
 #include "layout/concept/force_model.hpp"
 #include "layout/helpers/distance.hpp"
 #include <cstdint>
@@ -15,6 +16,7 @@ public:
 
   inline void AttractiveTick(DenseNodeID v, DenseNodeID u);
   inline void RepulsiveTick(DenseNodeID v, DenseNodeID u);
+  inline void RepulsiveTick(DenseNodeID v, const double* uPos, double uMass);
 
 private:
   uint8_t m_dimension;
@@ -30,6 +32,7 @@ public:
 
   inline void AttractiveTick(DenseNodeID v, DenseNodeID u);
   inline void RepulsiveTick(DenseNodeID v, DenseNodeID u);
+  inline void RepulsiveTick(DenseNodeID v, const double* uPos, double uMass);
 
 private:
   DenseComponentPool<PhysicsComponent> *m_physics;

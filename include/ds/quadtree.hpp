@@ -1,5 +1,6 @@
 #pragma once
 
+#include "concept/graphLike.hpp"
 #include "ds/vector.hpp"
 #include "memory/arena.hpp"
 #include <array>
@@ -10,9 +11,10 @@
 #include <vector>
 namespace SpacialIndex {
 
-using Point = std::array<double, 2>;
 
-enum QuadTreeQuadrant { NW, NE, SW, SE };
+enum QuadTreeQuadrant { NW, NE, SW, SE, COUNT };
+
+using Point = std::array<double, 2>;
 
 typedef struct AABB {
   Point center;
@@ -37,6 +39,7 @@ public:
     T data;
   };
 
+  QuadTree();
   QuadTree(const AABB &aabb);
   ~QuadTree() {
     for (uint32_t i = 0; i < m_pointCount; i++) {
@@ -48,12 +51,18 @@ public:
   bool Insert(const T &data, Point p, double mass = 1);
   std::vector<QuadTreeNode> QueryRange(const AABB &range) const;
 
+  inline double Mass() const { return m_mass; }
   inline Point CenterOfMass() const { return m_com; }
   inline QuadTree<T, S> *Quadrant(const QuadTreeQuadrant &quadrant);
   inline bool IsRoot() const { return m_ownedArena.get() != nullptr; }
   inline bool IsLeaf() const { return !m_northWest; }
+  inline bool IsEmpty() const { return m_pointCount == 0; }
+  inline Point PointAt(uint32_t i) const { return *pointPtr(i); }
+  inline T DataAt(uint32_t i) const { return *dataPtr(i); }
+  inline double HalfLength() const { return m_bounds.halfLength; }
+  inline const Point Center() const { return m_bounds.center; }
 
-  void Reset();
+  void Reset(const AABB &aabb);
 
 private:
   // Lets Memory::Arena::Allocate<QuadTree<T>> reach the constructor below
@@ -89,7 +98,6 @@ private:
   unique_ptr<Memory::Arena> m_ownedArena;
   Memory::Arena *m_arena;
 
-
   QuadTree<T, S> *m_northWest;
   QuadTree<T, S> *m_southWest;
   QuadTree<T, S> *m_northEast;
@@ -103,6 +111,11 @@ private:
   alignas(T) std::byte m_dataStorage[S * sizeof(T)];
   uint32_t m_pointCount = 0;
 };
+
+namespace Helpers {
+template <GraphLike G> AABB GetBoundingBox(G *graph);
+};
+
 }; // namespace SpacialIndex
 
 #include "ds/quadtree.tpp"

@@ -1,12 +1,21 @@
 #pragma once
 
 #include "ds/quadtree.hpp"
+#include "ds/vector.hpp"
+#include "ecs/components.hpp"
+#include "layout/components/position.hpp"
+#include <algorithm>
 #include <cassert>
+#include <limits>
 
 namespace SpacialIndex {
 
 template <typename T, uint32_t S>
 QuadTree<T, S>::QuadTree(const AABB &aabb) : QuadTree(aabb, nullptr) {}
+
+template <typename T, uint32_t S>
+QuadTree<T, S>::QuadTree()
+    : QuadTree({{0, 0}, std::numeric_limits<double>::infinity()}, nullptr) {}
 
 template <typename T, uint32_t S>
 QuadTree<T, S>::QuadTree(const AABB &aabb, Memory::Arena *arena)
@@ -75,9 +84,11 @@ bool QuadTree<T, S>::Insert(const T &data, Point p, double mass) {
   assert(false);
 }
 
-template <typename T, uint32_t S> void QuadTree<T, S>::Reset() {
-  if (IsRoot())
+template <typename T, uint32_t S> void QuadTree<T, S>::Reset(const AABB &aabb) {
+  if (IsRoot()) {
     m_ownedArena->Reset();
+    m_bounds = aabb;
+  }
 }
 
 template <typename T, uint32_t S>
@@ -100,6 +111,8 @@ QuadTree<T, S> *QuadTree<T, S>::Quadrant(const QuadTreeQuadrant &quadrant) {
     return m_southWest;
   case SE:
     return m_southEast;
+  default:
+    return nullptr;
   }
 }
 
@@ -126,5 +139,34 @@ QuadTree<T, S>::QueryRange(const AABB &range) const {
 
   return found;
 }
+
+namespace Helpers {
+template <GraphLike G> AABB GetBoundingBox(G *graph) {
+  DenseComponentPool<PositionComponent> *pool =
+      graph->NodeSpace().template GetPool<PositionComponent>();
+  if (!pool) {
+    return {{0, 0}, std::numeric_limits<double>::infinity()};
+  }
+  auto &positions = pool->Data();
+
+  double minX = std::numeric_limits<double>::infinity(),
+         maxX = -std::numeric_limits<double>::infinity();
+  double minY = std::numeric_limits<double>::infinity(),
+         maxY = -std::numeric_limits<double>::infinity();
+  for (uint32_t i = 0; i < positions.Size(); i++) {
+    minX = std::min(minX, positions[i].pos[0]);
+    maxX = std::max(maxX, positions[i].pos[0]);
+    minY = std::min(minY, positions[i].pos[1]);
+    maxY = std::max(maxY, positions[i].pos[1]);
+  }
+
+  double span = std::max(maxX - minX, maxY - minY);
+  double halfSize = span > EPSILON ? span / 2.0 : 1.0;
+  double cx = (minX + maxX) / 2.0;
+  double cy = (minY + maxY) / 2.0;
+
+  return {{cx, cy}, halfSize};
+}
+}; // namespace helpers
 
 } // namespace SpacialIndex

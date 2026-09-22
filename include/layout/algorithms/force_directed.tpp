@@ -1,26 +1,32 @@
 #pragma once
 
+#include "ds/quadtree.hpp"
 #include "ds/vector.hpp"
 #include "ecs/exceptions.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/algorithms/force_directed.hpp"
+#include "layout/algorithms/types.hpp"
 #include "layout/components/force_atlas_heat.hpp"
 #include "layout/components/physics.hpp"
 #include "layout/components/position.hpp"
+#include "layout/concept/force_model.hpp"
 #include <memory>
 
 template <GraphLike G, ForceModel F>
 ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
-    : m_graph(&graph) {
+    : m_graph(&graph), m_positions(nullptr) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
   m_dimension = static_cast<uint8_t>(*dim);
 
+  m_quadtree = &graph.template SetResource<QuadTreeResource>();
+
   // pools the force model, gravity system, randomizer, and heat control all
   // rely on
-  graph.NodeSpace().template SetPool<PositionComponent>(m_dimension);
+  m_positions =
+      graph.NodeSpace().template SetPool<PositionComponent>(m_dimension);
   graph.NodeSpace().template SetPool<PhysicsComponent>();
   graph.NodeSpace().template SetPool<ForceAtlasHeatComponent>();
 
@@ -33,7 +39,47 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
 }
 
 template <GraphLike G, ForceModel F>
+void ForceDirectedLayoutAlgorithm<G, F>::RepulsiveTick(
+    SpacialIndex::QuadTree<DenseNodeID, 1> *node, DenseNodeID v) {
+  // forces are accumulated in acc
+
+  if (!node || node->Mass() == 0.0 || node->IsEmpty()) // empty
+    return;
+
+  if (node->IsLeaf()) {
+    // only one vertex in the quadtree node, by construction
+    DenseNodeID DenseID = node->DataAt(0);
+    if (DenseID == v)
+      return;
+    const auto *uPos = m_positions->Find(DenseID.Raw());
+    m_forceModel->RepulsiveTick(v, uPos->pos, node->Mass());
+    return;
+  }
+
+  const auto *vPos = m_positions->Find(v.Raw());
+
+  SpacialIndex::Point com = node->CenterOfMass();
+  double dx = com[0] - vPos->pos[0];
+  double dy = com[1] - vPos->pos[1];
+  double dist = std::sqrt(dx * dx + dy * dy);
+  double ratio = (2.0 * node->HalfLength()) / dist;
+
+  if (ratio < 1.0) {
+    m_forceModel->RepulsiveTick(v, com.data(), node->Mass());
+    return;
+  }
+
+  for (size_t q = 0; q < SpacialIndex::QuadTreeQuadrant::COUNT; q++)
+    this->RepulsiveTick(
+        node->Quadrant(static_cast<SpacialIndex::QuadTreeQuadrant>(q)), v);
+}
+
+template <GraphLike G, ForceModel F>
 void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
+
+  SpacialIndex::AABB bbox = SpacialIndex::Helpers::GetBoundingBox(m_graph);
+  m_quadtree->root->Reset(bbox);
+
   uint32_t size = m_graph->Size();
   DenseComponentPool<PhysicsComponent> *physics =
       m_graph->NodeSpace().template GetPool<PhysicsComponent>();
@@ -46,11 +92,13 @@ void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
 
   for (uint32_t i = 0; i < size; i++) {
     // Repulsive Forces
-    for (uint32_t j = 0; j < size; j++) {
-      if (i == j)
-        continue;
-      m_forceModel->RepulsiveTick(DenseNodeID{i}, DenseNodeID{j});
-    }
+    // for (uint32_t j = 0; j < size; j++) {
+    //   if (i == j)
+    //     continue;
+    //   m_forceModel->RepulsiveTick(DenseNodeID{i}, DenseNodeID{j});
+    // }
+
+    RepulsiveTick(m_quadtree->root.get(), DenseNodeID{i});
 
     // Attractive Forces
     NodeID nid = m_graph->MapToSparse(DenseNodeID{i});

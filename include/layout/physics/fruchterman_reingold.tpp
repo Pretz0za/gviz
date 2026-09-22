@@ -25,9 +25,6 @@ void VanillaFruchtermanReingold<G>::AttractiveTick(DenseNodeID v,
   m_distanceCalc.VecBetweenNodes(v, u, out);
   double dist = m_distanceCalc.BetweenNodes(v, u);
 
-  // accumulate into disp (like GRIPFruchtermanReingold/GravityForceSystem);
-  // ForceDirectedLayoutAlgorithm::Tick applies the total disp to position
-  // once per tick, after clamping it.
   Vecaxpy(dist / m_edgeLength, out, m_physics->Find(v.Raw())->disp,
           m_dimension);
 }
@@ -39,6 +36,19 @@ void VanillaFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v,
   // v - u (not u - v): repulsion pushes v away from u.
   m_distanceCalc.VecBetweenNodes(u, v, out);
   double dist = m_distanceCalc.BetweenNodes(v, u);
+
+  Vecaxpy(m_edgeLength * m_edgeLength / (dist * dist), out,
+          m_physics->Find(v.Raw())->disp, m_dimension);
+}
+
+template <GraphLike G>
+void VanillaFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, const double *uPos,
+                                                  double uMass) {
+  double out[m_dimension];
+  // v - u (not u - v): repulsion pushes v away from u.
+  auto vPos = *m_positions->Find(v.Raw());
+  Subtract(uPos, vPos.pos, out, m_dimension);
+  double dist = L2Norm(out, m_dimension);
 
   Vecaxpy(m_edgeLength * m_edgeLength / (dist * dist), out,
           m_physics->Find(v.Raw())->disp, m_dimension);
@@ -74,5 +84,17 @@ void GRIPFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, DenseNodeID u) {
   if (IsZero(out, m_dimension))
     return;
   Vecaxpy((0.05 * (10.0 * 10.0) / pow(m_distanceCalc.BetweenNodes(v, u), 2.0)),
+          out, data[v.Raw()].disp, m_dimension);
+}
+
+template <GraphLike G>
+void GRIPFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, const double *uPos,
+                                               double uMass) {
+  auto &data = m_physics->Data();
+  double out[m_dimension];
+  Negate(m_distanceCalc.VecToPoint(v, uPos, out), m_dimension);
+  if (IsZero(out, m_dimension))
+    return;
+  Vecaxpy((0.05 * (10.0 * 10.0) / pow(m_distanceCalc.ToPoint(v, uPos), 2.0)),
           out, data[v.Raw()].disp, m_dimension);
 }

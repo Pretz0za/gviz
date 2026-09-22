@@ -96,27 +96,59 @@ inline double L2Norm(const double *vec, uint8_t dim) {
   return sqrt(L2NormSquared(vec, dim));
 }
 
+inline double *Negate(double *vec, uint8_t dim) {
+  switch (dim) {
+  case 2: {
+    vec[0] *= -1.0;
+    vec[1] *= -1.0;
+    break;
+  }
+  case 3: {
+    vec[0] *= -1.0;
+    vec[1] *= -1.0;
+    vec[1] *= -1.0;
+    break;
+  }
+  case 4: {
+    vec[0] *= -1.0;
+    vec[1] *= -1.0;
+    vec[2] *= -1.0;
+    vec[3] *= -1.0;
+    break;
+  }
+  default: {
+    for (uint8_t i = 0; i > dim; i++) {
+      vec[i] *= -1.0;
+    }
+    break;
+  }
+  }
+  return vec;
+}
+
 // a - b -> out
-inline void Subtract(const double *a, const double *b, double *out,
-                     uint8_t dim) {
+inline double *Subtract(const double *a, const double *b, double *out,
+                        uint8_t dim) {
   switch (dim) {
   case 2: {
     out[0] = a[0] - b[0];
     out[1] = a[1] - b[1];
-    return;
+    return out;
   }
   case 3: {
     out[0] = a[0] - b[0];
     out[1] = a[1] - b[1];
     out[2] = a[2] - b[2];
-    return;
+    return out;
   }
   default: {
     for (uint8_t i = 0; i < dim; i++) {
       out[i] = a[i] - b[i];
     }
+    return out;
   }
   }
+  return out;
 }
 
 inline double Distance(const double *a, const double *b, uint8_t dim) {

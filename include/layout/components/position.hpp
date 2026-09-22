@@ -21,7 +21,7 @@ public:
     return *reinterpret_cast<PositionComponent *>(&m_storage[idx * m_dim]);
   }
 
-  size_t size() const {
+  size_t Size() const {
     return m_storage.size() / m_dim;
   }
 
@@ -87,7 +87,7 @@ public:
   const PositionSpan &Data() const { return m_data; }
 
   size_t Size() const {
-    return m_data.size();
+    return m_data.Size();
   }
 
 private:
