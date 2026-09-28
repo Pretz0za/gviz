@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ds/vector.hpp"
-#include "layout/physics/kamada_kawai.hpp"
+  #include "layout/physics/force_model/kamada_kawai.hpp"
 
 template <GraphLike G>
 GRIPKamadaKawai<G>::GRIPKamadaKawai(G &graph)

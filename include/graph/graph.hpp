@@ -13,6 +13,7 @@
 #include "ecs/index_space.hpp"
 #include "ecs/resource.hpp"
 #include "graph/components/adjacency.hpp"
+#include "graph/components/degree.hpp"
 #include "graph/components/edge.hpp"
 #include "graph/components/weight.hpp"
 #include "graph/types.hpp"
@@ -72,6 +73,7 @@ private:
   IndexSpace m_edgeSpace;
   DenseComponentPool<InAdjacencyComponent> *m_inAdjPool;
   DenseComponentPool<OutAdjacencyComponent> *m_outAdjPool;
+  DenseComponentPool<DegreeComponent> *m_degreePool;
   DenseComponentPool<EdgeComponent> *m_edgePool;
   DenseComponentPool<WeightComponent> *m_weightPool;
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>

@@ -25,6 +25,11 @@ void OnUncapturedError(WGPUDevice const *, WGPUErrorType,
 } // namespace
 
 Renderer::Impl::~Impl() {
+#ifdef GVIZ_DEBUG_CHARTS
+  debugCharts.Shutdown();
+#endif
+  if (screenshotBuf)
+    wgpuBufferRelease(screenshotBuf);
   if (bindGroup)
     wgpuBindGroupRelease(bindGroup);
   if (edgesBuf)
@@ -270,12 +275,17 @@ bool Renderer::Impl::Init(uint32_t width, uint32_t height,
     }
   }
 
+  screenshotCopySupported = (caps.usages & WGPUTextureUsage_CopySrc) != 0;
+  WGPUTextureUsage surfaceUsage = WGPUTextureUsage_RenderAttachment;
+  if (screenshotCopySupported)
+    surfaceUsage |= WGPUTextureUsage_CopySrc;
+
   int fbw, fbh;
   glfwGetFramebufferSize(window, &fbw, &fbh);
   surfaceConfig = WGPUSurfaceConfiguration{
       .device = device,
       .format = surfaceFormat,
-      .usage = WGPUTextureUsage_RenderAttachment,
+      .usage = surfaceUsage,
       .width = static_cast<uint32_t>(fbw),
       .height = static_cast<uint32_t>(fbh),
       .alphaMode = caps.alphaModes[0],
@@ -299,5 +309,12 @@ bool Renderer::Impl::Init(uint32_t width, uint32_t height,
   glfwSetMouseButtonCallback(window, OnMouseButton);
   glfwSetCursorPosCallback(window, OnCursorPos);
   glfwSetScrollCallback(window, OnScroll);
+  glfwSetKeyCallback(window, OnKey);
+
+#ifdef GVIZ_DEBUG_CHARTS
+  if (!debugCharts.Init(window, device, surfaceFormat, depthFormat))
+    return false;
+#endif
+
   return true;
 }

@@ -22,4 +22,4 @@ private:
   uint8_t m_dimension;
 };
 
-#include "layout/physics/kamada_kawai.tpp"
+#include "layout/physics/force_model/kamada_kawai.tpp"

@@ -72,20 +72,20 @@ public:
       m_storage.push_back(0);
   }
 
-  KNearestComponent *Find(EntityID id) {
+  inline KNearestComponent *Find(EntityID id) {
     return const_cast<KNearestComponent *>(std::as_const(*this).Find(id));
   }
 
-  const KNearestComponent *Find(EntityID id) const {
+  inline const KNearestComponent *Find(EntityID id) const {
     if (id >= Size())
       return nullptr;
     return &m_data[id];
   }
 
-  KNearestSpan &Data() { return m_data; }
-  const KNearestSpan &Data() const { return m_data; }
+  inline KNearestSpan &Data() { return m_data; }
+  inline const KNearestSpan &Data() const { return m_data; }
 
-  size_t Size() const { return m_data.size(); }
+  inline size_t Size() const { return m_data.size(); }
 
 private:
   std::vector<uint32_t> m_storage;

@@ -73,20 +73,20 @@ public:
       m_storage.push_back(0.0);
   }
 
-  PositionComponent *Find(EntityID id) {
+  inline PositionComponent *Find(EntityID id) {
     return const_cast<PositionComponent *>(std::as_const(*this).Find(id));
   }
 
-  const PositionComponent *Find(EntityID id) const {
+  inline const PositionComponent *Find(EntityID id) const {
     if (id >= Size())
       return nullptr;
     return &m_data[id];
   }
 
-  PositionSpan &Data() { return m_data; }
-  const PositionSpan &Data() const { return m_data; }
+  inline PositionSpan &Data() { return m_data; }
+  inline const PositionSpan &Data() const { return m_data; }
 
-  size_t Size() const {
+  inline size_t Size() const {
     return m_data.Size();
   }
 

@@ -47,6 +47,11 @@ GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph)
   m_placementSystem = std::make_unique<PositionBarrycentric<G>>(graph);
   m_filtrationSystem = std::make_unique<MisFiltrationSystem<G>>(graph);
   m_physicsSystem = std::make_unique<GRIPPhysicsSystem<G>>(graph);
+
+#ifdef GVIZ_DEBUG_CHARTS
+  m_chart = graph.template SetResource<ChartRecorderResource>(graph.NodeSpace())
+                .recorder.get();
+#endif
 }
 
 template <GraphLike G> void GRIPLayoutAlgorithm<G>::RunFiltration() {
@@ -72,6 +77,10 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::Tick() {
   }
 
   m_physicsSystem->Tick();
+
+#ifdef GVIZ_DEBUG_CHARTS
+  m_chart->PushFrame<PhysicsComponent>();
+#endif
 }
 
 template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {

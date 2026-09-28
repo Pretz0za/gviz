@@ -5,9 +5,14 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 THIRD_PARTY="$ROOT/third-party"
 WGPU_DIR="$THIRD_PARTY/wgpu-native"
 GLFW_DIR="$THIRD_PARTY/glfw"
+IMGUI_DIR="$THIRD_PARTY/imgui"
 
 WGPU_NATIVE_VERSION="v29.0.1.1"
 GLFW_VERSION="3.4"
+# Dear ImGui's WGPU backend needs a fix for wgpu-native 29.0+
+# (https://github.com/ocornut/imgui/commit/6d1f88fe4a) that landed after the
+# v1.92.9 tag, so this pins a known-good commit on master instead of a tag.
+IMGUI_COMMIT="aa0181478b182f7170378a5d8629401b77ee326e"
 
 case "$(uname -s)" in
 Darwin)
@@ -31,6 +36,7 @@ esac
 
 WGPU_URL="https://github.com/gfx-rs/wgpu-native/releases/download/${WGPU_NATIVE_VERSION}/wgpu-${WGPU_PLATFORM}-release.zip"
 GLFW_URL="https://github.com/glfw/glfw/releases/download/${GLFW_VERSION}/glfw-${GLFW_VERSION}.zip"
+IMGUI_URL="https://github.com/ocornut/imgui/archive/${IMGUI_COMMIT}.zip"
 
 have_wgpu() {
     [[ -f "$WGPU_DIR/include/webgpu/webgpu.h" ]]
@@ -38,6 +44,10 @@ have_wgpu() {
 
 have_glfw() {
     [[ -f "$GLFW_DIR/CMakeLists.txt" ]]
+}
+
+have_imgui() {
+    [[ -f "$IMGUI_DIR/imgui.h" ]]
 }
 
 download_and_extract() {
@@ -74,6 +84,11 @@ if ! have_glfw; then
     download_and_extract "$GLFW_URL" "$GLFW_DIR"
 fi
 
+if ! have_imgui; then
+    download_and_extract "$IMGUI_URL" "$IMGUI_DIR"
+fi
+
 echo "Dependencies ready:"
 echo "  wgpu-native -> $WGPU_DIR"
 echo "  GLFW        -> $GLFW_DIR"
+echo "  Dear ImGui  -> $IMGUI_DIR"

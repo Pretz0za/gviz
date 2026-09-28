@@ -8,6 +8,7 @@
 Graph::Graph()
     : m_inAdjPool(m_nodeSpace.SetPool<InAdjacencyComponent>()),
       m_outAdjPool(m_nodeSpace.SetPool<OutAdjacencyComponent>()),
+      m_degreePool(m_nodeSpace.SetPool<DegreeComponent>()),
       m_edgePool(m_edgeSpace.SetPool<EdgeComponent>()),
       m_weightPool(m_edgeSpace.SetPool<WeightComponent>()) {}
 
@@ -34,6 +35,8 @@ EdgeID Graph::AddEdge(NodeID from, NodeID to) {
 
   outAdj->out.push_back({id, to});
   inAdj->in.push_back({id, from});
+  m_degreePool->Find(from.Raw())->out++;
+  m_degreePool->Find(to.Raw())->in++;
   return id;
 }
 

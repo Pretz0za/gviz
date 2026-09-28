@@ -8,4 +8,5 @@ concept ForceModel = requires(F forceModel, DenseNodeID denseId, const double* p
   { forceModel.RepulsiveTick(denseId, denseId) } -> std::same_as<void>;
   { forceModel.RepulsiveTick(denseId, pos, dbl) } -> std::same_as<void>;
   { forceModel.AttractiveTick(denseId, denseId) } -> std::same_as<void>;
+  { forceModel.EdgeLength() } -> std::same_as<double>;
 };

@@ -26,8 +26,10 @@ typedef struct AABB {
   }
 
   inline bool intersects(const AABB &other) const {
-    return fabs(center[0] - other.center[0]) <= (halfLength + halfLength) &&
-           fabs(center[1] - center[1]) <= (halfLength + halfLength);
+    return fabs(center[0] - other.center[0]) <=
+               (halfLength + other.halfLength) &&
+           fabs(center[1] - other.center[1]) <=
+               (halfLength + other.halfLength);
   };
 } AABB;
 
@@ -70,8 +72,9 @@ private:
   friend class Memory::Arena;
 
   // Used to construct children that share the parent's arena instead of
-  // each owning their own.
-  QuadTree(const AABB &aabb, Memory::Arena *arena);
+  // each owning their own. `depth` counts levels from the root and is used
+  // to cap subdivision (see kMaxDepth).
+  QuadTree(const AABB &aabb, Memory::Arena *arena, uint32_t depth = 0);
 
   void Subdivide();
 
@@ -109,7 +112,20 @@ private:
   AABB m_bounds;
   alignas(Point) std::byte m_pointsStorage[S * sizeof(Point)];
   alignas(T) std::byte m_dataStorage[S * sizeof(T)];
+  double m_massStorage[S];
   uint32_t m_pointCount = 0;
+
+  // How many levels deep this node is below the root.
+  uint32_t m_depth;
+
+  // Coincident (or numerically indistinguishable at this cell size) points
+  // can never be separated by subdividing, so subdivision stops at this
+  // depth; any further points that land here are folded into the leaf's
+  // aggregate mass/center of mass (updated unconditionally at the top of
+  // Insert) instead of recursing forever. 2^-32 of a root cell is still far
+  // above double's precision limit, so this is only ever hit by degenerate
+  // input, not by normal spatial resolution needs.
+  static constexpr uint32_t kMaxDepth = 32;
 };
 
 namespace Helpers {

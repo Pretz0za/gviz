@@ -5,15 +5,14 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 namespace {
 constexpr float kOrbitSensitivity = 0.006f; // radians per pixel
 } // namespace
 
-void Renderer::Impl::FrameCameraIfNeeded(const FrameData &fd) {
-  if (camera.initialized || !fd.bboxValid)
-    return;
-
+namespace {
+void FitToBBox(OrbitCamera &camera, const FrameData &fd) {
   float center[3];
   for (int i = 0; i < 3; i++)
     center[i] = (fd.bboxMin[i] + fd.bboxMax[i]) * 0.5f;
@@ -32,6 +31,24 @@ void Renderer::Impl::FrameCameraIfNeeded(const FrameData &fd) {
     float halfH = std::max((fd.bboxMax[1] - fd.bboxMin[1]) * 0.5f, 1e-3f) * 1.15f;
     camera.distance = std::max(halfW, halfH);
   }
+}
+} // namespace
+
+void Renderer::Impl::FrameCameraIfNeeded(const FrameData &fd) {
+  if (!fd.bboxValid)
+    return;
+
+  if (!camera.lockToFit && camera.initialized)
+    return;
+
+  FitToBBox(camera, fd);
+  camera.initialized = true;
+}
+
+void Renderer::Impl::FitToBounds() {
+  if (!frameData.bboxValid)
+    return;
+  FitToBBox(camera, frameData);
   camera.initialized = true;
 }
 
@@ -110,4 +127,19 @@ void Renderer::Impl::OnScroll(GLFWwindow *window, double, double yoffset) {
   if (!impl)
     return;
   impl->camera.Zoom(static_cast<float>(yoffset));
+}
+
+void Renderer::Impl::OnKey(GLFWwindow *window, int key, int, int action, int) {
+  auto *impl = static_cast<Impl *>(glfwGetWindowUserPointer(window));
+  if (!impl)
+    return;
+  if (action != GLFW_PRESS)
+    return;
+
+  if (key == GLFW_KEY_SPACE) {
+    impl->camera.lockToFit = !impl->camera.lockToFit;
+  } else if (key == GLFW_KEY_F12) {
+    impl->pendingScreenshotPath =
+        "screenshot_" + std::to_string(impl->screenshotCounter++) + ".bmp";
+  }
 }

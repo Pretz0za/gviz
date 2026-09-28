@@ -12,6 +12,7 @@ constexpr float kMaxPitch = 1.5533f; // ~89 degrees
 struct OrbitCamera {
   bool is3D = false;
   bool initialized = false;
+  bool lockToFit = false;
   float target[3] = {0.0f, 0.0f, 0.0f};
   // 3D: orbit radius around target. 2D: half-height of the ortho view, in
   // world units.

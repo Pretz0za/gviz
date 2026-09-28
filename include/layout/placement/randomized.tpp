@@ -7,7 +7,7 @@
 #include <ctime>
 #include <random>
 
-#define DEFAULT_BBOX_WIDTH 1000
+#define DEFAULT_BBOX_WIDTH 10000
 
 template <GraphLike G>
 PositionRandomized<G>::PositionRandomized(G &graph)

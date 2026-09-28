@@ -56,11 +56,17 @@ void DistanceCalculationSystem<G>::VecBetweenNodes(DenseNodeID v, DenseNodeID u,
 template <GraphLike G>
 double *DistanceCalculationSystem<G>::VecToPoint(DenseNodeID v, double *p,
                                                  double *out) {
-  PositionComponent vPos = m_positionData[v.Raw()];
+  // PositionComponent::pos is declared double[1] but is really backed by
+  // a m_dimension-wide slice of PositionSpan's shared storage -- valid
+  // only through a pointer/reference into that storage. A by-value
+  // PositionComponent copy only copies pos[0], leaving every other axis
+  // as uninitialized stack garbage (this silently corrupted every
+  // dimension past X here).
+  const PositionComponent &vPos = m_positionData[v.Raw()];
   return Subtract(p, vPos.pos, out, m_dimension);
 }
 template <GraphLike G>
 double DistanceCalculationSystem<G>::DistanceToPoint(DenseNodeID v, double *p) {
-  PositionComponent vPos = m_positionData[v.Raw()];
+  const PositionComponent &vPos = m_positionData[v.Raw()];
   return Distance(vPos.pos, p, m_dimension);
 }

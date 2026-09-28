@@ -12,6 +12,8 @@ if(ENABLE_ASAN)
     add_link_options(-fsanitize=address)
 endif()
 
+option(GVIZ_DEBUG_CHARTS "Enable ChartRecorder instrumentation of component pools" OFF)
+
 # gviz (and everything it statically links, e.g. `planar` below) builds as a
 # shared library, so every object file needs position-independent code even
 # on platforms where that isn't the default for static archives.
@@ -46,6 +48,10 @@ target_link_libraries(gviz
     PRIVATE
     m
 )
+
+if(GVIZ_DEBUG_CHARTS)
+    target_compile_definitions(gviz PUBLIC GVIZ_DEBUG_CHARTS)
+endif()
 
 add_executable(main main.cpp)
 set_target_properties(main PROPERTIES
@@ -108,9 +114,44 @@ if(GVIZ_BUILD_RENDER)
     add_library(gvizRender STATIC
         src/render/renderer.cpp
         src/render/gpu/device.cpp
+        src/render/gpu/screenshot.cpp
         src/render/camera/camera_control.cpp
         src/render/frame/frame.cpp
     )
+
+    if(GVIZ_DEBUG_CHARTS)
+        set(GVIZ_IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/imgui" CACHE PATH
+            "Path to a Dear ImGui source tree (with backends/)")
+        if(NOT EXISTS "${GVIZ_IMGUI_DIR}/imgui.h")
+            message(FATAL_ERROR
+                "Dear ImGui not found at ${GVIZ_IMGUI_DIR}.\n"
+                "Run ./scripts/setup-deps.sh once, or set -DGVIZ_IMGUI_DIR=...")
+        endif()
+
+        add_library(imgui STATIC
+            "${GVIZ_IMGUI_DIR}/imgui.cpp"
+            "${GVIZ_IMGUI_DIR}/imgui_draw.cpp"
+            "${GVIZ_IMGUI_DIR}/imgui_tables.cpp"
+            "${GVIZ_IMGUI_DIR}/imgui_widgets.cpp"
+            "${GVIZ_IMGUI_DIR}/backends/imgui_impl_glfw.cpp"
+            "${GVIZ_IMGUI_DIR}/backends/imgui_impl_wgpu.cpp"
+        )
+        target_include_directories(imgui PUBLIC
+            "${GVIZ_IMGUI_DIR}"
+            "${GVIZ_IMGUI_DIR}/backends"
+        )
+        target_compile_definitions(imgui PUBLIC IMGUI_IMPL_WEBGPU_BACKEND_WGPU)
+        target_link_libraries(imgui PUBLIC wgpu_native glfw)
+
+        target_sources(gvizRender PRIVATE
+            src/render/debug/chart_window.cpp
+            src/render/debug/chart_overlay.cpp
+        )
+        # PUBLIC: the debug chart templates in include/render/debug/ pull in
+        # <imgui.h> wherever a caller instantiates ChartWindow::With<T>, so
+        # imgui's include dirs must reach consumers of gvizRender too.
+        target_link_libraries(gvizRender PUBLIC imgui)
+    endif()
     if(APPLE)
         target_sources(gvizRender PRIVATE src/render/gpu/surface_cocoa.mm)
         target_link_libraries(gvizRender PRIVATE "-framework AppKit")
@@ -132,4 +173,11 @@ if(GVIZ_BUILD_RENDER)
 
     add_executable(renderDemo examples/renderDemo.cpp)
     target_link_libraries(renderDemo PRIVATE gvizRender gviz)
+endif()
+
+option(GVIZ_BUILD_TESTS "Build the gviz unit test suite" OFF)
+
+if(GVIZ_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
 endif()

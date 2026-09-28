@@ -41,3 +41,21 @@ void Renderer::SetBackgroundColor(float r, float g, float b, float a) {
   m_impl->bgColor[2] = b;
   m_impl->bgColor[3] = a;
 }
+
+void Renderer::RequestScreenshot(std::string path) {
+  m_impl->pendingScreenshotPath = std::move(path);
+}
+
+void Renderer::SetLockToFit(bool enabled) { m_impl->camera.lockToFit = enabled; }
+
+bool Renderer::LockToFit() const { return m_impl->camera.lockToFit; }
+
+void Renderer::FitToBounds() { m_impl->FitToBounds(); }
+
+#ifdef GVIZ_DEBUG_CHARTS
+ChartWindow &Renderer::DebugCharts() { return m_impl->debugCharts.Charts(); }
+
+void Renderer::SyncChartRecorder(ChartRecorderResource *resource) {
+  m_impl->debugCharts.SetRecorder(resource ? resource->recorder.get() : nullptr);
+}
+#endif

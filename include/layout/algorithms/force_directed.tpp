@@ -11,11 +11,13 @@
 #include "layout/components/physics.hpp"
 #include "layout/components/position.hpp"
 #include "layout/concept/force_model.hpp"
+#include <cmath>
+#include <cstdio>
 #include <memory>
 
 template <GraphLike G, ForceModel F>
 ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
-    : m_graph(&graph), m_positions(nullptr) {
+    : m_graph(&graph), m_positions(nullptr), m_mass(nullptr) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
@@ -25,6 +27,7 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
 
   // pools the force model, gravity system, randomizer, and heat control all
   // rely on
+  m_mass = graph.NodeSpace().template SetPool<MassComponent>();
   m_positions =
       graph.NodeSpace().template SetPool<PositionComponent>(m_dimension);
   graph.NodeSpace().template SetPool<PhysicsComponent>();
@@ -35,15 +38,55 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
   m_randomizer = std::make_unique<PositionRandomized<G>>(graph);
   m_heat = std::make_unique<ForceAtlasHeat<G>>(graph);
 
+#ifdef GVIZ_DEBUG_CHARTS
+  m_chart = graph.template SetResource<ChartRecorderResource>(graph.NodeSpace())
+                .recorder.get();
+#endif
+
+  // Scale the initial random placement box to the model's own target
+  // spacing (mirrors grapher-old's DefaultBoxExtent). Without this, a
+  // fixed box width picked independent of edgeLength either strands
+  // vertices absurdly far apart relative to their target spacing (weak,
+  // slow convergence) or crams them absurdly close together relative to
+  // it (attraction on that first tick, ~gap^2/edgeLength, becomes huge
+  // and snaps connected vertices together before repulsion ever gets a
+  // chance to push back).
+  double boxExtent = 0.5 * std::sqrt(static_cast<double>(graph.Size())) *
+                      m_forceModel->EdgeLength();
+  if (boxExtent > 0.0)
+    m_randomizer->SetBoundingBox(static_cast<uint32_t>(boxExtent));
+
   m_randomizer->PlaceAll();
+}
+
+template <GraphLike G, ForceModel F>
+void ForceDirectedLayoutAlgorithm<G, F>::RebuildQuadTree() {
+  SpacialIndex::AABB bbox = SpacialIndex::Helpers::GetBoundingBox(m_graph);
+  m_quadtree->root->Reset(bbox);
+
+  auto &positions = m_positions->Data();
+  for (uint32_t i = 0; i < positions.Size(); i++) {
+    bool inserted = m_quadtree->root->Insert(
+        DenseNodeID{i}, {positions[i].pos[0], positions[i].pos[1]},
+        m_mass->Find(i)->mass);
+    if (!inserted) {
+      fprintf(stderr, "[quadtree] Insert failed for node %u at (%.6f, %.6f)\n",
+              i, positions[i].pos[0], positions[i].pos[1]);
+    }
+  }
 }
 
 template <GraphLike G, ForceModel F>
 void ForceDirectedLayoutAlgorithm<G, F>::RepulsiveTick(
     SpacialIndex::QuadTree<DenseNodeID, 1> *node, DenseNodeID v) {
-  // forces are accumulated in acc
-
-  if (!node || node->Mass() == 0.0 || node->IsEmpty()) // empty
+  // NOTE: don't also check node->IsEmpty() here -- it reports whether this
+  // node's own point array is empty, which is true for every subdivided
+  // internal node (Subdivide() redistributes its points into children and
+  // resets its own count to 0) even though the subtree under it is full of
+  // mass. Mass() alone is the correct "nothing under here" check: Insert()
+  // accumulates it unconditionally on every node from the root down,
+  // whether or not that node ever holds a point directly.
+  if (!node || node->Mass() == 0.0)
     return;
 
   if (node->IsLeaf()) {
@@ -76,10 +119,7 @@ void ForceDirectedLayoutAlgorithm<G, F>::RepulsiveTick(
 
 template <GraphLike G, ForceModel F>
 void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
-
-  SpacialIndex::AABB bbox = SpacialIndex::Helpers::GetBoundingBox(m_graph);
-  m_quadtree->root->Reset(bbox);
-
+  RebuildQuadTree();
   uint32_t size = m_graph->Size();
   DenseComponentPool<PhysicsComponent> *physics =
       m_graph->NodeSpace().template GetPool<PhysicsComponent>();
@@ -91,13 +131,6 @@ void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
   }
 
   for (uint32_t i = 0; i < size; i++) {
-    // Repulsive Forces
-    // for (uint32_t j = 0; j < size; j++) {
-    //   if (i == j)
-    //     continue;
-    //   m_forceModel->RepulsiveTick(DenseNodeID{i}, DenseNodeID{j});
-    // }
-
     RepulsiveTick(m_quadtree->root.get(), DenseNodeID{i});
 
     // Attractive Forces
@@ -123,4 +156,9 @@ void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
     Scale(disp, m_heat->SpeedFactor(DenseNodeID{i}), m_dimension);
     Vecaxpy(1.0, disp, positions->Find(i)->pos, m_dimension);
   }
+
+#ifdef GVIZ_DEBUG_CHARTS
+  m_chart->PushFrame<PhysicsComponent>();
+  m_chart->PushFrame<ForceAtlasHeatComponent>();
+#endif
 }

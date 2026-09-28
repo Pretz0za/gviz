@@ -17,10 +17,16 @@ public:
   inline void AttractiveTick(DenseNodeID v, DenseNodeID u);
   inline void RepulsiveTick(DenseNodeID v, DenseNodeID u);
   inline void RepulsiveTick(DenseNodeID v, const double* uPos, double uMass);
+  inline double EdgeLength() const { return m_edgeLength; }
 
 private:
   uint8_t m_dimension;
-  double m_edgeLength = 10.0;
+  double m_edgeLength = 100.0;
+  // Floors the distance used for repulsion's magnitude at
+  // m_edgeLength * kMinDistFraction, so two vertices landing arbitrarily
+  // close together (or exactly coincident) can't spike k^2/dist into an
+  // unbounded one-tick impulse. Mirrors grapher-old's VecMinDistFraction.
+  static constexpr double kMinDistFraction = 0.01;
   DistanceCalculationSystem<G> m_distanceCalc;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<PhysicsComponent> *m_physics;
@@ -33,6 +39,8 @@ public:
   inline void AttractiveTick(DenseNodeID v, DenseNodeID u);
   inline void RepulsiveTick(DenseNodeID v, DenseNodeID u);
   inline void RepulsiveTick(DenseNodeID v, const double* uPos, double uMass);
+  // GRIP's tick formulas hardcode 10.0 as their implicit target spacing.
+  inline double EdgeLength() const { return 10.0; }
 
 private:
   DenseComponentPool<PhysicsComponent> *m_physics;
@@ -40,6 +48,6 @@ private:
   uint8_t m_dimension;
 };
 
-#include "layout/physics/fruchterman_reingold.tpp"
+#include "layout/physics/force_model/fruchterman_reingold.tpp"
 static_assert(ForceModel<VanillaFruchtermanReingold<Graph>>);
 static_assert(ForceModel<GRIPFruchtermanReingold<Graph>>);

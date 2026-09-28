@@ -42,6 +42,6 @@ template <typename T> uint32_t DenseComponentPool<T>::Size() const {
 
 template <typename T>
 template <typename U>
-DenseComponentPool<U> DenseComponentPool<T>::Sibling() const {
+DenseComponentPool<U> *DenseComponentPool<T>::Sibling() const {
   return m_admin.GetPool<U>();
 }

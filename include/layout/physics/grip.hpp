@@ -7,8 +7,8 @@
 #include "layout/components/knearest.hpp"
 #include "layout/filtration/mis_filtration.hpp"
 #include "layout/heat/localheat_grip.hpp"
-#include "layout/physics/fruchterman_reingold.hpp"
-#include "layout/physics/kamada_kawai.hpp"
+#include "layout/physics/force_model/fruchterman_reingold.hpp"
+#include "layout/physics/force_model/kamada_kawai.hpp"
 #include "layout/types.hpp"
 
 template <GraphLike G> class GRIPPhysicsSystem {

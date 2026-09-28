@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "debug/chart_recorder.hpp"
 #include "layout/filtration/mis_filtration.hpp"
 #include "layout/physics/grip.hpp"
 #include "layout/placement/barrycenter.hpp"
@@ -27,6 +28,9 @@ private:
   std::unique_ptr<MisFiltrationSystem<G>> m_filtrationSystem = nullptr;
   std::unique_ptr<PositionBarrycentric<G>> m_placementSystem = nullptr;
   std::unique_ptr<GRIPPhysicsSystem<G>> m_physicsSystem = nullptr;
+#ifdef GVIZ_DEBUG_CHARTS
+  ChartRecorder *m_chart = nullptr;
+#endif
 };
 
 #include "layout/algorithms/grip.tpp"

@@ -10,5 +10,8 @@ Renderer::Renderer(uint32_t width, uint32_t height, const std::string &title,
 template <GraphLike G> bool Renderer::Frame(G &graph) {
   FrameData &fd = FrameBuffer();
   ExtractFrameData(graph, Is3D(), fd);
+#ifdef GVIZ_DEBUG_CHARTS
+  SyncChartRecorder(graph.template GetResource<ChartRecorderResource>());
+#endif
   return ApplyFrame(fd);
 }

@@ -108,6 +108,10 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
     return true;
   }
 
+#ifdef GVIZ_DEBUG_CHARTS
+  debugCharts.NewFrame();
+#endif
+
   WGPUTextureView frame = wgpuTextureCreateView(surfaceTexture.texture, nullptr);
   WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(
       device,
@@ -141,12 +145,22 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   wgpuRenderPassEncoderSetPipeline(pass, nodePipeline);
   wgpuRenderPassEncoderDraw(pass, 6, static_cast<uint32_t>(fd.nodeIds.size()),
                            0, 0);
+
+#ifdef GVIZ_DEBUG_CHARTS
+  debugCharts.Draw(pass);
+#endif
+
   wgpuRenderPassEncoderEnd(pass);
   wgpuRenderPassEncoderRelease(pass);
+
+  EncodeScreenshotCopy(encoder, surfaceTexture.texture,
+                      static_cast<uint32_t>(fbw), static_cast<uint32_t>(fbh));
 
   WGPUCommandBuffer commands = wgpuCommandEncoderFinish(encoder, nullptr);
   wgpuQueueSubmit(queue, 1, &commands);
   wgpuSurfacePresent(surface);
+
+  WriteScreenshot(static_cast<uint32_t>(fbw), static_cast<uint32_t>(fbh));
 
   wgpuCommandBufferRelease(commands);
   wgpuCommandEncoderRelease(encoder);

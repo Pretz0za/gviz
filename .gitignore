@@ -5,4 +5,5 @@
 /build-render/
 /third-party/wgpu-native/
 /third-party/glfw/
+/third-party/imgui/
 /compile_commands.json

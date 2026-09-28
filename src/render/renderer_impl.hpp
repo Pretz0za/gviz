@@ -4,7 +4,12 @@
 #include "gpu/render_internal.hpp"
 #include "render/renderer.hpp"
 
+#include <string>
 #include <webgpu/webgpu.h>
+
+#ifdef GVIZ_DEBUG_CHARTS
+#include "render/debug/chart_overlay.hpp"
+#endif
 
 struct GlobalsUBO {
   float viewProj[16];
@@ -69,6 +74,16 @@ struct Renderer::Impl {
   bool orbitDragging = false; // left button: 3D orbit, no-op in 2D
   bool panDragging = false;   // right/middle button: pan, both 2D and 3D
 
+  bool screenshotCopySupported = false;
+  std::string pendingScreenshotPath;
+  WGPUBuffer screenshotBuf = nullptr;
+  size_t screenshotBufCapacity = 0;
+  uint32_t screenshotCounter = 0;
+
+#ifdef GVIZ_DEBUG_CHARTS
+  ChartOverlay debugCharts;
+#endif
+
   ~Impl();
 
   bool Init(uint32_t width, uint32_t height, const std::string &title);
@@ -81,10 +96,17 @@ struct Renderer::Impl {
   void RebuildBindGroup();
   bool ApplyFrame(const FrameData &fd);
   void FrameCameraIfNeeded(const FrameData &fd);
+  void FitToBounds();
   void ComputeViewProj(float outMat[16], uint32_t fbw, uint32_t fbh) const;
+
+  void EncodeScreenshotCopy(WGPUCommandEncoder encoder, WGPUTexture source,
+                            uint32_t fbw, uint32_t fbh);
+  void WriteScreenshot(uint32_t fbw, uint32_t fbh);
 
   static void OnMouseButton(GLFWwindow *window, int button, int action,
                             int mods);
   static void OnCursorPos(GLFWwindow *window, double x, double y);
   static void OnScroll(GLFWwindow *window, double xoffset, double yoffset);
+  static void OnKey(GLFWwindow *window, int key, int scancode, int action,
+                    int mods);
 };
