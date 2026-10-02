@@ -8,7 +8,7 @@ void Renderer::Impl::RebuildBindGroup() {
   if (bindGroup)
     wgpuBindGroupRelease(bindGroup);
 
-  WGPUBindGroupEntry entries[6] = {};
+  WGPUBindGroupEntry entries[7] = {};
   entries[0] = WGPUBindGroupEntry{
       .binding = 0, .buffer = globalsBuf, .size = sizeof(GlobalsUBO)};
   entries[1] = WGPUBindGroupEntry{
@@ -21,12 +21,14 @@ void Renderer::Impl::RebuildBindGroup() {
       .binding = 4, .buffer = radiusBuf, .size = radiusCapacity};
   entries[5] = WGPUBindGroupEntry{
       .binding = 5, .buffer = colorBuf, .size = colorCapacity};
+  entries[6] = WGPUBindGroupEntry{
+      .binding = 6, .buffer = edgeColorBuf, .size = edgeColorCapacity};
 
   bindGroup = wgpuDeviceCreateBindGroup(
       device, WgpuPtr(WGPUBindGroupDescriptor{
                   .label = {"render bind group", WGPU_STRLEN},
                   .layout = bindGroupLayout,
-                  .entryCount = 6,
+                  .entryCount = 7,
                   .entries = entries,
               }));
   bindGroupDirty = false;
@@ -56,6 +58,8 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   size_t edgeBytes = std::max<size_t>(fd.edges.size() * sizeof(uint32_t), 1);
   size_t radiusBytes = std::max<size_t>(fd.radii.size() * sizeof(float), 1);
   size_t colorBytes = std::max<size_t>(fd.colors.size() * sizeof(uint32_t), 1);
+  size_t edgeColorBytes =
+      std::max<size_t>(fd.edgeColors.size() * sizeof(uint32_t), 1);
 
   EnsureBuffer(positionsBuf, positionsCapacity, posBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
@@ -72,6 +76,9 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   EnsureBuffer(colorBuf, colorCapacity, colorBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
               "render color");
+  EnsureBuffer(edgeColorBuf, edgeColorCapacity, edgeColorBytes,
+              WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+              "render edge color");
 
   if (!fd.positions.empty())
     wgpuQueueWriteBuffer(queue, positionsBuf, 0, fd.positions.data(),
@@ -88,6 +95,9 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   if (!fd.colors.empty())
     wgpuQueueWriteBuffer(queue, colorBuf, 0, fd.colors.data(),
                          fd.colors.size() * sizeof(uint32_t));
+  if (!fd.edgeColors.empty())
+    wgpuQueueWriteBuffer(queue, edgeColorBuf, 0, fd.edgeColors.data(),
+                         fd.edgeColors.size() * sizeof(uint32_t));
 
   if (bindGroupDirty)
     RebuildBindGroup();
@@ -104,6 +114,7 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   camera.Basis(globals.cameraRight, globals.cameraUp);
   std::memcpy(globals.nodeColor, nodeColor, sizeof(globals.nodeColor));
   std::memcpy(globals.edgeColor, edgeColor, sizeof(globals.edgeColor));
+  globals.useEdgeColors = fd.edgeColors.empty() ? 0u : 1u;
   wgpuQueueWriteBuffer(queue, globalsBuf, 0, &globals, sizeof(globals));
 
   WGPUSurfaceTexture surfaceTexture;

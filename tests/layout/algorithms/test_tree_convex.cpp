@@ -1,6 +1,6 @@
 #include "catch_amalgamated.hpp"
 #include "layout/algorithms/tree_convex.hpp"
-#include "layout/components/radial_edge_decorator.hpp"
+#include "layout/components/convex_edge_decorator.hpp"
 #include <cmath>
 #include <numbers>
 

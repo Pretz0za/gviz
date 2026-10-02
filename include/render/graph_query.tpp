@@ -25,6 +25,7 @@ void ExtractFrameData(G &graph, bool is3D, FrameData &out) {
   out.edges.clear();
   out.radii.clear();
   out.colors.clear();
+  out.edgeColors.clear();
   out.bboxValid = false;
 
   auto *posPool = graph.NodeSpace().template GetPool<PositionComponent>();
@@ -40,6 +41,10 @@ void ExtractFrameData(G &graph, bool is3D, FrameData &out) {
   auto *colorPool = graph.NodeSpace().template GetPool<ColorComponent>();
   if (!colorPool)
     useDefaultColor = true;
+
+  auto *edgeColorPool = graph.EdgeSpace().template GetPool<ColorComponent>();
+  if (edgeColorPool)
+    out.edgeColors.reserve(edgeColorPool->Size());
 
   const VisibleNodesResource *visible =
       graph.template HasResource<VisibleNodesResource>()
@@ -110,6 +115,12 @@ void ExtractFrameData(G &graph, bool is3D, FrameData &out) {
     if (aVisible && bVisible) {
       out.edges.push_back(a.Raw());
       out.edges.push_back(b.Raw());
+      if (edgeColorPool) {
+        DenseEdgeID deid = graph.MapToDense(eid);
+        out.edgeColors.push_back(deid.Raw() < edgeColorPool->Size()
+                                      ? edgeColorPool->Find(deid.Raw())->color
+                                      : DEFAULT_COLOR);
+      }
     }
   }
 }

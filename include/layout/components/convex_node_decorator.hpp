@@ -6,7 +6,7 @@
 
 enum class TreeShape : uint8_t { Unclassified, Path, Rake, Other };
 
-struct RadialNodeDecorator : Component {
+struct ConvexNodeDecorator : Component {
   TreeShape shape = TreeShape::Unclassified;
   bool chainable = false;
   double firstLeafSlope = 0.0;

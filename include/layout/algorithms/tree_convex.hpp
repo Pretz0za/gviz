@@ -5,8 +5,8 @@
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
-#include "layout/components/radial_edge_decorator.hpp"
-#include "layout/components/radial_node_decorator.hpp"
+#include "layout/components/convex_edge_decorator.hpp"
+#include "layout/components/convex_node_decorator.hpp"
 #include <cstdint>
 #include <vector>
 
@@ -14,7 +14,7 @@ template <GraphLike G> class TreeConvexLayoutAlgorithm {
 public:
   TreeConvexLayoutAlgorithm(G &graph, bool respectEmbedding);
 
-  void Layout();
+  void Layout(NodeID root = NodeID{0xffffffff});
 
   double AngularResolution() const { return m_resolution; }
   void SetEdgeLength(double length) { m_edgeLength = length; }
@@ -48,12 +48,14 @@ private:
   void AssignChainSlope(DenseNodeID w, double slope, bool allowBend);
 
   void PlaceVertices();
-  void PlacePreorder(DenseNodeID v, double x, double y);
+  void PlacePreorder(DenseNodeID v, double x, double y, uint32_t depth);
+
+  uint8_t Depth(DenseNodeID v) const;
 
   G *m_graph;
   bool m_respectEmbedding;
-  DenseComponentPool<RadialNodeDecorator> *m_info;
-  DenseComponentPool<RadialEdgeDecorator> *m_edgeInfo;
+  DenseComponentPool<ConvexNodeDecorator> *m_info;
+  DenseComponentPool<ConvexEdgeDecorator> *m_edgeInfo;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseNodeID m_root{0};
   uint32_t m_forkCount = 0;

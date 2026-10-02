@@ -42,6 +42,8 @@ Renderer::Impl::~Impl() {
     wgpuBufferRelease(radiusBuf);
   if (colorBuf)
     wgpuBufferRelease(colorBuf);
+  if (edgeColorBuf)
+    wgpuBufferRelease(edgeColorBuf);
   if (globalsBuf)
     wgpuBufferRelease(globalsBuf);
   if (edgePipeline)
@@ -108,13 +110,13 @@ bool Renderer::Impl::CreatePipelines() {
   if (!shaderModule)
     return false;
 
-  WGPUBindGroupLayoutEntry entries[6] = {};
+  WGPUBindGroupLayoutEntry entries[7] = {};
   entries[0] = WGPUBindGroupLayoutEntry{
       .binding = 0,
       .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
       .buffer = {.type = WGPUBufferBindingType_Uniform},
   };
-  for (uint32_t i = 1; i < 6; i++) {
+  for (uint32_t i = 1; i < 7; i++) {
     entries[i] = WGPUBindGroupLayoutEntry{
         .binding = i,
         .visibility = WGPUShaderStage_Vertex,
@@ -125,7 +127,7 @@ bool Renderer::Impl::CreatePipelines() {
   bindGroupLayout = wgpuDeviceCreateBindGroupLayout(
       device, WgpuPtr(WGPUBindGroupLayoutDescriptor{
                   .label = {"render bgl", WGPU_STRLEN},
-                  .entryCount = 6,
+                  .entryCount = 7,
                   .entries = entries,
               }));
   pipelineLayout = wgpuDeviceCreatePipelineLayout(

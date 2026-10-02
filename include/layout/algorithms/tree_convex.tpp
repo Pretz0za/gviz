@@ -7,14 +7,15 @@
 #include "layout/types.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <numbers>
 
 template <GraphLike G>
 TreeConvexLayoutAlgorithm<G>::TreeConvexLayoutAlgorithm(G &graph,
                                                         bool respectEmbedding)
     : m_graph(&graph), m_respectEmbedding(respectEmbedding) {
-  m_info = graph.NodeSpace().template SetPool<RadialNodeDecorator>();
-  m_edgeInfo = graph.EdgeSpace().template SetPool<RadialEdgeDecorator>();
+  m_info = graph.NodeSpace().template SetPool<ConvexNodeDecorator>();
+  m_edgeInfo = graph.EdgeSpace().template SetPool<ConvexEdgeDecorator>();
 
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)
@@ -38,7 +39,8 @@ template <GraphLike G> NodeID TreeConvexLayoutAlgorithm<G>::ChooseRoot() const {
 }
 
 template <GraphLike G>
-std::vector<AdjEntry> TreeConvexLayoutAlgorithm<G>::Children(DenseNodeID v) const {
+std::vector<AdjEntry>
+TreeConvexLayoutAlgorithm<G>::Children(DenseNodeID v) const {
   NodeID parent = m_info->Find(v.Raw())->parent;
   std::vector<AdjEntry> result;
   for (const AdjEntry &adj : m_graph->OutNeighbors(m_graph->MapToSparse(v)))
@@ -90,14 +92,14 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ClassifyShapes() {
 
   for (auto it = order.rbegin(); it != order.rend(); ++it) {
     DenseNodeID id = *it;
-    RadialNodeDecorator *info = m_info->Find(id.Raw());
+    ConvexNodeDecorator *info = m_info->Find(id.Raw());
     std::vector<AdjEntry> children = Children(id);
     uint32_t k = static_cast<uint32_t>(children.size());
 
     uint32_t branchy = 0;
     bool anyOther = false;
     for (const AdjEntry &adj : children) {
-      RadialNodeDecorator *child =
+      ConvexNodeDecorator *child =
           m_info->Find(m_graph->MapToDense(adj.other).Raw());
       if (child->shape == TreeShape::Other)
         anyOther = true;
@@ -123,7 +125,8 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ClassifyShapes() {
   }
 }
 
-template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ReorderForMinimumForks() {
+template <GraphLike G>
+void TreeConvexLayoutAlgorithm<G>::ReorderForMinimumForks() {
   uint32_t n = m_graph->Size();
   for (uint32_t i = 0; i < n; i++) {
     std::vector<AdjEntry> children = Children(DenseNodeID{i});
@@ -132,7 +135,8 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ReorderForMinimumForks
 
     std::vector<AdjEntry> paths, rakes, others;
     for (const AdjEntry &adj : children) {
-      TreeShape shape = m_info->Find(m_graph->MapToDense(adj.other).Raw())->shape;
+      TreeShape shape =
+          m_info->Find(m_graph->MapToDense(adj.other).Raw())->shape;
       if (shape == TreeShape::Path)
         paths.push_back(adj);
       else if (shape == TreeShape::Rake)
@@ -295,7 +299,7 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::AssignGeneral() {
 template <GraphLike G>
 double TreeConvexLayoutAlgorithm<G>::AssignSlopesAt(DenseNodeID v,
                                                     double currentSlope) {
-  RadialNodeDecorator *info = m_info->Find(v.Raw());
+  ConvexNodeDecorator *info = m_info->Find(v.Raw());
   std::vector<AdjEntry> children = Children(v);
   std::vector<ForkSegment> segments = PartitionForks(children);
 
@@ -378,7 +382,7 @@ double TreeConvexLayoutAlgorithm<G>::AssignSlopesAt(DenseNodeID v,
       lastSlope = currentSlope;
     } else {
       double childEnd = AssignSlopesAt(child, currentSlope);
-      RadialNodeDecorator *childInfo = m_info->Find(child.Raw());
+      ConvexNodeDecorator *childInfo = m_info->Find(child.Raw());
       double bisect =
           (childInfo->firstLeafSlope + childInfo->lastLeafSlope) / 2.0;
       m_edgeInfo->Find(adj.edge.Raw())->slope = bisect;
@@ -399,10 +403,10 @@ double TreeConvexLayoutAlgorithm<G>::AssignSlopesAt(DenseNodeID v,
 
 template <GraphLike G>
 void TreeConvexLayoutAlgorithm<G>::PlacePreorder(DenseNodeID v, double x,
-                                                 double y) {
+                                                 double y, uint32_t depth) {
   auto &pos = m_positions->Data();
   for (const AdjEntry &adj : Children(v)) {
-    RadialEdgeDecorator *edge = m_edgeInfo->Find(adj.edge.Raw());
+    ConvexEdgeDecorator *edge = m_edgeInfo->Find(adj.edge.Raw());
     edge->length = m_placementLength;
     DenseNodeID child = m_graph->MapToDense(adj.other);
     double cx = x + edge->length * std::cos(edge->slope);
@@ -414,9 +418,10 @@ void TreeConvexLayoutAlgorithm<G>::PlacePreorder(DenseNodeID v, double x,
 }
 
 template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::PlaceVertices() {
-  m_placementLength = m_resolution > 0.0
-                          ? std::max(m_edgeLength, m_minSeparation / m_resolution)
-                          : m_edgeLength;
+  m_placementLength =
+      m_resolution > 0.0
+          ? std::max(m_edgeLength, m_minSeparation / m_resolution)
+          : m_edgeLength;
 
   auto &pos = m_positions->Data();
   pos[m_root.Raw()].pos[0] = 0.0;
@@ -424,7 +429,9 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::PlaceVertices() {
   PlacePreorder(m_root, 0.0, 0.0);
 }
 
-template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Layout() {
+template <GraphLike G> uint8_t TreeConvexLayoutAlgorithm<G>::Depth(DenseNodeID v) const {}
+
+template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Layout(NodeID root) {
   constexpr double pi = std::numbers::pi;
   uint32_t n = m_graph->Size();
   if (n == 0)
@@ -438,7 +445,8 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Layout() {
     return;
   }
 
-  NodeID root = ChooseRoot();
+  if (root == NodeID{0xffffffff})
+    root = ChooseRoot();
   BuildParents(root);
   m_root = m_graph->MapToDense(root);
   ClassifyShapes();

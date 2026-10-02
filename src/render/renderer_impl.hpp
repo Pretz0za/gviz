@@ -23,7 +23,9 @@ struct GlobalsUBO {
                         // space, so node radius is a world-space size
   float _padR;          // WGSL aligns the next vec3f to 16 bytes
   float cameraUp[3];
-  float _padU; // WGSL rounds the struct size up to a multiple of 16 bytes
+  uint32_t useEdgeColors; // u32 only needs 4-byte alignment, so this packs
+                          // right after cameraUp with no padding; the struct
+                          // is then already a multiple of 16 bytes (144)
 };
 
 struct Renderer::Impl {
@@ -52,6 +54,7 @@ struct Renderer::Impl {
   WGPUBuffer edgesBuf = nullptr;
   WGPUBuffer radiusBuf = nullptr;
   WGPUBuffer colorBuf = nullptr;
+  WGPUBuffer edgeColorBuf = nullptr;
   WGPUBindGroup bindGroup = nullptr;
 
   size_t positionsCapacity = 0;
@@ -59,6 +62,7 @@ struct Renderer::Impl {
   size_t edgesCapacity = 0;
   size_t radiusCapacity = 0;
   size_t colorCapacity = 0;
+  size_t edgeColorCapacity = 0;
   bool bindGroupDirty = true;
 
   FrameData frameData;

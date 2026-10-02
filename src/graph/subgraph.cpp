@@ -62,4 +62,4 @@ uint32_t Subgraph::Degree(NodeID id) const {
 }
 
 IndexSpace &Subgraph::NodeSpace() { return m_compactNodeSpace; }
-// IndexSpace &Subgraph::EdgeSpace() {}
+IndexSpace &Subgraph::EdgeSpace() { return m_compactEdgeSpace; }
