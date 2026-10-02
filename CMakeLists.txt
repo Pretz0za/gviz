@@ -173,6 +173,9 @@ if(GVIZ_BUILD_RENDER)
 
     add_executable(renderDemo examples/renderDemo.cpp)
     target_link_libraries(renderDemo PRIVATE gvizRender gviz)
+
+    add_executable(treeDemo examples/treeDemo.cpp)
+    target_link_libraries(treeDemo PRIVATE gvizRender gviz)
 endif()
 
 option(GVIZ_BUILD_TESTS "Build the gviz unit test suite" OFF)

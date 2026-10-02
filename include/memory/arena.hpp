@@ -16,23 +16,18 @@ using std::unique_ptr;
 namespace Memory {
 class Arena {
 public:
-  constexpr explicit Arena(size_t blockCapacity) : m_blockCapacity{blockCapacity} {}
+  constexpr explicit Arena(size_t blockCapacity)
+      : m_blockCapacity{blockCapacity} {}
 
-  // Note: placement-new, not std::construct_at, on purpose. construct_at's
-  // constraint (and any constructible_from/is_constructible_v check) does
-  // access control as if unrelated to friend declarations, so it can never
-  // reach a type's private-but-friended-to-Arena constructor. A raw
-  // placement-new expression is evaluated in this function's own context,
-  // where Arena's friendship actually applies.
   template <typename T, typename... Args>
   constexpr T *Allocate(Args &&...args) {
     auto it = std::find_if(m_storage.begin(), m_storage.end(),
-                            [](const Block &block) {
-                              return block.CanAllocate(sizeof(T), alignof(T));
-                            });
+                           [](const Block &block) {
+                             return block.CanAllocate(sizeof(T), alignof(T));
+                           });
 
-    Block *block = it == m_storage.end() ? &m_storage.emplace_back(m_blockCapacity)
-                                          : &*it;
+    Block *block =
+        it == m_storage.end() ? &m_storage.emplace_back(m_blockCapacity) : &*it;
     void *mem = block->Allocate(sizeof(T), alignof(T));
     return ::new (mem) T(std::forward<Args>(args)...);
   }

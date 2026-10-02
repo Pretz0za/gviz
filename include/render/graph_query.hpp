@@ -10,6 +10,7 @@ struct FrameData {
   std::vector<uint32_t> nodeIds;
   std::vector<uint32_t> edges;
   std::vector<float> radii;
+  std::vector<uint32_t> colors;
 
   float bboxMin[3] = {0.0f, 0.0f, 0.0f};
   float bboxMax[3] = {0.0f, 0.0f, 0.0f};

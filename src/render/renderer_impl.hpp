@@ -51,12 +51,14 @@ struct Renderer::Impl {
   WGPUBuffer nodeIdsBuf = nullptr;
   WGPUBuffer edgesBuf = nullptr;
   WGPUBuffer radiusBuf = nullptr;
+  WGPUBuffer colorBuf = nullptr;
   WGPUBindGroup bindGroup = nullptr;
 
   size_t positionsCapacity = 0;
   size_t nodeIdsCapacity = 0;
   size_t edgesCapacity = 0;
   size_t radiusCapacity = 0;
+  size_t colorCapacity = 0;
   bool bindGroupDirty = true;
 
   FrameData frameData;

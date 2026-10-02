@@ -6,7 +6,7 @@
 #include <ranges>
 #include <utility>
 
-#define DEFAULT_RADIUS 16.0
+#define DEFAULT_RADIUS 8.0
 #define MAX_RADIUS 32.0
 #define HALF_SATURATION_DEGREE 6.0
 

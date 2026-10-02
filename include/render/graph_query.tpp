@@ -7,6 +7,7 @@
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
 #include "layout/components/radius.hpp"
+#include "render/components/color.hpp"
 #include <algorithm>
 #include <limits>
 
@@ -23,6 +24,7 @@ void ExtractFrameData(G &graph, bool is3D, FrameData &out) {
   out.nodeIds.clear();
   out.edges.clear();
   out.radii.clear();
+  out.colors.clear();
   out.bboxValid = false;
 
   auto *posPool = graph.NodeSpace().template GetPool<PositionComponent>();
@@ -34,6 +36,11 @@ void ExtractFrameData(G &graph, bool is3D, FrameData &out) {
   if (!radiusPool)
     useDefaultRadius = true;
 
+  bool useDefaultColor = false;
+  auto *colorPool = graph.NodeSpace().template GetPool<ColorComponent>();
+  if (!colorPool)
+    useDefaultColor = true;
+
   const VisibleNodesResource *visible =
       graph.template HasResource<VisibleNodesResource>()
           ? graph.template GetResource<VisibleNodesResource>()
@@ -41,6 +48,7 @@ void ExtractFrameData(G &graph, bool is3D, FrameData &out) {
 
   out.positions.reserve(graph.Size() * 3);
   out.radii.reserve(graph.Size());
+  out.colors.reserve(graph.Size());
 
   float minB[3] = {std::numeric_limits<float>::max(),
                    std::numeric_limits<float>::max(),
@@ -65,6 +73,10 @@ void ExtractFrameData(G &graph, bool is3D, FrameData &out) {
         useDefaultRadius
             ? DEFAULT_RADIUS
             : static_cast<float>(radiusPool->Find(denseID.Raw())->radius));
+
+    out.colors.push_back(useDefaultColor
+                              ? DEFAULT_COLOR
+                              : colorPool->Find(denseID.Raw())->color);
 
     bool isVisible =
         visible ? (denseID.Raw() < visible->Size() && visible->Test(denseID))

@@ -8,7 +8,7 @@ void Renderer::Impl::RebuildBindGroup() {
   if (bindGroup)
     wgpuBindGroupRelease(bindGroup);
 
-  WGPUBindGroupEntry entries[5] = {};
+  WGPUBindGroupEntry entries[6] = {};
   entries[0] = WGPUBindGroupEntry{
       .binding = 0, .buffer = globalsBuf, .size = sizeof(GlobalsUBO)};
   entries[1] = WGPUBindGroupEntry{
@@ -19,12 +19,14 @@ void Renderer::Impl::RebuildBindGroup() {
       .binding = 3, .buffer = edgesBuf, .size = edgesCapacity};
   entries[4] = WGPUBindGroupEntry{
       .binding = 4, .buffer = radiusBuf, .size = radiusCapacity};
+  entries[5] = WGPUBindGroupEntry{
+      .binding = 5, .buffer = colorBuf, .size = colorCapacity};
 
   bindGroup = wgpuDeviceCreateBindGroup(
       device, WgpuPtr(WGPUBindGroupDescriptor{
                   .label = {"render bind group", WGPU_STRLEN},
                   .layout = bindGroupLayout,
-                  .entryCount = 5,
+                  .entryCount = 6,
                   .entries = entries,
               }));
   bindGroupDirty = false;
@@ -53,6 +55,7 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
       std::max<size_t>(fd.nodeIds.size() * sizeof(uint32_t), 1);
   size_t edgeBytes = std::max<size_t>(fd.edges.size() * sizeof(uint32_t), 1);
   size_t radiusBytes = std::max<size_t>(fd.radii.size() * sizeof(float), 1);
+  size_t colorBytes = std::max<size_t>(fd.colors.size() * sizeof(uint32_t), 1);
 
   EnsureBuffer(positionsBuf, positionsCapacity, posBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
@@ -66,6 +69,9 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   EnsureBuffer(radiusBuf, radiusCapacity, radiusBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
               "render radius");
+  EnsureBuffer(colorBuf, colorCapacity, colorBytes,
+              WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+              "render color");
 
   if (!fd.positions.empty())
     wgpuQueueWriteBuffer(queue, positionsBuf, 0, fd.positions.data(),
@@ -79,6 +85,9 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   if (!fd.radii.empty())
     wgpuQueueWriteBuffer(queue, radiusBuf, 0, fd.radii.data(),
                          fd.radii.size() * sizeof(float));
+  if (!fd.colors.empty())
+    wgpuQueueWriteBuffer(queue, colorBuf, 0, fd.colors.data(),
+                         fd.colors.size() * sizeof(uint32_t));
 
   if (bindGroupDirty)
     RebuildBindGroup();
