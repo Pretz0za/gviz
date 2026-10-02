@@ -13,7 +13,6 @@ Graph::Graph()
       m_weightPool(m_edgeSpace.SetPool<WeightComponent>()) {}
 
 NodeID Graph::AddNode() {
-  m_version++;
   return NodeID(m_nodeSpace.Create());
 }
 
@@ -27,7 +26,6 @@ EdgeID Graph::AddEdge(NodeID from, NodeID to) {
   if (!outAdj || !inAdj)
     return EdgeID{};
 
-  m_version++;
   EdgeID id(m_edgeSpace.Create());
   auto &edge = *m_edgePool->Find(id.Raw());
   edge.from = from;
@@ -44,14 +42,12 @@ EdgeID Graph::AddEdge(NodeID from, NodeID to, float weight) {
   EdgeID id = AddEdge(from, to);
   if (id.IsValid())
     m_weightPool->Find(id.Raw())->value = weight;
-  m_version++;
   return id;
 }
 
 std::pair<EdgeID, EdgeID> Graph::AddUndirectedEdge(NodeID a, NodeID b) {
   EdgeID ab = AddEdge(a, b);
   EdgeID ba = AddEdge(b, a);
-  m_version++;
   return {ab, ba};
 }
 
@@ -59,7 +55,6 @@ std::pair<EdgeID, EdgeID> Graph::AddUndirectedEdge(NodeID a, NodeID b,
                                                    float weight) {
   EdgeID ab = AddEdge(a, b, weight);
   EdgeID ba = AddEdge(b, a, weight);
-  m_version++;
   return {ab, ba};
 }
 

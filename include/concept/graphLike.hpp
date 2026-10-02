@@ -34,6 +34,7 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
       std::ranges::range_value_t<decltype(graph.OutNeighbors(nid))>, AdjEntry>;
 
   { cgraph.Size() } -> std::convertible_to<uint32_t>;
+  { cgraph.EdgeCount() } -> std::convertible_to<uint32_t>;
 
   { cgraph.OutDegree(nid) } -> std::convertible_to<uint32_t>;
   { cgraph.Degree(nid) } -> std::convertible_to<uint32_t>;
@@ -43,8 +44,10 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   { cgraph.GetEdge(eid) } -> std::same_as<EdgeComponent>;
   { cgraph.MapToSparse(DenseNodeID{}) } -> std::same_as<NodeID>;
   { cgraph.MapToDense(nid) } -> std::same_as<DenseNodeID>;
+  { cgraph.MapToSparse(DenseEdgeID{}) } -> std::same_as<EdgeID>;
+  { cgraph.MapToDense(eid) } -> std::same_as<DenseEdgeID>;
   { graph.NodeSpace() } -> std::same_as<IndexSpace &>;
-  { cgraph.Version() } -> std::convertible_to<uint64_t>;
+  { graph.EdgeSpace() } -> std::same_as<IndexSpace &>;
 
   // Generic resource-template interface (see GraphLikeResourceProbe above).
   { graph.template SetResource<detail::GraphLikeResourceProbe>() };

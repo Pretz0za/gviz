@@ -43,14 +43,6 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
                 .recorder.get();
 #endif
 
-  // Scale the initial random placement box to the model's own target
-  // spacing (mirrors grapher-old's DefaultBoxExtent). Without this, a
-  // fixed box width picked independent of edgeLength either strands
-  // vertices absurdly far apart relative to their target spacing (weak,
-  // slow convergence) or crams them absurdly close together relative to
-  // it (attraction on that first tick, ~gap^2/edgeLength, becomes huge
-  // and snaps connected vertices together before repulsion ever gets a
-  // chance to push back).
   double boxExtent = 0.5 * std::sqrt(static_cast<double>(graph.Size())) *
                       m_forceModel->EdgeLength();
   if (boxExtent > 0.0)
@@ -79,13 +71,6 @@ void ForceDirectedLayoutAlgorithm<G, F>::RebuildQuadTree() {
 template <GraphLike G, ForceModel F>
 void ForceDirectedLayoutAlgorithm<G, F>::RepulsiveTick(
     SpacialIndex::QuadTree<DenseNodeID, 1> *node, DenseNodeID v) {
-  // NOTE: don't also check node->IsEmpty() here -- it reports whether this
-  // node's own point array is empty, which is true for every subdivided
-  // internal node (Subdivide() redistributes its points into children and
-  // resets its own count to 0) even though the subtree under it is full of
-  // mass. Mass() alone is the correct "nothing under here" check: Insert()
-  // accumulates it unconditionally on every node from the root down,
-  // whether or not that node ever holds a point directly.
   if (!node || node->Mass() == 0.0)
     return;
 
@@ -107,6 +92,7 @@ void ForceDirectedLayoutAlgorithm<G, F>::RepulsiveTick(
   double dist = std::sqrt(dx * dx + dy * dy);
   double ratio = (2.0 * node->HalfLength()) / dist;
 
+  // TODO: theta moved to config
   if (ratio < 1.0) {
     m_forceModel->RepulsiveTick(v, com.data(), node->Mass());
     return;

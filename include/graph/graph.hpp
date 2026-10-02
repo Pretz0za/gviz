@@ -58,8 +58,15 @@ public:
     return DenseNodeID(id.Raw());
   };
 
+  constexpr EdgeID MapToSparse(DenseEdgeID id) const {
+    return EdgeID(id.Raw());
+  };
+  constexpr DenseEdgeID MapToDense(EdgeID id) const {
+    return DenseEdgeID(id.Raw());
+  };
+
   uint32_t Size() const;
-  inline uint64_t Version() const { return m_version; };
+  uint32_t EdgeCount() const { return m_edgeSpace.Size(); }
 
   IndexSpace &NodeSpace();
   IndexSpace &EdgeSpace();
@@ -78,7 +85,6 @@ private:
   DenseComponentPool<WeightComponent> *m_weightPool;
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
-  uint64_t m_version = 0;
 };
 
 #include "graph/graph.tpp"

@@ -8,16 +8,15 @@
 #include "graph/types.hpp"
 #include <cstdint>
 #include <ranges>
-#include <vector>
 
 class Subgraph {
 public:
   Subgraph(Graph &parent);
 
-  void AddNode(NodeID);
+  DenseNodeID AddNode(NodeID);
 
-  bool HasNode(NodeID id) const;
-  bool HasEdge(EdgeID id) const;
+  inline bool HasNode(NodeID id) const { return m_nodeSet.Test(id); }
+  inline bool HasEdge(EdgeID id) const { return m_edgeSet.Test(id); }
 
   EdgeComponent GetEdge(EdgeID id) const;
 
@@ -47,38 +46,42 @@ public:
   }
 
   constexpr DenseNodeID MapToDense(NodeID id) const {
-    return m_mapToDense[id.Raw()];
+    return DenseNodeID{m_compactNodeSpace.MapToDense(id.Raw())};
   };
 
   constexpr NodeID MapToSparse(DenseNodeID id) const {
-    return m_mapToSparse[id.Raw()];
+    return NodeID{m_compactNodeSpace.MapToSparse(id.Raw())};
+  }
+
+  constexpr DenseEdgeID MapToDense(EdgeID id) const {
+    return DenseEdgeID{m_compactEdgeSpace.MapToDense(id.Raw())};
+  };
+
+  constexpr EdgeID MapToSparse(DenseEdgeID id) const {
+    return EdgeID{m_compactEdgeSpace.MapToSparse(id.Raw())};
   }
 
   uint32_t Size() const { return m_size; };
-  // NOTE: since subgraph only has AddNode to mutate, we return size
-  inline uint64_t Version() const { return m_size; }
+  uint32_t EdgeCount() const { return m_compactEdgeSpace.Size(); };
 
   IndexSpace &NodeSpace();
 
-  // NOTE: maybe this could be removed
-
-  // IndexSpace &EdgeSpace();
+  IndexSpace &EdgeSpace();
 
   template <typename T, typename... Args> T &SetResource(Args &&...args);
   template <typename T> T *GetResource();
   template <typename T> bool HasResource() const;
 
 private:
+  void setEdgesAndDegrees(NodeID id);
 
-  void incrementDegrees(NodeID id);
-  
   uint32_t m_size = 0;
   Graph *m_parent;
+  IndexSpace m_compactEdgeSpace;
   IndexSpace m_compactNodeSpace;
   SparseNodeSet m_nodeSet;
+  SparseEdgeSet m_edgeSet;
   DenseComponentPool<DegreeComponent> *m_degrees;
-  std::vector<DenseNodeID> m_mapToDense; // parent graph -> compact index
-  std::vector<NodeID> m_mapToSparse;     // compact index -> parent graph index
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
 };
