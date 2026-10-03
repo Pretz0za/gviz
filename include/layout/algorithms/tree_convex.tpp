@@ -23,6 +23,26 @@ TreeConvexLayoutAlgorithm<G>::TreeConvexLayoutAlgorithm(G &graph,
   uint8_t dimension = static_cast<uint8_t>(*dim);
   m_positions =
       graph.NodeSpace().template SetPool<PositionComponent>(dimension);
+
+  bool isNewEdgeLengthMode =
+      !graph.template HasResource<StateMachine<EdgeLengthMode>>();
+  m_edgeLengthMode = &graph.template SetResource<StateMachine<EdgeLengthMode>>(
+      EdgeLengthMode::Uniform);
+  if (isNewEdgeLengthMode) {
+    constexpr EdgeLengthMode kModes[] = {
+        EdgeLengthMode::Uniform, EdgeLengthMode::DepthBased,
+        EdgeLengthMode::SubtreeSize};
+    for (EdgeLengthMode from : kModes)
+      for (EdgeLengthMode to : kModes)
+        if (from != to)
+          m_edgeLengthMode->AddTransition(from, to);
+  }
+}
+
+template <GraphLike G>
+void TreeConvexLayoutAlgorithm<G>::SetEdgeLengthFunction(EdgeLengthMode mode) {
+  if (m_edgeLengthMode->Current() != mode)
+    m_edgeLengthMode->Transition(mode);
 }
 
 template <GraphLike G> NodeID TreeConvexLayoutAlgorithm<G>::ChooseRoot() const {
@@ -60,10 +80,12 @@ void TreeConvexLayoutAlgorithm<G>::BuildParents(NodeID root) {
   std::vector<NodeID> stack;
   stack.push_back(root);
   visited.Set(m_graph->MapToDense(root));
+  m_info->Find(m_graph->MapToDense(root).Raw())->depth = 0;
 
   while (!stack.empty()) {
     NodeID current = stack.back();
     stack.pop_back();
+    uint32_t currentDepth = m_info->Find(m_graph->MapToDense(current).Raw())->depth;
     uint32_t order = 0;
     for (const AdjEntry &adj : m_graph->OutNeighbors(current)) {
       DenseNodeID denseOther = m_graph->MapToDense(adj.other);
@@ -71,6 +93,7 @@ void TreeConvexLayoutAlgorithm<G>::BuildParents(NodeID root) {
         continue;
       visited.Set(denseOther);
       m_info->Find(denseOther.Raw())->parent = current;
+      m_info->Find(denseOther.Raw())->depth = currentDepth + 1;
       m_edgeInfo->Find(adj.edge.Raw())->order = order++;
       stack.push_back(adj.other);
     }
@@ -98,14 +121,17 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ClassifyShapes() {
 
     uint32_t branchy = 0;
     bool anyOther = false;
+    uint32_t subtreeSize = 1;
     for (const AdjEntry &adj : children) {
       ConvexNodeDecorator *child =
           m_info->Find(m_graph->MapToDense(adj.other).Raw());
+      subtreeSize += child->subtreeSize;
       if (child->shape == TreeShape::Other)
         anyOther = true;
       else if (child->shape == TreeShape::Rake || !child->chainable)
         branchy++;
     }
+    info->subtreeSize = subtreeSize;
 
     if (anyOther || k > 3 || branchy > 2) {
       info->shape = TreeShape::Other;
@@ -403,12 +429,12 @@ double TreeConvexLayoutAlgorithm<G>::AssignSlopesAt(DenseNodeID v,
 
 template <GraphLike G>
 void TreeConvexLayoutAlgorithm<G>::PlacePreorder(DenseNodeID v, double x,
-                                                 double y, uint32_t depth) {
+                                                 double y) {
   auto &pos = m_positions->Data();
   for (const AdjEntry &adj : Children(v)) {
     ConvexEdgeDecorator *edge = m_edgeInfo->Find(adj.edge.Raw());
-    edge->length = m_placementLength;
     DenseNodeID child = m_graph->MapToDense(adj.other);
+    edge->length = EdgeLengthFor(child);
     double cx = x + edge->length * std::cos(edge->slope);
     double cy = y + edge->length * std::sin(edge->slope);
     pos[child.Raw()].pos[0] = cx;
@@ -429,7 +455,25 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::PlaceVertices() {
   PlacePreorder(m_root, 0.0, 0.0);
 }
 
-template <GraphLike G> uint8_t TreeConvexLayoutAlgorithm<G>::Depth(DenseNodeID v) const {}
+template <GraphLike G>
+uint8_t TreeConvexLayoutAlgorithm<G>::Depth(DenseNodeID v) const {
+  return static_cast<uint8_t>(m_info->Find(v.Raw())->depth);
+}
+
+template <GraphLike G>
+double TreeConvexLayoutAlgorithm<G>::EdgeLengthFor(DenseNodeID topVertex) const {
+  switch (m_edgeLengthMode->Current()) {
+  case EdgeLengthMode::DepthBased:
+    return m_placementLength *
+           std::pow(m_depthDecay, static_cast<double>(Depth(topVertex)));
+  case EdgeLengthMode::SubtreeSize:
+    return m_placementLength * m_subtreeSizeScale *
+           std::sqrt(static_cast<double>(m_info->Find(topVertex.Raw())->subtreeSize));
+  case EdgeLengthMode::Uniform:
+  default:
+    return m_placementLength;
+  }
+}
 
 template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Layout(NodeID root) {
   constexpr double pi = std::numbers::pi;

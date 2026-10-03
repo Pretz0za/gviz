@@ -12,4 +12,6 @@ struct ConvexNodeDecorator : Component {
   double firstLeafSlope = 0.0;
   double lastLeafSlope = 0.0;
   NodeID parent = INVALID_NODE_ID;
+  uint32_t depth = 0;
+  uint32_t subtreeSize = 1;
 };

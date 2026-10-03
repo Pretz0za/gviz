@@ -142,4 +142,13 @@ void Renderer::Impl::OnKey(GLFWwindow *window, int key, int, int action, int) {
     impl->pendingScreenshotPath =
         "screenshot_" + std::to_string(impl->screenshotCounter++) + ".bmp";
   }
+  impl->pendingKeyPresses.insert(key);
+}
+
+bool Renderer::Impl::ConsumeKeyPress(int key) {
+  auto it = pendingKeyPresses.find(key);
+  if (it == pendingKeyPresses.end())
+    return false;
+  pendingKeyPresses.erase(it);
+  return true;
 }

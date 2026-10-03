@@ -33,6 +33,8 @@ public:
   bool LockToFit() const;
   void FitToBounds();
 
+  bool KeyPressed(char key);
+
 #ifdef GVIZ_DEBUG_CHARTS
   ChartWindow &DebugCharts();
 #endif

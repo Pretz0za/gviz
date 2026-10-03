@@ -1,12 +1,14 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "ds/state_machine.hpp"
 #include "ecs/components.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
 #include "layout/components/convex_edge_decorator.hpp"
 #include "layout/components/convex_node_decorator.hpp"
+#include "layout/types.hpp"
 #include <cstdint>
 #include <vector>
 
@@ -21,6 +23,12 @@ public:
   void SetMinimumLeafSeparation(double separation) {
     m_minSeparation = separation;
   }
+
+  void SetEdgeLengthFunction(EdgeLengthMode mode);
+  EdgeLengthMode EdgeLengthFunction() const { return m_edgeLengthMode->Current(); }
+
+  void SetDepthDecay(double decay) { m_depthDecay = decay; }
+  void SetSubtreeSizeScale(double scale) { m_subtreeSizeScale = scale; }
 
 private:
   struct ForkSegment {
@@ -48,9 +56,10 @@ private:
   void AssignChainSlope(DenseNodeID w, double slope, bool allowBend);
 
   void PlaceVertices();
-  void PlacePreorder(DenseNodeID v, double x, double y, uint32_t depth);
+  void PlacePreorder(DenseNodeID v, double x, double y);
 
   uint8_t Depth(DenseNodeID v) const;
+  double EdgeLengthFor(DenseNodeID topVertex) const;
 
   G *m_graph;
   bool m_respectEmbedding;
@@ -64,6 +73,9 @@ private:
   double m_edgeLength = 100.0;
   double m_minSeparation = 40.0;
   double m_placementLength = 0.0;
+  StateMachine<EdgeLengthMode> *m_edgeLengthMode;
+  double m_depthDecay = 0.7;
+  double m_subtreeSizeScale = 1.0;
 };
 
 #include "layout/algorithms/tree_convex.tpp"

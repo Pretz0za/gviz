@@ -84,7 +84,7 @@ TEST_CASE("Bent-path children never collapse onto a duplicate sibling slope",
   TreeConvexLayoutAlgorithm<Graph> alg(g, false);
   alg.Layout();
 
-  auto *edgePool = g.EdgeSpace().GetPool<RadialEdgeDecorator>();
+  auto *edgePool = g.EdgeSpace().GetPool<ConvexEdgeDecorator>();
   bool anyDuplicate = false;
   for (NodeID v : g.Nodes()) {
     std::vector<double> slopes;
@@ -96,6 +96,113 @@ TEST_CASE("Bent-path children never collapse onto a duplicate sibling slope",
           anyDuplicate = true;
   }
   REQUIRE_FALSE(anyDuplicate);
+}
+
+TEST_CASE("Edge length function defaults to Uniform",
+         "[layout][algorithms][tree_convex]") {
+  Graph g = MakeGraph(3, 2);
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::Uniform);
+}
+
+TEST_CASE("Edge length function can switch directly between every mode",
+         "[layout][algorithms][tree_convex]") {
+  Graph g = MakeGraph(3, 2);
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+
+  alg.SetEdgeLengthFunction(EdgeLengthMode::DepthBased);
+  REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::DepthBased);
+
+  alg.SetEdgeLengthFunction(EdgeLengthMode::SubtreeSize);
+  REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::SubtreeSize);
+
+  alg.SetEdgeLengthFunction(EdgeLengthMode::Uniform);
+  REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::Uniform);
+
+  alg.SetEdgeLengthFunction(EdgeLengthMode::SubtreeSize);
+  REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::SubtreeSize);
+
+  alg.SetEdgeLengthFunction(EdgeLengthMode::DepthBased);
+  REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::DepthBased);
+}
+
+namespace {
+// Walks parent -> child down a chain built as nodes[0] - nodes[1] - ... and
+// returns the length of each edge along that chain, in order. Each
+// AddUndirectedEdge call allocates two EdgeIDs (one per direction); only the
+// direction actually traversed during placement gets a non-zero length, so
+// the chain must be walked via OutNeighbors rather than raw pool indices.
+std::vector<double> ChainEdgeLengths(Graph &g, const std::vector<NodeID> &nodes) {
+  auto *edgePool = g.EdgeSpace().GetPool<ConvexEdgeDecorator>();
+  std::vector<double> lengths;
+  for (size_t i = 0; i + 1 < nodes.size(); i++) {
+    for (const AdjEntry &adj : g.OutNeighbors(nodes[i]))
+      if (adj.other == nodes[i + 1])
+        lengths.push_back(edgePool->Find(adj.edge.Raw())->length);
+  }
+  return lengths;
+}
+} // namespace
+
+TEST_CASE("Uniform edge length mode keeps every edge the same length",
+         "[layout][algorithms][tree_convex]") {
+  Graph g = MakeGraph(5, 2);
+  auto nodes = std::vector<NodeID>(g.Nodes().begin(), g.Nodes().end());
+  for (size_t i = 0; i + 1 < nodes.size(); i++)
+    g.AddUndirectedEdge(nodes[i], nodes[i + 1]);
+
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  alg.Layout(nodes[0]);
+
+  std::vector<double> lengths = ChainEdgeLengths(g, nodes);
+  REQUIRE(lengths.size() == 4);
+  for (double length : lengths)
+    REQUIRE(length == Catch::Approx(lengths[0]));
+}
+
+TEST_CASE("DepthBased edge length mode shrinks edges farther from the root",
+         "[layout][algorithms][tree_convex]") {
+  Graph g = MakeGraph(5, 2);
+  auto nodes = std::vector<NodeID>(g.Nodes().begin(), g.Nodes().end());
+  for (size_t i = 0; i + 1 < nodes.size(); i++)
+    g.AddUndirectedEdge(nodes[i], nodes[i + 1]);
+
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  alg.SetEdgeLengthFunction(EdgeLengthMode::DepthBased);
+  alg.Layout(nodes[0]);
+
+  std::vector<double> lengths = ChainEdgeLengths(g, nodes);
+  REQUIRE(lengths.size() == 4);
+  for (size_t i = 0; i + 1 < lengths.size(); i++)
+    REQUIRE(lengths[i + 1] < lengths[i]);
+}
+
+TEST_CASE("SubtreeSize edge length mode grows edges leading into bigger subtrees",
+         "[layout][algorithms][tree_convex]") {
+  // Root has two children: one leaf, and one with a large rake subtree.
+  Graph g = MakeGraph(7, 2);
+  auto nodes = std::vector<NodeID>(g.Nodes().begin(), g.Nodes().end());
+  g.AddUndirectedEdge(nodes[0], nodes[1]); // small branch (leaf)
+  g.AddUndirectedEdge(nodes[0], nodes[2]); // big branch
+  g.AddUndirectedEdge(nodes[2], nodes[3]);
+  g.AddUndirectedEdge(nodes[2], nodes[4]);
+  g.AddUndirectedEdge(nodes[2], nodes[5]);
+  g.AddUndirectedEdge(nodes[2], nodes[6]);
+
+  TreeConvexLayoutAlgorithm<Graph> alg(g, false);
+  alg.SetEdgeLengthFunction(EdgeLengthMode::SubtreeSize);
+  alg.Layout(nodes[0]);
+
+  auto *edgePool = g.EdgeSpace().GetPool<ConvexEdgeDecorator>();
+  double smallBranchLength = -1.0, bigBranchLength = -1.0;
+  for (const AdjEntry &adj : g.OutNeighbors(nodes[0])) {
+    double length = edgePool->Find(adj.edge.Raw())->length;
+    if (adj.other == nodes[1])
+      smallBranchLength = length;
+    else if (adj.other == nodes[2])
+      bigBranchLength = length;
+  }
+  REQUIRE(bigBranchLength > smallBranchLength);
 }
 
 TEST_CASE("General tree produces a positive resolution and valid positions",

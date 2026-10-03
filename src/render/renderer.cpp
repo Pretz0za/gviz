@@ -52,6 +52,10 @@ bool Renderer::LockToFit() const { return m_impl->camera.lockToFit; }
 
 void Renderer::FitToBounds() { m_impl->FitToBounds(); }
 
+bool Renderer::KeyPressed(char key) {
+  return m_impl->ConsumeKeyPress(static_cast<int>(key));
+}
+
 #ifdef GVIZ_DEBUG_CHARTS
 ChartWindow &Renderer::DebugCharts() { return m_impl->debugCharts.Charts(); }
 

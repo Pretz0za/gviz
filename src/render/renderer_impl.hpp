@@ -5,6 +5,7 @@
 #include "render/renderer.hpp"
 
 #include <string>
+#include <unordered_set>
 #include <webgpu/webgpu.h>
 
 #ifdef GVIZ_DEBUG_CHARTS
@@ -86,6 +87,8 @@ struct Renderer::Impl {
   size_t screenshotBufCapacity = 0;
   uint32_t screenshotCounter = 0;
 
+  std::unordered_set<int> pendingKeyPresses;
+
 #ifdef GVIZ_DEBUG_CHARTS
   ChartOverlay debugCharts;
 #endif
@@ -104,6 +107,7 @@ struct Renderer::Impl {
   void FrameCameraIfNeeded(const FrameData &fd);
   void FitToBounds();
   void ComputeViewProj(float outMat[16], uint32_t fbw, uint32_t fbh) const;
+  bool ConsumeKeyPress(int key);
 
   void EncodeScreenshotCopy(WGPUCommandEncoder encoder, WGPUTexture source,
                             uint32_t fbw, uint32_t fbh);

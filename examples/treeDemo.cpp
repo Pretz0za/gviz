@@ -1,8 +1,10 @@
+#include "ds/state_machine.hpp"
 #include "graph/graph.hpp"
 #include "layout/algorithms/tree_convex.hpp"
 #include "layout/types.hpp"
 #include "render/renderer.hpp"
 #include <random>
+#include <vector>
 
 static void AddRandomChildren(Graph &g, NodeID root, int depth, int maxDepth,
                               int branchingFactor, bool exact,
@@ -43,7 +45,17 @@ int main() {
   Renderer renderer(1280, 720, "gviz treeDemo", g);
   renderer.SetLockToFit(true);
 
+  std::mt19937 rng(std::random_device{}());
+  StateMachine<EdgeLengthMode> *edgeLengthMode =
+      g.GetResource<StateMachine<EdgeLengthMode>>();
+
   while (renderer.Frame(g)) {
+    if (renderer.KeyPressed('T')) {
+      std::vector<EdgeLengthMode> transitions = edgeLengthMode->Transitions();
+      std::uniform_int_distribution<size_t> dist(0, transitions.size() - 1);
+      edgeLengthMode->Transition(transitions[dist(rng)]);
+      layout.Layout();
+    }
   }
 
   return 0;
