@@ -6,6 +6,7 @@
 #include "graph/components/adjacency.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
+#include "layout/animation.hpp"
 #include "layout/components/convex_edge_decorator.hpp"
 #include "layout/components/convex_node_decorator.hpp"
 #include "layout/types.hpp"
@@ -26,6 +27,11 @@ public:
 
   void SetEdgeLengthFunction(EdgeLengthMode mode);
   EdgeLengthMode EdgeLengthFunction() const { return m_edgeLengthMode->Current(); }
+
+  void TransitionTo(EdgeLengthMode mode, double durationSeconds,
+                    Easing easing = Easing::EaseInOutCubic);
+
+  PositionAnimationSystem<G> &Animation() { return m_animation; }
 
   void SetDepthDecay(double decay) { m_depthDecay = decay; }
   void SetSubtreeSizeScale(double scale) { m_subtreeSizeScale = scale; }
@@ -76,6 +82,7 @@ private:
   StateMachine<EdgeLengthMode> *m_edgeLengthMode;
   double m_depthDecay = 0.7;
   double m_subtreeSizeScale = 1.0;
+  PositionAnimationSystem<G> m_animation;
 };
 
 #include "layout/algorithms/tree_convex.tpp"

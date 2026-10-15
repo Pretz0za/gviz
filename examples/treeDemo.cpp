@@ -50,11 +50,12 @@ int main() {
       g.GetResource<StateMachine<EdgeLengthMode>>();
 
   while (renderer.Frame(g)) {
+    layout.Animation().Advance();
+
     if (renderer.KeyPressed('T')) {
       std::vector<EdgeLengthMode> transitions = edgeLengthMode->Transitions();
       std::uniform_int_distribution<size_t> dist(0, transitions.size() - 1);
-      edgeLengthMode->Transition(transitions[dist(rng)]);
-      layout.Layout();
+      layout.TransitionTo(transitions[dist(rng)], 0.6);
     }
   }
 

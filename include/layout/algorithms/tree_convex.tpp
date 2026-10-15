@@ -23,6 +23,7 @@ TreeConvexLayoutAlgorithm<G>::TreeConvexLayoutAlgorithm(G &graph,
   uint8_t dimension = static_cast<uint8_t>(*dim);
   m_positions =
       graph.NodeSpace().template SetPool<PositionComponent>(dimension);
+  m_animation.Init(graph);
 
   bool isNewEdgeLengthMode =
       !graph.template HasResource<StateMachine<EdgeLengthMode>>();
@@ -43,6 +44,16 @@ template <GraphLike G>
 void TreeConvexLayoutAlgorithm<G>::SetEdgeLengthFunction(EdgeLengthMode mode) {
   if (m_edgeLengthMode->Current() != mode)
     m_edgeLengthMode->Transition(mode);
+}
+
+template <GraphLike G>
+void TreeConvexLayoutAlgorithm<G>::TransitionTo(EdgeLengthMode mode,
+                                                double durationSeconds,
+                                                Easing easing) {
+  m_animation.Begin();
+  SetEdgeLengthFunction(mode);
+  PlaceVertices();
+  m_animation.End(durationSeconds, easing);
 }
 
 template <GraphLike G> NodeID TreeConvexLayoutAlgorithm<G>::ChooseRoot() const {
