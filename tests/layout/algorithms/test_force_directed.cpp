@@ -25,7 +25,8 @@ TEST_CASE("Construction registers position/physics/heat pools and a QuadTreeReso
          "[layout][algorithms][force_directed]") {
   Graph g = MakeGraph(5, 2);
 
-  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>> alg(g);
+  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>::Configuration algConfig;
+  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>> alg(g, &algConfig);
 
   REQUIRE(g.NodeSpace().GetPool<PositionComponent>() != nullptr);
   REQUIRE(g.NodeSpace().GetPool<PhysicsComponent>() != nullptr);
@@ -37,7 +38,8 @@ TEST_CASE("Construction randomizes every node's initial position within the "
          "default bounding box",
          "[layout][algorithms][force_directed]") {
   Graph g = MakeGraph(10, 2);
-  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>> alg(g);
+  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>::Configuration algConfig;
+  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>> alg(g, &algConfig);
 
   auto *positions = g.NodeSpace().GetPool<PositionComponent>();
   bool anyNonZero = false;
@@ -57,7 +59,8 @@ TEST_CASE("Missing DimensionResource is reported instead of silently defaulting"
   Graph g; // no DimensionResource set
   g.AddNode();
 
+  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>::Configuration algConfig;
   REQUIRE_THROWS_AS(
-      (ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>(g)),
+      (ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>(g, &algConfig)),
       MissingResourceException<DimensionResource>);
 }

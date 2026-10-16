@@ -35,7 +35,8 @@ TEST_CASE("RefreshKNearest populates each node's k-nearest list via BFS",
   fx.filtration->m_layerCount = 1;
   fx.filtration->m_filtration = {DenseNodeID(0), DenseNodeID(1), DenseNodeID(2)};
 
-  GRIPPhysicsSystem<Graph> physics(fx.graph);
+  GRIPPhysicsSystem<Graph>::Configuration physicsConfig;
+  GRIPPhysicsSystem<Graph> physics(fx.graph, &physicsConfig);
   physics.RefreshKNearest(0);
 
   auto &knn = fx.knearest->Data();
@@ -67,7 +68,8 @@ TEST_CASE("Tick at layer 0 applies FR attractive+repulsive forces, then "
   fx.filtration->m_layerCount = 1;
   fx.filtration->m_filtration = {DenseNodeID(0), DenseNodeID(1)};
 
-  GRIPPhysicsSystem<Graph> physics(fx.graph);
+  GRIPPhysicsSystem<Graph>::Configuration physicsConfig;
+  GRIPPhysicsSystem<Graph> physics(fx.graph, &physicsConfig);
   physics.RefreshKNearest(0);
   physics.Tick();
 
@@ -99,7 +101,8 @@ TEST_CASE("Tick is a no-op before RefreshKNearest establishes a current layer",
   fx.filtration->m_layerCount = 1;
   fx.filtration->m_filtration = {DenseNodeID(0), DenseNodeID(1)};
 
-  GRIPPhysicsSystem<Graph> physics(fx.graph);
+  GRIPPhysicsSystem<Graph>::Configuration physicsConfig;
+  GRIPPhysicsSystem<Graph> physics(fx.graph, &physicsConfig);
   physics.Tick(); // no RefreshKNearest call yet
 
   auto &positions = fx.positions->Data();

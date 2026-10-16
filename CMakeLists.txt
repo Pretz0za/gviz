@@ -146,6 +146,7 @@ if(GVIZ_BUILD_RENDER)
         target_sources(gvizRender PRIVATE
             src/render/debug/chart_window.cpp
             src/render/debug/chart_overlay.cpp
+            src/render/debug/config_window.cpp
         )
         # PUBLIC: the debug chart templates in include/render/debug/ pull in
         # <imgui.h> wherever a caller instantiates ChartWindow::With<T>, so

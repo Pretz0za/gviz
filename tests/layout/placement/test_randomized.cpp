@@ -14,9 +14,10 @@ TEST_CASE("PlaceAll assigns every node a position within [-bboxWidth, bboxWidth]
   Graph g = MakeGraph(20, 2);
   auto *positions = WithPositions(g, 2);
 
-  PositionRandomized<Graph> placer(g);
+  PositionRandomized<Graph>::Configuration placerConfig;
+  PositionRandomized<Graph> placer(g, &placerConfig);
   placer.SetSeed(1234);
-  placer.SetBoundingBox(50);
+  placer.Config()->WithBoundingBoxWidth(50);
   placer.PlaceAll();
 
   for (uint32_t i = 0; i < 20; i++) {
@@ -31,13 +32,15 @@ TEST_CASE("PlaceAll assigns every node a position within [-bboxWidth, bboxWidth]
 TEST_CASE("The same seed produces the same placement", "[layout][placement][randomized]") {
   Graph g1 = MakeGraph(10, 2);
   auto *positions1 = WithPositions(g1, 2);
-  PositionRandomized<Graph> placer1(g1);
+  PositionRandomized<Graph>::Configuration placer1Config;
+  PositionRandomized<Graph> placer1(g1, &placer1Config);
   placer1.SetSeed(42);
   placer1.PlaceAll();
 
   Graph g2 = MakeGraph(10, 2);
   auto *positions2 = WithPositions(g2, 2);
-  PositionRandomized<Graph> placer2(g2);
+  PositionRandomized<Graph>::Configuration placer2Config;
+  PositionRandomized<Graph> placer2(g2, &placer2Config);
   placer2.SetSeed(42);
   placer2.PlaceAll();
 
@@ -51,13 +54,15 @@ TEST_CASE("Different seeds (almost certainly) produce different placements",
          "[layout][placement][randomized]") {
   Graph g1 = MakeGraph(5, 2);
   auto *positions1 = WithPositions(g1, 2);
-  PositionRandomized<Graph> placer1(g1);
+  PositionRandomized<Graph>::Configuration placer1Config;
+  PositionRandomized<Graph> placer1(g1, &placer1Config);
   placer1.SetSeed(1);
   placer1.PlaceAll();
 
   Graph g2 = MakeGraph(5, 2);
   auto *positions2 = WithPositions(g2, 2);
-  PositionRandomized<Graph> placer2(g2);
+  PositionRandomized<Graph>::Configuration placer2Config;
+  PositionRandomized<Graph> placer2(g2, &placer2Config);
   placer2.SetSeed(2);
   placer2.PlaceAll();
 
@@ -77,7 +82,8 @@ TEST_CASE("PlaceAll only writes the configured dimension's components",
   Graph g = MakeGraph(3, 2); // dimension 2, so pos[] only has 2 live slots
   auto *positions = WithPositions(g, 2);
 
-  PositionRandomized<Graph> placer(g);
+  PositionRandomized<Graph>::Configuration placerConfig;
+  PositionRandomized<Graph> placer(g, &placerConfig);
   placer.SetSeed(7);
   placer.PlaceAll();
 

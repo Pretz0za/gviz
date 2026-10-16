@@ -8,6 +8,7 @@
 #ifdef GVIZ_DEBUG_CHARTS
 #include "debug/chart_recorder.hpp"
 #include "render/debug/chart_window.hpp"
+#include "render/debug/config_window.hpp"
 #endif
 
 class Renderer {
@@ -37,6 +38,7 @@ public:
 
 #ifdef GVIZ_DEBUG_CHARTS
   ChartWindow &DebugCharts();
+  ConfigWindow &DebugConfigs();
 #endif
 
 private:

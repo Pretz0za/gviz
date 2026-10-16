@@ -58,6 +58,7 @@ bool Renderer::KeyPressed(char key) {
 
 #ifdef GVIZ_DEBUG_CHARTS
 ChartWindow &Renderer::DebugCharts() { return m_impl->debugCharts.Charts(); }
+ConfigWindow &Renderer::DebugConfigs() { return m_impl->debugCharts.Configs(); }
 
 void Renderer::SyncChartRecorder(ChartRecorderResource *resource) {
   m_impl->debugCharts.SetRecorder(resource ? resource->recorder.get() : nullptr);

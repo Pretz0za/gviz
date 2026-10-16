@@ -16,8 +16,9 @@
 #include <memory>
 
 template <GraphLike G, ForceModel F>
-ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
-    : m_graph(&graph), m_positions(nullptr), m_mass(nullptr) {
+ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_graph(&graph),
+      m_positions(nullptr), m_mass(nullptr) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)
     throw MissingResourceException<DimensionResource>();
@@ -33,10 +34,10 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
   graph.NodeSpace().template SetPool<PhysicsComponent>();
   graph.NodeSpace().template SetPool<ForceAtlasHeatComponent>();
 
-  m_forceModel = std::make_unique<F>(graph);
-  m_gravity = std::make_unique<GravityForceSystem<G>>(graph);
-  m_randomizer = std::make_unique<PositionRandomized<G>>(graph);
-  m_heat = std::make_unique<ForceAtlasHeat<G>>(graph);
+  m_forceModel = std::make_unique<F>(graph, &m_config->forceModelConfig);
+  m_gravity = std::make_unique<GravityForceSystem<G>>(graph, &m_config->gravityConfig);
+  m_randomizer = std::make_unique<PositionRandomized<G>>(graph, &m_config->randomizedConfig);
+  m_heat = std::make_unique<ForceAtlasHeat<G>>(graph, &m_config->heatConfig);
 
 #ifdef GVIZ_DEBUG_CHARTS
   m_chart = graph.template SetResource<ChartRecorderResource>(graph.NodeSpace())
@@ -46,7 +47,7 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph)
   double boxExtent = 0.5 * std::sqrt(static_cast<double>(graph.Size())) *
                       m_forceModel->EdgeLength();
   if (boxExtent > 0.0)
-    m_randomizer->SetBoundingBox(static_cast<uint32_t>(boxExtent));
+    m_config->randomizedConfig.WithBoundingBoxWidth(static_cast<uint32_t>(boxExtent));
 
   m_randomizer->PlaceAll();
 }
@@ -92,8 +93,7 @@ void ForceDirectedLayoutAlgorithm<G, F>::RepulsiveTick(
   double dist = std::sqrt(dx * dx + dy * dy);
   double ratio = (2.0 * node->HalfLength()) / dist;
 
-  // TODO: theta moved to config
-  if (ratio < 1.0) {
+  if (ratio < m_config->theta) {
     m_forceModel->RepulsiveTick(v, com.data(), node->Mass());
     return;
   }

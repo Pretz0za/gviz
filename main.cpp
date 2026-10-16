@@ -98,7 +98,8 @@ int main() {
   //   PrintPositions(g);
   // }
 
-  GRIPLayoutAlgorithm grip{g};
+  GRIPLayoutAlgorithm<Graph>::Configuration gripConfig;
+  GRIPLayoutAlgorithm grip{g, &gripConfig};
   grip.RunFiltration();
 
   NestedFiltrationResult result = *g.GetResource<NestedFiltrationResult>();

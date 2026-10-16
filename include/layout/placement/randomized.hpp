@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "config/configuration.hpp"
 #include "ecs/components.hpp"
 #include "layout/components/position.hpp"
 #include "layout/types.hpp"
@@ -10,17 +11,33 @@
 
 template <GraphLike G> class PositionRandomized {
 public:
-  PositionRandomized(G &graph);
-  PositionRandomized(G &graph, uint32_t seed);
+  class Configuration : public IConfiguration {
+  public:
+    Configuration() = default;
+
+    uint32_t boundingBoxWidth = 10000;
+
+    Configuration WithBoundingBoxWidth(uint32_t v) { boundingBoxWidth = v; return *this; }
+
+    std::vector<ConfigField> Fields() override {
+      return {
+          {"Bounding Box Width", &boundingBoxWidth, ConfigFieldType::UInt32, 0.0, 1000000.0},
+      };
+    }
+  };
+
+  PositionRandomized(G &graph, Configuration *config);
+  PositionRandomized(G &graph, uint32_t seed, Configuration *config);
   ~PositionRandomized() = default;
 
-  void SetBoundingBox(uint32_t width);
+  Configuration *Config() { return m_config; }
+
   void SetSeed(uint32_t seed);
 
   void PlaceAll();
 
 private:
-  uint32_t m_bboxWidth;
+  Configuration *m_config;
   std::mt19937 m_rng;
   std::uniform_real_distribution<double> m_dist;
   uint8_t m_dimension;

@@ -8,8 +8,9 @@
 #include "layout/types.hpp"
 
 template <GraphLike G>
-LocalHeatGrip<G>::LocalHeatGrip(G &graph)
-    : m_heatPool(graph.NodeSpace().template GetPool<LocalHeatComponent>()),
+LocalHeatGrip<G>::LocalHeatGrip(G &graph, Configuration *config)
+    : m_config(RequireConfiguration(config)),
+      m_heatPool(graph.NodeSpace().template GetPool<LocalHeatComponent>()),
       m_physicsPool(graph.NodeSpace().template GetPool<PhysicsComponent>()),
       m_dimension(0) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
@@ -24,8 +25,7 @@ template <GraphLike G> void LocalHeatGrip<G>::Tick(DenseNodeID id) {
 
   if (IsNan(physics->oldDisp, m_dimension)) {
     // no displacement history yet -- nothing to compare against.
-    // TODO: config edge length
-    heat->heat = 10.0 / 6.0;
+    heat->heat = m_config->initialHeat;
 	heat->oldCos = 0.0;
     return;
   }
@@ -38,14 +38,10 @@ template <GraphLike G> void LocalHeatGrip<G>::Tick(DenseNodeID id) {
     double cos = DotProduct(physics->disp, physics->oldDisp, m_dimension) /
                  (nrm * oldNrm);
 
-    // TODO: move these to a config
-    constexpr double kHeatR = 0.15;
-    constexpr double kHeatS = 3.0;
-
     if (cos > 0 && heat->oldCos > 0)
-      heat->heat *= (1 + cos * kHeatR * kHeatS);
+      heat->heat *= (1 + cos * m_config->heatR * m_config->heatS);
     else
-      heat->heat *= (1 + cos * kHeatR);
+      heat->heat *= (1 + cos * m_config->heatR);
 
     heat->oldCos = cos;
   }

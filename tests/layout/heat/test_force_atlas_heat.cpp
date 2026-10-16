@@ -24,7 +24,8 @@ TEST_CASE("Observe measures swinging as the change in force since last tick",
   Graph g = MakeGraph(1, 2);
   auto *heatPool = WithForceAtlasHeat(g);
 
-  ForceAtlasHeat<Graph> heat(g);
+  ForceAtlasHeat<Graph>::Configuration heatConfig;
+  ForceAtlasHeat<Graph> heat(g, &heatConfig);
   heat.BeginTick();
 
   double force[2] = {1.0, 0.0};
@@ -40,7 +41,8 @@ TEST_CASE("Observe with a repeated identical force reports zero swinging",
   Graph g = MakeGraph(1, 2);
   WithForceAtlasHeat(g);
 
-  ForceAtlasHeat<Graph> heat(g);
+  ForceAtlasHeat<Graph>::Configuration heatConfig;
+  ForceAtlasHeat<Graph> heat(g, &heatConfig);
   double force[2] = {2.0, 3.0};
 
   heat.BeginTick();
@@ -58,7 +60,8 @@ TEST_CASE("SpeedFactor decreases as a node's swinging increases", "[layout][heat
   Graph g = MakeGraph(2, 2);
   WithForceAtlasHeat(g);
 
-  ForceAtlasHeat<Graph> heat(g);
+  ForceAtlasHeat<Graph>::Configuration heatConfig;
+  ForceAtlasHeat<Graph> heat(g, &heatConfig);
 
   heat.BeginTick();
   double smallForce[2] = {0.1, 0.0};
@@ -78,7 +81,8 @@ TEST_CASE("UpdateGlobalSpeed leaves the global speed at its initial value "
   Graph g = MakeGraph(1, 2);
   WithForceAtlasHeat(g);
 
-  ForceAtlasHeat<Graph> heat(g);
+  ForceAtlasHeat<Graph>::Configuration heatConfig;
+  ForceAtlasHeat<Graph> heat(g, &heatConfig);
   heat.BeginTick();
   // No Observe() call: totalTraction stays 0, below the epsilon guard.
   heat.UpdateGlobalSpeed(1);
@@ -93,7 +97,8 @@ TEST_CASE("UpdateGlobalSpeed drops global speed toward the jitter-tolerance-"
   Graph g = MakeGraph(1, 2);
   WithForceAtlasHeat(g);
 
-  ForceAtlasHeat<Graph> heat(g);
+  ForceAtlasHeat<Graph>::Configuration heatConfig;
+  ForceAtlasHeat<Graph> heat(g, &heatConfig);
 
   double force[2] = {1.0, 0.0};
   heat.BeginTick();

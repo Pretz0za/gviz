@@ -9,8 +9,8 @@
 #include "layout/types.hpp"
 
 template <GraphLike G>
-GravityForceSystem<G>::GravityForceSystem(G &graph)
-    : m_graph(&graph),
+GravityForceSystem<G>::GravityForceSystem(G &graph, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_graph(&graph),
       m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
       m_positions(graph.NodeSpace().template GetPool<PositionComponent>()) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
@@ -19,10 +19,6 @@ GravityForceSystem<G>::GravityForceSystem(G &graph)
   m_dimension = static_cast<uint8_t>(*dim);
 }
 
-template <GraphLike G>
-void GravityForceSystem<G>::SetMagnitude(double magnitude) {
-  m_magnitude = magnitude;
-}
 template <GraphLike G> void GravityForceSystem<G>::Tick() {
   for (NodeID nid : m_graph->Nodes()) {
     uint32_t degree = m_graph->Degree(nid);
@@ -33,7 +29,7 @@ template <GraphLike G> void GravityForceSystem<G>::Tick() {
     if (IsZero(dist))
       continue;
 
-    Vecaxpy(-1 * m_magnitude * static_cast<double>(degree + 1) / dist, pos,
+    Vecaxpy(-1 * m_config->magnitude * static_cast<double>(degree + 1) / dist, pos,
             m_physics->Find(denseID.Raw())->disp, m_dimension);
   }
 }

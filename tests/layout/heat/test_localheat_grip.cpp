@@ -22,7 +22,8 @@ TEST_CASE("With no displacement history, heat is set to the fixed initial value"
   auto *heat = WithLocalHeat(g);
   heat->Find(0)->heat = 99.0; // should be overwritten, not accumulated
 
-  LocalHeatGrip<Graph> system(g);
+  LocalHeatGrip<Graph>::Configuration systemConfig;
+  LocalHeatGrip<Graph> system(g, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   REQUIRE(heat->Find(0)->heat == Catch::Approx(10.0 / 6.0));
@@ -43,7 +44,8 @@ TEST_CASE("A displacement pointing the same way as last tick raises the heat",
   heat->Find(0)->heat = 2.0;
   heat->Find(0)->oldCos = 0.0; // not > 0, so the "steady streak" bonus doesn't apply yet
 
-  LocalHeatGrip<Graph> system(g);
+  LocalHeatGrip<Graph>::Configuration systemConfig;
+  LocalHeatGrip<Graph> system(g, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   // cos = 1, oldCos was 0 (not > 0) -> heat *= (1 + cos * 0.15) = 1.15
@@ -65,7 +67,8 @@ TEST_CASE("Two consecutive ticks pointing the same way compound the bonus",
   heat->Find(0)->heat = 2.0;
   heat->Find(0)->oldCos = 0.5; // already positive from a prior tick
 
-  LocalHeatGrip<Graph> system(g);
+  LocalHeatGrip<Graph>::Configuration systemConfig;
+  LocalHeatGrip<Graph> system(g, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   // cos = 1, oldCos > 0 -> heat *= (1 + cos * 0.15 * 3.0) = 1.45
@@ -86,7 +89,8 @@ TEST_CASE("A displacement reversing direction cools the node down",
   heat->Find(0)->heat = 2.0;
   heat->Find(0)->oldCos = 1.0;
 
-  LocalHeatGrip<Graph> system(g);
+  LocalHeatGrip<Graph>::Configuration systemConfig;
+  LocalHeatGrip<Graph> system(g, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   // cos = -1 -> heat *= (1 + (-1) * 0.15) = 0.85
@@ -108,7 +112,8 @@ TEST_CASE("A zero displacement leaves heat and oldCos unchanged",
   heat->Find(0)->heat = 3.0;
   heat->Find(0)->oldCos = 0.7;
 
-  LocalHeatGrip<Graph> system(g);
+  LocalHeatGrip<Graph>::Configuration systemConfig;
+  LocalHeatGrip<Graph> system(g, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   REQUIRE(heat->Find(0)->heat == Catch::Approx(3.0));

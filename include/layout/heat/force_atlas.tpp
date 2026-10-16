@@ -9,14 +9,12 @@
 
 namespace {
 constexpr double kForceAtlasEpsilon = 1e-7;
-constexpr double kSpeedEfficiencyMin = 0.05;
-constexpr double kSpeedEfficiencyMax = 1.0;
-constexpr double kSpeedMaxRise = 0.5;
 } // namespace
 
 template <GraphLike G>
-ForceAtlasHeat<G>::ForceAtlasHeat(G &graph)
-    : m_heatPool(
+ForceAtlasHeat<G>::ForceAtlasHeat(G &graph, Configuration *config)
+    : m_config(RequireConfiguration(config)),
+      m_heatPool(
           graph.NodeSpace().template GetPool<ForceAtlasHeatComponent>()) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr)
@@ -58,14 +56,14 @@ void ForceAtlasHeat<G>::UpdateGlobalSpeed(uint32_t nodeCount) {
   double minJT = std::sqrt(estimatedOptimalJT);
   double maxJT = 10.0;
   double jt =
-      m_jitterTolerance *
+      m_config->jitterTolerance *
       std::max(minJT, std::min(maxJT, estimatedOptimalJT * m_totalTraction /
                                           (n * n)));
 
   if (m_totalSwinging / m_totalTraction > 2.0) {
-    if (m_speedEfficiency > kSpeedEfficiencyMin)
+    if (m_speedEfficiency > m_config->speedEfficiencyMin)
       m_speedEfficiency *= 0.5;
-    jt = std::max(jt, m_jitterTolerance);
+    jt = std::max(jt, m_config->jitterTolerance);
   }
 
   double targetSpeed = m_totalSwinging > kForceAtlasEpsilon
@@ -74,16 +72,16 @@ void ForceAtlasHeat<G>::UpdateGlobalSpeed(uint32_t nodeCount) {
                            : m_globalSpeed;
 
   if (m_totalSwinging > jt * m_totalTraction) {
-    if (m_speedEfficiency > kSpeedEfficiencyMin)
+    if (m_speedEfficiency > m_config->speedEfficiencyMin)
       m_speedEfficiency *= 0.7;
   } else if (m_globalSpeed < 1000.0) {
     m_speedEfficiency *= 1.3;
   }
 
   m_speedEfficiency =
-      std::clamp(m_speedEfficiency, kSpeedEfficiencyMin, kSpeedEfficiencyMax);
+      std::clamp(m_speedEfficiency, m_config->speedEfficiencyMin, m_config->speedEfficiencyMax);
   m_globalSpeed +=
-      std::min(targetSpeed - m_globalSpeed, kSpeedMaxRise * m_globalSpeed);
+      std::min(targetSpeed - m_globalSpeed, m_config->speedMaxRise * m_globalSpeed);
 }
 
 template <GraphLike G>

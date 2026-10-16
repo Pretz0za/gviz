@@ -12,8 +12,10 @@
 
 template <GraphLike G>
 TreeConvexLayoutAlgorithm<G>::TreeConvexLayoutAlgorithm(G &graph,
-                                                        bool respectEmbedding)
-    : m_graph(&graph), m_respectEmbedding(respectEmbedding) {
+                                                        bool respectEmbedding,
+                                                        Configuration *config)
+    : m_config(RequireConfiguration(config)), m_graph(&graph),
+      m_respectEmbedding(respectEmbedding) {
   m_info = graph.NodeSpace().template SetPool<ConvexNodeDecorator>();
   m_edgeInfo = graph.EdgeSpace().template SetPool<ConvexEdgeDecorator>();
 
@@ -457,8 +459,8 @@ void TreeConvexLayoutAlgorithm<G>::PlacePreorder(DenseNodeID v, double x,
 template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::PlaceVertices() {
   m_placementLength =
       m_resolution > 0.0
-          ? std::max(m_edgeLength, m_minSeparation / m_resolution)
-          : m_edgeLength;
+          ? std::max(m_config->edgeLength, m_config->minSeparation / m_resolution)
+          : m_config->edgeLength;
 
   auto &pos = m_positions->Data();
   pos[m_root.Raw()].pos[0] = 0.0;
@@ -476,9 +478,9 @@ double TreeConvexLayoutAlgorithm<G>::EdgeLengthFor(DenseNodeID topVertex) const 
   switch (m_edgeLengthMode->Current()) {
   case EdgeLengthMode::DepthBased:
     return m_placementLength *
-           std::pow(m_depthDecay, static_cast<double>(Depth(topVertex)));
+           std::pow(m_config->depthDecay, static_cast<double>(Depth(topVertex)));
   case EdgeLengthMode::SubtreeSize:
-    return m_placementLength * m_subtreeSizeScale *
+    return m_placementLength * m_config->subtreeSizeScale *
            std::sqrt(static_cast<double>(m_info->Find(topVertex.Raw())->subtreeSize));
   case EdgeLengthMode::Uniform:
   default:

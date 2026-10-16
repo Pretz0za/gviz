@@ -58,6 +58,7 @@ void ChartOverlay::NewFrame() {
   ImGui::NewFrame();
   if (m_recorder)
     m_charts.Render(*m_recorder, m_open);
+  m_configs.Render(m_configOpen);
   ImGui::Render();
 }
 
@@ -68,5 +69,6 @@ void ChartOverlay::Draw(WGPURenderPassEncoder pass) {
 }
 
 ChartWindow &ChartOverlay::Charts() { return m_charts; }
+ConfigWindow &ChartOverlay::Configs() { return m_configs; }
 
 #endif

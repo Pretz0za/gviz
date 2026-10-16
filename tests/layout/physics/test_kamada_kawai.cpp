@@ -29,7 +29,8 @@ TEST_CASE("Tick pulls v toward u when the gap is smaller than the ideal distance
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
-  GRIPKamadaKawai<Graph> kk(g);
+  GRIPKamadaKawai<Graph>::Configuration kkConfig;
+  GRIPKamadaKawai<Graph> kk(g, &kkConfig);
   kk.Tick(DenseNodeID(0), DenseNodeID(1), /*graphDist=*/2);
 
   // gap = 10, factor = 10 / (2 * 100) - 1 = -0.95, direction (1, 0) * gap
@@ -49,7 +50,8 @@ TEST_CASE("A larger graphDist lowers the ideal distance, making the pull stronge
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
-  GRIPKamadaKawai<Graph> kk(g);
+  GRIPKamadaKawai<Graph>::Configuration kkConfig;
+  GRIPKamadaKawai<Graph> kk(g, &kkConfig);
   kk.Tick(DenseNodeID(0), DenseNodeID(1), /*graphDist=*/1);
 
   // factor = 10 / (1 * 100) - 1 = -0.9
@@ -69,7 +71,8 @@ TEST_CASE("Tick accumulates into any pre-existing displacement",
   SetRadius(radii, 1, 0.0);
   physics->Find(0)->disp[0] = 1.0;
 
-  GRIPKamadaKawai<Graph> kk(g);
+  GRIPKamadaKawai<Graph>::Configuration kkConfig;
+  GRIPKamadaKawai<Graph> kk(g, &kkConfig);
   kk.Tick(DenseNodeID(0), DenseNodeID(1), 2);
 
   double *disp = physics->Find(0)->disp;

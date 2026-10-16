@@ -10,7 +10,8 @@ using test_helpers::MakeGraph;
 
 namespace {
 double Resolution(Graph &g, bool respectEmbedding = true) {
-  TreeConvexLayoutAlgorithm<Graph> alg(g, respectEmbedding);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, respectEmbedding, &algConfig);
   alg.Layout();
   return alg.AngularResolution();
 }
@@ -18,7 +19,8 @@ double Resolution(Graph &g, bool respectEmbedding = true) {
 
 TEST_CASE("Single node places at origin", "[layout][algorithms][tree_convex]") {
   Graph g = MakeGraph(1, 2);
-  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true, &algConfig);
   alg.Layout();
 
   auto *positions = g.NodeSpace().GetPool<PositionComponent>();
@@ -81,7 +83,8 @@ TEST_CASE("Bent-path children never collapse onto a duplicate sibling slope",
   g.AddUndirectedEdge(nodes[3], nodes[9]);
   g.AddUndirectedEdge(nodes[3], nodes[10]);
 
-  TreeConvexLayoutAlgorithm<Graph> alg(g, false);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, false, &algConfig);
   alg.Layout();
 
   auto *edgePool = g.EdgeSpace().GetPool<ConvexEdgeDecorator>();
@@ -101,14 +104,16 @@ TEST_CASE("Bent-path children never collapse onto a duplicate sibling slope",
 TEST_CASE("Edge length function defaults to Uniform",
          "[layout][algorithms][tree_convex]") {
   Graph g = MakeGraph(3, 2);
-  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true, &algConfig);
   REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::Uniform);
 }
 
 TEST_CASE("Edge length function can switch directly between every mode",
          "[layout][algorithms][tree_convex]") {
   Graph g = MakeGraph(3, 2);
-  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true, &algConfig);
 
   alg.SetEdgeLengthFunction(EdgeLengthMode::DepthBased);
   REQUIRE(alg.EdgeLengthFunction() == EdgeLengthMode::DepthBased);
@@ -151,7 +156,8 @@ TEST_CASE("Uniform edge length mode keeps every edge the same length",
   for (size_t i = 0; i + 1 < nodes.size(); i++)
     g.AddUndirectedEdge(nodes[i], nodes[i + 1]);
 
-  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true, &algConfig);
   alg.Layout(nodes[0]);
 
   std::vector<double> lengths = ChainEdgeLengths(g, nodes);
@@ -167,7 +173,8 @@ TEST_CASE("DepthBased edge length mode shrinks edges farther from the root",
   for (size_t i = 0; i + 1 < nodes.size(); i++)
     g.AddUndirectedEdge(nodes[i], nodes[i + 1]);
 
-  TreeConvexLayoutAlgorithm<Graph> alg(g, true);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, true, &algConfig);
   alg.SetEdgeLengthFunction(EdgeLengthMode::DepthBased);
   alg.Layout(nodes[0]);
 
@@ -189,7 +196,8 @@ TEST_CASE("SubtreeSize edge length mode grows edges leading into bigger subtrees
   g.AddUndirectedEdge(nodes[2], nodes[5]);
   g.AddUndirectedEdge(nodes[2], nodes[6]);
 
-  TreeConvexLayoutAlgorithm<Graph> alg(g, false);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, false, &algConfig);
   alg.SetEdgeLengthFunction(EdgeLengthMode::SubtreeSize);
   alg.Layout(nodes[0]);
 
@@ -224,7 +232,8 @@ TEST_CASE("General tree produces a positive resolution and valid positions",
   g.AddUndirectedEdge(nodes[9], nodes[11]);
   g.AddUndirectedEdge(nodes[9], nodes[12]);
 
-  TreeConvexLayoutAlgorithm<Graph> alg(g, false);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration algConfig;
+  TreeConvexLayoutAlgorithm<Graph> alg(g, false, &algConfig);
   alg.Layout();
 
   REQUIRE(alg.AngularResolution() > 0.0);

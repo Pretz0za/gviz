@@ -8,8 +8,8 @@
 #include <cstdint>
 
 template <GraphLike G>
-VanillaFruchtermanReingold<G>::VanillaFruchtermanReingold(G &graph)
-    : m_distanceCalc(graph),
+VanillaFruchtermanReingold<G>::VanillaFruchtermanReingold(G &graph, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_distanceCalc(graph),
       m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
       m_positions(graph.NodeSpace().template GetPool<PositionComponent>()) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
@@ -25,7 +25,7 @@ void VanillaFruchtermanReingold<G>::AttractiveTick(DenseNodeID v,
   double out[m_dimension];
   m_distanceCalc.VecBetweenNodes(v, u, out);
   double gap = m_distanceCalc.BetweenNodes(v, u);
-  Vecaxpy(std::fabs(gap) / m_edgeLength, out, m_physics->Find(v.Raw())->disp,
+  Vecaxpy(std::fabs(gap) / m_config->edgeLength, out, m_physics->Find(v.Raw())->disp,
           m_dimension);
 }
 
@@ -37,10 +37,10 @@ void VanillaFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v,
   m_distanceCalc.VecBetweenNodes(u, v, out);
   double dist = m_distanceCalc.BetweenNodes(v, u);
 
-  // See kMinDistFraction: floor the magnitude's distance so a near-zero
-  // (or negative, once overlapping) gap can't blow this up.
-  double safeDist = std::fmax(std::fabs(dist), m_edgeLength * kMinDistFraction);
-  Vecaxpy(m_edgeLength * m_edgeLength / (safeDist * safeDist), out,
+  // See Configuration::minDistFraction: floor the magnitude's distance so a
+  // near-zero (or negative, once overlapping) gap can't blow this up.
+  double safeDist = std::fmax(std::fabs(dist), m_config->edgeLength * m_config->minDistFraction);
+  Vecaxpy(m_config->edgeLength * m_config->edgeLength / (safeDist * safeDist), out,
           m_physics->Find(v.Raw())->disp, m_dimension);
 }
 
@@ -75,18 +75,18 @@ void VanillaFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, const double *u
     dist = 1.0;
   }
 
-  // See kMinDistFraction: floor the magnitude's distance so two points
-  // landing arbitrarily close together can't turn k^2/dist into an
-  // unbounded one-tick impulse (direction still follows the real,
+  // See Configuration::minDistFraction: floor the magnitude's distance so
+  // two points landing arbitrarily close together can't turn k^2/dist into
+  // an unbounded one-tick impulse (direction still follows the real,
   // unfloored `out`/dist).
-  double safeDist = std::fmax(dist, m_edgeLength * kMinDistFraction);
-  double mag = (m_edgeLength * m_edgeLength) / safeDist;
+  double safeDist = std::fmax(dist, m_config->edgeLength * m_config->minDistFraction);
+  double mag = (m_config->edgeLength * m_config->edgeLength) / safeDist;
   Vecaxpy(mag / dist, out, m_physics->Find(v.Raw())->disp, m_dimension);
 }
 
 template <GraphLike G>
-GRIPFruchtermanReingold<G>::GRIPFruchtermanReingold(G &graph)
-    : m_distanceCalc(graph),
+GRIPFruchtermanReingold<G>::GRIPFruchtermanReingold(G &graph, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_distanceCalc(graph),
       m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()) {
   DimensionResource *dim = graph.template GetResource<DimensionResource>();
   if (dim == nullptr) {
@@ -102,7 +102,8 @@ void GRIPFruchtermanReingold<G>::AttractiveTick(DenseNodeID v, DenseNodeID u) {
   m_distanceCalc.VecBetweenNodes(v, u, out);
   if (IsZero(out, m_dimension))
     return;
-  Vecaxpy((pow(m_distanceCalc.BetweenNodes(v, u), 2.0) / (10.0 * 10.0)), out,
+  double spacing = m_config->targetSpacing;
+  Vecaxpy((pow(m_distanceCalc.BetweenNodes(v, u), 2.0) / (spacing * spacing)), out,
           data[v.Raw()].disp, m_dimension);
 }
 
@@ -113,7 +114,8 @@ void GRIPFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, DenseNodeID u) {
   m_distanceCalc.VecBetweenNodes(u, v, out);
   if (IsZero(out, m_dimension))
     return;
-  Vecaxpy((0.05 * (10.0 * 10.0) / pow(m_distanceCalc.BetweenNodes(v, u), 2.0)),
+  double spacing = m_config->targetSpacing;
+  Vecaxpy((m_config->repulsionStrength * (spacing * spacing) / pow(m_distanceCalc.BetweenNodes(v, u), 2.0)),
           out, data[v.Raw()].disp, m_dimension);
 }
 
@@ -125,6 +127,7 @@ void GRIPFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, const double *uPos
   Negate(m_distanceCalc.VecToPoint(v, uPos, out), m_dimension);
   if (IsZero(out, m_dimension))
     return;
-  Vecaxpy((0.05 * (10.0 * 10.0) / pow(m_distanceCalc.ToPoint(v, uPos), 2.0)),
+  double spacing = m_config->targetSpacing;
+  Vecaxpy((m_config->repulsionStrength * (spacing * spacing) / pow(m_distanceCalc.ToPoint(v, uPos), 2.0)),
           out, data[v.Raw()].disp, m_dimension);
 }

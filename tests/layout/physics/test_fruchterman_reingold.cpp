@@ -37,7 +37,8 @@ TEST_CASE("Vanilla AttractiveTick pulls v toward u by (gap / edgeLength)",
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
-  VanillaFruchtermanReingold<Graph> fr(g);
+  VanillaFruchtermanReingold<Graph>::Configuration frConfig;
+  VanillaFruchtermanReingold<Graph> fr(g, &frConfig);
   fr.AttractiveTick(DenseNodeID(0), DenseNodeID(1));
 
   // gap = 10, edgeLength = 10 -> factor 1, direction (1, 0)
@@ -57,7 +58,8 @@ TEST_CASE("Vanilla RepulsiveTick(v, u) pushes v away from u",
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
-  VanillaFruchtermanReingold<Graph> fr(g);
+  VanillaFruchtermanReingold<Graph>::Configuration frConfig;
+  VanillaFruchtermanReingold<Graph> fr(g, &frConfig);
   fr.RepulsiveTick(DenseNodeID(0), DenseNodeID(1));
 
   // gap = 10, edgeLength^2 / gap^2 = 1, direction away from u is (-1, 0)
@@ -82,7 +84,8 @@ TEST_CASE("Vanilla RepulsiveTick(v, pointer, mass) matches the two-node form "
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
 
-  VanillaFruchtermanReingold<Graph> fr(g);
+  VanillaFruchtermanReingold<Graph>::Configuration frConfig;
+  VanillaFruchtermanReingold<Graph> fr(g, &frConfig);
   double uPos[2] = {10.0, 0.0};
   fr.RepulsiveTick(DenseNodeID(0), uPos, 1.0);
 
@@ -101,7 +104,8 @@ TEST_CASE("GRIP AttractiveTick scales by (gap^2 / 100)", "[layout][physics][fruc
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
-  GRIPFruchtermanReingold<Graph> fr(g);
+  GRIPFruchtermanReingold<Graph>::Configuration frConfig;
+  GRIPFruchtermanReingold<Graph> fr(g, &frConfig);
   fr.AttractiveTick(DenseNodeID(0), DenseNodeID(1));
 
   // gap = 20, factor = 20^2 / 100 = 4, direction (1, 0) * gap = (20, 0)
@@ -121,7 +125,8 @@ TEST_CASE("GRIP RepulsiveTick(v, u) scales by (0.05 * 100 / gap^2)",
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
-  GRIPFruchtermanReingold<Graph> fr(g);
+  GRIPFruchtermanReingold<Graph>::Configuration frConfig;
+  GRIPFruchtermanReingold<Graph> fr(g, &frConfig);
   fr.RepulsiveTick(DenseNodeID(0), DenseNodeID(1));
 
   // gap = 20, factor = 0.05 * 100 / 400 = 0.0125, direction away from u * gap
@@ -139,7 +144,8 @@ TEST_CASE("GRIP AttractiveTick is a no-op when the two nodes coincide",
   SetPosition(positions, 0, {5.0, 5.0});
   SetPosition(positions, 1, {5.0, 5.0});
 
-  GRIPFruchtermanReingold<Graph> fr(g);
+  GRIPFruchtermanReingold<Graph>::Configuration frConfig;
+  GRIPFruchtermanReingold<Graph> fr(g, &frConfig);
   fr.AttractiveTick(DenseNodeID(0), DenseNodeID(1));
 
   double *disp = physics->Find(0)->disp;

@@ -4,6 +4,7 @@
 
 #include "debug/chart_recorder.hpp"
 #include "render/debug/chart_window.hpp"
+#include "render/debug/config_window.hpp"
 #include <webgpu/webgpu.h>
 
 typedef struct GLFWwindow GLFWwindow;
@@ -22,11 +23,14 @@ public:
   void Draw(WGPURenderPassEncoder pass);
 
   ChartWindow &Charts();
+  ConfigWindow &Configs();
 
 private:
   ChartWindow m_charts;
+  ConfigWindow m_configs;
   const ChartRecorder *m_recorder = nullptr;
   bool m_open = true;
+  bool m_configOpen = true;
   bool m_initialized = false;
 };
 

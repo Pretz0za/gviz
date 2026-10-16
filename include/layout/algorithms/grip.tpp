@@ -15,8 +15,8 @@
 #include <memory>
 
 template <GraphLike G>
-GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph)
-    : m_graph(&graph),
+GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_graph(&graph),
       m_visible(
           &graph.template SetResource<VisibleNodesResource>(graph.Size(), 0)),
       m_filtrationOutput(
@@ -37,7 +37,8 @@ GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph)
 
   // pools grip's systems use
   m_graph->NodeSpace().template SetPool<PositionComponent>(m_dimension);
-  m_graph->NodeSpace().template SetPool<KNearestComponent>(32); // TODO: config
+  m_graph->NodeSpace().template SetPool<KNearestComponent>(
+      m_config->physicsConfig.refinementKNearest);
   m_graph->NodeSpace().template SetPool<LocalHeatComponent>();
   m_graph->NodeSpace()
       .template SetPool<PhysicsComponent>(); // TODO: this should be m_dimension
@@ -46,7 +47,7 @@ GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph)
   // systems grip uses
   m_placementSystem = std::make_unique<PositionBarrycentric<G>>(graph);
   m_filtrationSystem = std::make_unique<MisFiltrationSystem<G>>(graph);
-  m_physicsSystem = std::make_unique<GRIPPhysicsSystem<G>>(graph);
+  m_physicsSystem = std::make_unique<GRIPPhysicsSystem<G>>(graph, &m_config->physicsConfig);
 
 #ifdef GVIZ_DEBUG_CHARTS
   m_chart = graph.template SetResource<ChartRecorderResource>(graph.NodeSpace())
@@ -89,7 +90,7 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {
 
   if (m_currLayer == filtration->m_layerCount - 1) {
     std::vector<double> simplex(m_dimension * (m_dimension + 1));
-    RegularSimplexPoints(m_dimension, 100000.0, simplex.data());
+    RegularSimplexPoints(m_dimension, m_config->simplexExtent, simplex.data());
 
     DenseComponentPool<PositionComponent> *positions =
         m_graph->NodeSpace().template GetPool<PositionComponent>();
@@ -114,7 +115,7 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {
   for (uint32_t i = filtration->m_borders[m_currLayer + 1];
        i < filtration->m_borders[m_currLayer]; i++) {
     m_placementSystem->PlaceBetweenKNearest(
-        m_graph->MapToSparse(filtration->m_filtration[i]), 10, *m_visible);
+        m_graph->MapToSparse(filtration->m_filtration[i]), m_config->placementKNearest, *m_visible);
   }
   for (uint32_t i = filtration->m_borders[m_currLayer + 1];
        i < filtration->m_borders[m_currLayer]; i++) {

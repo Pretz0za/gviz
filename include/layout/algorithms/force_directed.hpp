@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "config/configuration.hpp"
 #include "debug/chart_recorder.hpp"
 #include "ds/quadtree.hpp"
 #include "layout/algorithms/types.hpp"
@@ -16,12 +17,36 @@
 template <GraphLike G, ForceModel F> class ForceDirectedLayoutAlgorithm {
 
 public:
-  ForceDirectedLayoutAlgorithm(G &graph);
+  class Configuration : public IConfiguration {
+  public:
+    Configuration() = default;
+
+    // Barnes-Hut opening-angle threshold: a quadtree node is treated as a
+    // single mass once (2 * halfLength / distance) falls below this.
+    double theta = 1.0;
+    typename F::Configuration forceModelConfig;
+    typename GravityForceSystem<G>::Configuration gravityConfig;
+    typename PositionRandomized<G>::Configuration randomizedConfig;
+    typename ForceAtlasHeat<G>::Configuration heatConfig;
+
+    Configuration WithTheta(double v) { theta = v; return *this; }
+
+    std::vector<ConfigField> Fields() override {
+      return {
+          {"Theta", &theta, ConfigFieldType::Double, 0.0, 2.0},
+      };
+    }
+  };
+
+  ForceDirectedLayoutAlgorithm(G &graph, Configuration *config);
   void Tick();
+
+  Configuration *Config() { return m_config; }
 
 private:
   void RepulsiveTick(SpacialIndex::QuadTree<DenseNodeID, 1> *node, DenseNodeID v);
   void RebuildQuadTree();
+  Configuration *m_config;
   G *m_graph;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<MassComponent> *m_mass;

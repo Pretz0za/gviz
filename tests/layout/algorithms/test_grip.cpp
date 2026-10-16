@@ -30,7 +30,8 @@ TEST_CASE("RunFiltration builds the same nested layers MisFiltrationSystem "
          "produces standalone",
          "[layout][algorithms][grip]") {
   Graph g = MakePathGraph(6);
-  GRIPLayoutAlgorithm<Graph> alg(g);
+  GRIPLayoutAlgorithm<Graph>::Configuration algConfig;
+  GRIPLayoutAlgorithm<Graph> alg(g, &algConfig);
   alg.RunFiltration();
 
   auto *filtration = g.GetResource<NestedFiltrationResult>();
@@ -42,7 +43,8 @@ TEST_CASE("RunFiltration builds the same nested layers MisFiltrationSystem "
 TEST_CASE("Tick before RunFiltration throws UinitializedResourceException",
          "[layout][algorithms][grip]") {
   Graph g = MakePathGraph(4);
-  GRIPLayoutAlgorithm<Graph> alg(g);
+  GRIPLayoutAlgorithm<Graph>::Configuration algConfig;
+  GRIPLayoutAlgorithm<Graph> alg(g, &algConfig);
 
   REQUIRE_THROWS_AS(alg.Tick(), UinitializedResourceException<NestedFiltrationResult>);
 }
@@ -51,7 +53,8 @@ TEST_CASE("Walking TransitionState down to 0 places every node with finite "
          "coordinates and marks the whole graph visible",
          "[layout][algorithms][grip]") {
   Graph g = MakePathGraph(6);
-  GRIPLayoutAlgorithm<Graph> alg(g);
+  GRIPLayoutAlgorithm<Graph>::Configuration algConfig;
+  GRIPLayoutAlgorithm<Graph> alg(g, &algConfig);
   alg.RunFiltration();
 
   uint32_t layer = 0;
@@ -78,7 +81,8 @@ TEST_CASE("Tick after the full transition sequence runs without error and "
          "keeps positions finite",
          "[layout][algorithms][grip]") {
   Graph g = MakePathGraph(6);
-  GRIPLayoutAlgorithm<Graph> alg(g);
+  GRIPLayoutAlgorithm<Graph>::Configuration algConfig;
+  GRIPLayoutAlgorithm<Graph> alg(g, &algConfig);
   alg.RunFiltration();
 
   uint32_t layer = 0;

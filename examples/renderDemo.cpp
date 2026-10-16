@@ -63,12 +63,20 @@ int main() {
     }
   }
 
+  ForceDirectedLayoutAlgorithm<Subgraph, VanillaFruchtermanReingold<Subgraph>>::Configuration
+      forceDirectedConfig;
   ForceDirectedLayoutAlgorithm<Subgraph, VanillaFruchtermanReingold<Subgraph>>
-      forceDirected{g};
+      forceDirected{g, &forceDirectedConfig};
 
   Renderer renderer(1280, 720, "gviz renderDemo", g);
 
 #ifdef GVIZ_DEBUG_CHARTS
+  renderer.DebugConfigs().Add("Force Directed", forceDirectedConfig);
+  renderer.DebugConfigs().Add("Fruchterman-Reingold", forceDirectedConfig.forceModelConfig);
+  renderer.DebugConfigs().Add("Gravity", forceDirectedConfig.gravityConfig);
+  renderer.DebugConfigs().Add("Randomized Placement", forceDirectedConfig.randomizedConfig);
+  renderer.DebugConfigs().Add("Heat", forceDirectedConfig.heatConfig);
+
   renderer.DebugCharts().With<PhysicsComponent>(
       "disp", [](const std::vector<PhysicsComponent> &frame) {
         double sum = 0.0;

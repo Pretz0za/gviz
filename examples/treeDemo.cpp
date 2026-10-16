@@ -39,11 +39,16 @@ int main() {
   Graph g = BuildRandomTree(8, 4, false, std::random_device{}());
   g.SetResource<DimensionResource>(DimensionResource::D2);
 
-  TreeConvexLayoutAlgorithm<Graph> layout(g, false);
+  TreeConvexLayoutAlgorithm<Graph>::Configuration layoutConfig;
+  TreeConvexLayoutAlgorithm<Graph> layout(g, false, &layoutConfig);
   layout.Layout();
 
   Renderer renderer(1280, 720, "gviz treeDemo", g);
   renderer.SetLockToFit(true);
+
+#ifdef GVIZ_DEBUG_CHARTS
+  renderer.DebugConfigs().Add("Tree Convex", layoutConfig);
+#endif
 
   std::mt19937 rng(std::random_device{}());
   StateMachine<EdgeLengthMode> *edgeLengthMode =

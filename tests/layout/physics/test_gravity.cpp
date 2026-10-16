@@ -19,7 +19,8 @@ TEST_CASE("An isolated node is pulled toward the origin by -magnitude/dist * pos
   auto *physics = WithPhysics(g);
   SetPosition(positions, 0, {3.0, 4.0});
 
-  GravityForceSystem<Graph> gravity(g);
+  GravityForceSystem<Graph>::Configuration gravityConfig;
+  GravityForceSystem<Graph> gravity(g, &gravityConfig);
   gravity.Tick();
 
   // dist = 5, degree = 0 -> factor = -0.2 * 1 / 5 = -0.04
@@ -38,7 +39,8 @@ TEST_CASE("Higher degree nodes are pulled proportionally harder",
   SetPosition(positions, 0, {6.0, 8.0});
   SetPosition(positions, 1, {0.0, 0.0});
 
-  GravityForceSystem<Graph> gravity(g);
+  GravityForceSystem<Graph>::Configuration gravityConfig;
+  GravityForceSystem<Graph> gravity(g, &gravityConfig);
   gravity.Tick();
 
   // dist = 10, degree = 1 -> factor = -0.2 * 2 / 10 = -0.04
@@ -53,7 +55,8 @@ TEST_CASE("A node already at the origin is left untouched", "[layout][physics][g
   auto *physics = WithPhysics(g);
   SetPosition(positions, 0, {0.0, 0.0});
 
-  GravityForceSystem<Graph> gravity(g);
+  GravityForceSystem<Graph>::Configuration gravityConfig;
+  GravityForceSystem<Graph> gravity(g, &gravityConfig);
   gravity.Tick();
 
   double *disp = physics->Find(0)->disp;
@@ -67,8 +70,9 @@ TEST_CASE("SetMagnitude scales the pull linearly", "[layout][physics][gravity]")
   auto *physics = WithPhysics(g);
   SetPosition(positions, 0, {3.0, 4.0});
 
-  GravityForceSystem<Graph> gravity(g);
-  gravity.SetMagnitude(1.0);
+  GravityForceSystem<Graph>::Configuration gravityConfig;
+  GravityForceSystem<Graph> gravity(g, &gravityConfig);
+  gravity.Config()->WithMagnitude(1.0);
   gravity.Tick();
 
   // dist = 5, degree = 0 -> factor = -1.0 * 1 / 5 = -0.2
@@ -86,7 +90,8 @@ TEST_CASE("Tick accumulates into existing displacement rather than overwriting i
   physics->Find(0)->disp[0] = 100.0;
   physics->Find(0)->disp[1] = 100.0;
 
-  GravityForceSystem<Graph> gravity(g);
+  GravityForceSystem<Graph>::Configuration gravityConfig;
+  GravityForceSystem<Graph> gravity(g, &gravityConfig);
   gravity.Tick();
 
   double *disp = physics->Find(0)->disp;
