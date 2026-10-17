@@ -45,6 +45,7 @@ public:
   Configuration *Config() { return m_config; }
 
   void Layout(NodeID root = NodeID{0xffffffff});
+  void Tick();
 
   double AngularResolution() const { return m_resolution; }
 
@@ -100,6 +101,8 @@ private:
   double m_placementLength = 0.0;
   StateMachine<EdgeLengthMode> *m_edgeLengthMode;
   PositionAnimationSystem<G> m_animation;
+  uint64_t m_lastConfigHash = 0;
+  bool m_hasRun = false;
 };
 
 #include "layout/algorithms/tree_convex.tpp"

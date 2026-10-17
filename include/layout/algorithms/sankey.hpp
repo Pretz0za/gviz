@@ -50,6 +50,7 @@ public:
   Configuration *Config() { return m_config; }
 
   void Layout();
+  void Tick();
 
   uint32_t LayerCount() const { return m_layerCount; }
 
@@ -72,6 +73,8 @@ private:
   uint32_t m_layerCount = 0;
   std::vector<std::vector<DenseNodeID>> m_layers;
   std::vector<double> m_columnX;
+  uint64_t m_lastConfigHash = 0;
+  bool m_hasRun = false;
 };
 
 #include "layout/algorithms/sankey.tpp"

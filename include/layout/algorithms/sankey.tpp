@@ -183,3 +183,13 @@ template <GraphLike G> void SankeyLayoutAlgorithm<G>::Layout() {
   PlaceNodes();
   AssignPortsAndBuildCurves();
 }
+
+template <GraphLike G> void SankeyLayoutAlgorithm<G>::Tick() {
+  uint64_t hash = m_config->Hash();
+  if (m_hasRun && hash == m_lastConfigHash)
+    return;
+
+  m_lastConfigHash = hash;
+  m_hasRun = true;
+  Layout();
+}

@@ -49,7 +49,7 @@ int main() {
   layoutConfig.minThickness = 4.0;
   layoutConfig.nodeWidth = 24.0;
   SankeyLayoutAlgorithm<Graph> layout(g, &layoutConfig);
-  layout.Layout();
+  layout.Tick();
 
   auto *radii = g.NodeSpace().SetPool<RadiusComponent>(MANUAL);
   for (NodeID nid : g.Nodes())
@@ -68,6 +68,7 @@ int main() {
 #endif
 
   while (renderer.Frame(g)) {
+    layout.Tick();
   }
 
   return 0;

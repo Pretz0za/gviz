@@ -41,7 +41,7 @@ int main() {
 
   TreeConvexLayoutAlgorithm<Graph>::Configuration layoutConfig;
   TreeConvexLayoutAlgorithm<Graph> layout(g, false, &layoutConfig);
-  layout.Layout();
+  layout.Tick();
 
   Renderer renderer(1280, 720, "gviz treeDemo", g);
   renderer.SetLockToFit(true);
@@ -55,7 +55,7 @@ int main() {
       g.GetResource<StateMachine<EdgeLengthMode>>();
 
   while (renderer.Frame(g)) {
-    layout.Animation().Advance();
+    layout.Tick();
 
     if (renderer.KeyPressed('T')) {
       std::vector<EdgeLengthMode> transitions = edgeLengthMode->Transitions();

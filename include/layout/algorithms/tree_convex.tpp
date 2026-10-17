@@ -535,3 +535,14 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Layout(NodeID root) {
 
   PlaceVertices();
 }
+
+template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Tick() {
+  m_animation.Advance();
+  uint64_t hash = m_config->Hash();
+  if (m_hasRun && hash == m_lastConfigHash)
+    return;
+
+  m_lastConfigHash = hash;
+  m_hasRun = true;
+  Layout();
+}
