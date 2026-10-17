@@ -68,6 +68,10 @@ public:
   uint32_t Size() const;
   uint32_t EdgeCount() const { return m_edgeSpace.Size(); }
 
+  // Increases on every AddNode/AddEdge call, so callers can cheaply detect
+  // whether the graph's topology has changed since they last looked.
+  uint64_t Version() const { return m_version; }
+
   IndexSpace &NodeSpace();
   IndexSpace &EdgeSpace();
 
@@ -83,6 +87,7 @@ private:
   DenseComponentPool<DegreeComponent> *m_degreePool;
   DenseComponentPool<EdgeComponent> *m_edgePool;
   DenseComponentPool<WeightComponent> *m_weightPool;
+  uint64_t m_version = 0;
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
 };

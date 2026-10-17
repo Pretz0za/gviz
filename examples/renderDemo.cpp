@@ -3,7 +3,7 @@
 #include "graph/subgraph.hpp"
 #include "layout/algorithms/force_directed.hpp"
 #include "layout/components/radius.hpp"
-#include "layout/physics/force_model/fruchterman_reingold.hpp"
+#include "layout/physics/force_model/linlog.hpp"
 #include "layout/types.hpp"
 #include "render/renderer.hpp"
 #include <cstdint>
@@ -63,16 +63,16 @@ int main() {
     }
   }
 
-  ForceDirectedLayoutAlgorithm<Subgraph, VanillaFruchtermanReingold<Subgraph>>::Configuration
+  ForceDirectedLayoutAlgorithm<Subgraph, LinLog<Subgraph>>::Configuration
       forceDirectedConfig;
-  ForceDirectedLayoutAlgorithm<Subgraph, VanillaFruchtermanReingold<Subgraph>>
+  ForceDirectedLayoutAlgorithm<Subgraph, LinLog<Subgraph>>
       forceDirected{g, &forceDirectedConfig};
 
   Renderer renderer(1280, 720, "gviz renderDemo", g);
 
 #ifdef GVIZ_DEBUG_CHARTS
   renderer.DebugConfigs().Add("Force Directed", forceDirectedConfig);
-  renderer.DebugConfigs().Add("Fruchterman-Reingold", forceDirectedConfig.forceModelConfig);
+  renderer.DebugConfigs().Add("LinLog", forceDirectedConfig.forceModelConfig);
   renderer.DebugConfigs().Add("Gravity", forceDirectedConfig.gravityConfig);
   renderer.DebugConfigs().Add("Randomized Placement", forceDirectedConfig.randomizedConfig);
   renderer.DebugConfigs().Add("Heat", forceDirectedConfig.heatConfig);
@@ -111,7 +111,7 @@ int main() {
   renderer.SetLockToFit(true);
 
   while (renderer.Frame(g)) {
-    for (size_t i = 0; i < 1; i++)
+    for (size_t i = 0; i < 20; i++)
       forceDirected.Tick();
   }
 

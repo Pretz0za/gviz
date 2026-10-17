@@ -64,6 +64,9 @@ public:
   uint32_t Size() const { return m_size; };
   uint32_t EdgeCount() const { return m_compactEdgeSpace.Size(); };
 
+  // How many nodes have been added to this subgraph so far.
+  uint32_t Version() const { return m_size; }
+
   IndexSpace &NodeSpace();
 
   IndexSpace &EdgeSpace();

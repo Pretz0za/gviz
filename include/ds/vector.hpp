@@ -106,7 +106,7 @@ inline double *Negate(double *vec, uint8_t dim) {
   case 3: {
     vec[0] *= -1.0;
     vec[1] *= -1.0;
-    vec[1] *= -1.0;
+    vec[2] *= -1.0;
     break;
   }
   case 4: {
@@ -117,7 +117,7 @@ inline double *Negate(double *vec, uint8_t dim) {
     break;
   }
   default: {
-    for (uint8_t i = 0; i > dim; i++) {
+    for (uint8_t i = 0; i < dim; i++) {
       vec[i] *= -1.0;
     }
     break;

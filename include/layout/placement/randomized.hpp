@@ -15,7 +15,7 @@ public:
   public:
     Configuration() = default;
 
-    uint32_t boundingBoxWidth = 10000;
+    uint32_t boundingBoxWidth = 100000;
 
     Configuration WithBoundingBoxWidth(uint32_t v) { boundingBoxWidth = v; return *this; }
 

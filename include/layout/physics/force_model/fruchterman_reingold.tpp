@@ -48,37 +48,14 @@ template <GraphLike G>
 void VanillaFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, const double *uPos,
                                                   double uMass) {
   double out[m_dimension];
-  // v - u (not u - v): repulsion pushes v away from u.
-  //
-  // PositionComponent::pos is declared double[1] but is really backed by
-  // an m_dimension-wide slice of PositionSpan's shared storage, valid
-  // only through a pointer/reference into that storage -- a by-value
-  // PositionComponent copy (`auto vPos = *ptr`) only copies pos[0],
-  // leaving every axis past X as uninitialized stack garbage. That
-  // silently corrupted every repulsive force computed through this
-  // overload (the Barnes-Hut hot path) on every axis but X.
   const PositionComponent *vPos = m_positions->Find(v.Raw());
   Subtract(vPos->pos, uPos, out, m_dimension);
   double dist = L2Norm(out, m_dimension);
 
   if (dist < 1e-9) {
-    // Exactly (or numerically) coincident: there's no direction to push
-    // in, so pick a stable, deterministic one from the node's own bit
-    // pattern rather than leaving the pair stuck with a zero vector.
-    uint64_t bits = reinterpret_cast<uintptr_t>(m_physics->Find(v.Raw()));
-    bits ^= bits >> 33;
-    bits *= 0x9E3779B97F4A7C15ULL;
-    double angle = (bits >> 40) * (6.283185307179586 / (1ull << 24));
-    out[0] = std::cos(angle);
-    if (m_dimension > 1) out[1] = std::sin(angle);
-    for (uint8_t d = 2; d < m_dimension; d++) out[d] = 0.0;
-    dist = 1.0;
+    return;
   }
 
-  // See Configuration::minDistFraction: floor the magnitude's distance so
-  // two points landing arbitrarily close together can't turn k^2/dist into
-  // an unbounded one-tick impulse (direction still follows the real,
-  // unfloored `out`/dist).
   double safeDist = std::fmax(dist, m_config->edgeLength * m_config->minDistFraction);
   double mag = (m_config->edgeLength * m_config->edgeLength) / safeDist;
   Vecaxpy(mag / dist, out, m_physics->Find(v.Raw())->disp, m_dimension);

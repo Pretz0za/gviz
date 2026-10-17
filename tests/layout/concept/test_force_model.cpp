@@ -7,11 +7,16 @@
 #include "graph/graph.hpp"
 #include "layout/concept/force_model.hpp"
 #include "layout/physics/force_model/fruchterman_reingold.hpp"
+#include "layout/physics/force_model/linlog.hpp"
 
 TEST_CASE("Both Fruchterman-Reingold variants satisfy ForceModel",
          "[layout][concept][force_model]") {
   STATIC_REQUIRE(ForceModel<VanillaFruchtermanReingold<Graph>>);
   STATIC_REQUIRE(ForceModel<GRIPFruchtermanReingold<Graph>>);
+}
+
+TEST_CASE("LinLog satisfies ForceModel", "[layout][concept][force_model]") {
+  STATIC_REQUIRE(ForceModel<LinLog<Graph>>);
 }
 
 TEST_CASE("An unrelated type does not satisfy ForceModel", "[layout][concept][force_model]") {

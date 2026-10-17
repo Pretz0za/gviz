@@ -1,4 +1,7 @@
-gviz is a graph layout engine and renderer. 
+---
+name: gviz-debug
+description: Use when debugging gviz (the graph layout engine and renderer) at runtime — diagnosing incorrect layouts, suspicious physics/positions, or other behavior that doesn't match what the code assumes. Covers taking in-app screenshots via Renderer::RequestScreenshot, locking the camera to fit via Renderer::LockToFit, and recording/charting any ComponentPool over time with the GVIZ_DEBUG_CHARTS build (ChartRecorder, ChartWindow). Use this whenever the user reports a runtime/visual bug in gviz, not for compile errors or static code review.
+---
 
 # Basics
 

@@ -20,6 +20,7 @@ TEST_CASE("An isolated node is pulled toward the origin by -magnitude/dist * pos
   SetPosition(positions, 0, {3.0, 4.0});
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
+  gravityConfig.magnitude = 0.2;
   GravityForceSystem<Graph> gravity(g, &gravityConfig);
   gravity.Tick();
 
@@ -40,6 +41,7 @@ TEST_CASE("Higher degree nodes are pulled proportionally harder",
   SetPosition(positions, 1, {0.0, 0.0});
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
+  gravityConfig.magnitude = 0.2;
   GravityForceSystem<Graph> gravity(g, &gravityConfig);
   gravity.Tick();
 
@@ -91,6 +93,7 @@ TEST_CASE("Tick accumulates into existing displacement rather than overwriting i
   physics->Find(0)->disp[1] = 100.0;
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
+  gravityConfig.magnitude = 0.2;
   GravityForceSystem<Graph> gravity(g, &gravityConfig);
   gravity.Tick();
 

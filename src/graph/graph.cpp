@@ -13,6 +13,7 @@ Graph::Graph()
       m_weightPool(m_edgeSpace.SetPool<WeightComponent>()) {}
 
 NodeID Graph::AddNode() {
+  m_version++;
   return NodeID(m_nodeSpace.Create());
 }
 
@@ -21,6 +22,7 @@ bool Graph::HasNode(NodeID id) const {
 }
 
 EdgeID Graph::AddEdge(NodeID from, NodeID to) {
+  m_version++;
   auto *outAdj = m_outAdjPool->Find(from.Raw());
   auto *inAdj = m_inAdjPool->Find(to.Raw());
   if (!outAdj || !inAdj)

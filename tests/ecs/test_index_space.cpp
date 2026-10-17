@@ -106,7 +106,7 @@ TEST_CASE("DenseComponentPool Set/Find round-trip a value for an entity",
   auto *pool = space.SetPool<Position2D>();
   EntityID id = space.Create();
 
-  pool->Set(id, Position2D{3.0, 4.0});
+  pool->Set(id, Position2D{{}, 3.0, 4.0});
   Position2D *got = pool->Find(id);
   REQUIRE(got->x == 3.0);
   REQUIRE(got->y == 4.0);
@@ -128,8 +128,8 @@ TEST_CASE("DenseComponentPool::Data exposes the backing storage directly",
   space.Create();
   space.Create();
 
-  pool->Set(EntityID(0), Tag{10});
-  pool->Set(EntityID(1), Tag{20});
+  pool->Set(EntityID(0), Tag{{}, 10});
+  pool->Set(EntityID(1), Tag{{}, 20});
 
   auto &data = pool->Data();
   REQUIRE(data.size() == 2);

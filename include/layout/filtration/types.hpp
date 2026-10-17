@@ -1,3 +1,5 @@
+#pragma once
+
 #include "graph/types.hpp"
 #include <cstdint>
 #include <vector>

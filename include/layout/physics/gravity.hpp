@@ -13,7 +13,7 @@ public:
   public:
     Configuration() = default;
 
-    double magnitude = 0.0;
+    double magnitude = 1.0;
 
     Configuration WithMagnitude(double v) { magnitude = v; return *this; }
 

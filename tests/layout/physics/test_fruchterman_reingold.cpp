@@ -38,6 +38,7 @@ TEST_CASE("Vanilla AttractiveTick pulls v toward u by (gap / edgeLength)",
   SetRadius(radii, 1, 0.0);
 
   VanillaFruchtermanReingold<Graph>::Configuration frConfig;
+  frConfig.edgeLength = 10.0;
   VanillaFruchtermanReingold<Graph> fr(g, &frConfig);
   fr.AttractiveTick(DenseNodeID(0), DenseNodeID(1));
 
@@ -59,6 +60,7 @@ TEST_CASE("Vanilla RepulsiveTick(v, u) pushes v away from u",
   SetRadius(radii, 1, 0.0);
 
   VanillaFruchtermanReingold<Graph>::Configuration frConfig;
+  frConfig.edgeLength = 10.0;
   VanillaFruchtermanReingold<Graph> fr(g, &frConfig);
   fr.RepulsiveTick(DenseNodeID(0), DenseNodeID(1));
 
@@ -85,6 +87,7 @@ TEST_CASE("Vanilla RepulsiveTick(v, pointer, mass) matches the two-node form "
   SetPosition(positions, 1, {10.0, 0.0});
 
   VanillaFruchtermanReingold<Graph>::Configuration frConfig;
+  frConfig.edgeLength = 10.0;
   VanillaFruchtermanReingold<Graph> fr(g, &frConfig);
   double uPos[2] = {10.0, 0.0};
   fr.RepulsiveTick(DenseNodeID(0), uPos, 1.0);
