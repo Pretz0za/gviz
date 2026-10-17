@@ -18,7 +18,7 @@ public:
   public:
     Configuration() = default;
 
-    double edgeLength = 1000.0;
+    double edgeLength = 10.0;
     double minDistFraction = 0.01;
 
     Configuration WithEdgeLength(double v) { edgeLength = v; return *this; }

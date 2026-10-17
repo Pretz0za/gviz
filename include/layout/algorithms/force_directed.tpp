@@ -127,15 +127,13 @@ void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
     }
   }
 
-  // observed before gravity so gravity doesn't skew the swinging/traction
-  // measurement
   m_heat->BeginTick();
   for (uint32_t i = 0; i < size; i++) {
     m_heat->Observe(DenseNodeID{i}, physics->Find(i)->disp);
   }
   m_heat->UpdateGlobalSpeed(size);
 
-  // m_gravity->Tick();
+  m_gravity->Tick();
 
   for (uint32_t i = 0; i < size; i++) {
     double *disp = physics->Find(i)->disp;

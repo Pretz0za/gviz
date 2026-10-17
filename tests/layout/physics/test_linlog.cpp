@@ -1,6 +1,3 @@
-// Unit tests for the LinLog force model (ported from grapher-old's
-// ForceModel::LinLog).
-
 #include "catch_amalgamated.hpp"
 #include "layout/physics/force_model/linlog.hpp"
 
