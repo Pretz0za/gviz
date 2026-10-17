@@ -1,33 +1,87 @@
 [
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /home/aziz/Projects/gviz/src/ecs/index_space.cpp",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/graphEmbed.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/graphEmbed.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/graphEmbed.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/graphEmbed.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/graphIO.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/graphIO.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/graphIO.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/graphIO.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/graphIsolator.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/graphIsolator.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/graphIsolator.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/graphIsolator.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/graphNonplanar.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/graphNonplanar.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/graphNonplanar.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/graphNonplanar.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/graphPreprocess.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/graphPreprocess.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/graphPreprocess.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/graphPreprocess.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/graphStructure.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/graphStructure.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/graphStructure.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/graphStructure.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/listcoll.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/listcoll.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/listcoll.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/listcoll.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/cc  -I/home/aziz/Projects/gviz/third-party -g -std=gnu11 -fPIC -o CMakeFiles/planar.dir/third-party/boyerMyrvold/stack.c.o -c /home/aziz/Projects/gviz/third-party/boyerMyrvold/stack.c",
+  "file": "/home/aziz/Projects/gviz/third-party/boyerMyrvold/stack.c",
+  "output": "CMakeFiles/planar.dir/third-party/boyerMyrvold/stack.c.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o -c /home/aziz/Projects/gviz/src/ecs/index_space.cpp",
   "file": "/home/aziz/Projects/gviz/src/ecs/index_space.cpp",
   "output": "CMakeFiles/gviz.dir/src/ecs/index_space.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /home/aziz/Projects/gviz/src/graph/graph.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/graph/graph.cpp.o -c /home/aziz/Projects/gviz/src/graph/graph.cpp",
   "file": "/home/aziz/Projects/gviz/src/graph/graph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/graph.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o -c /home/aziz/Projects/gviz/src/graph/subgraph.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o -c /home/aziz/Projects/gviz/src/graph/subgraph.cpp",
   "file": "/home/aziz/Projects/gviz/src/graph/subgraph.cpp",
   "output": "CMakeFiles/gviz.dir/src/graph/subgraph.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o -c /home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o -c /home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
   "file": "/home/aziz/Projects/gviz/src/ds/bfs_scratch.cpp",
   "output": "CMakeFiles/gviz.dir/src/ds/bfs_scratch.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o -c /home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o -c /home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
   "file": "/home/aziz/Projects/gviz/src/layout/placement/helpers.cpp",
   "output": "CMakeFiles/gviz.dir/src/layout/placement/helpers.cpp.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party -g -std=gnu++23 -fPIC -o CMakeFiles/gviz.dir/src/layout/planarity/boyer_myrvold.cpp.o -c /home/aziz/Projects/gviz/src/layout/planarity/boyer_myrvold.cpp",
+  "file": "/home/aziz/Projects/gviz/src/layout/planarity/boyer_myrvold.cpp",
+  "output": "CMakeFiles/gviz.dir/src/layout/planarity/boyer_myrvold.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
@@ -136,6 +190,12 @@
   "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIE -o CMakeFiles/treeDemo.dir/examples/treeDemo.cpp.o -c /home/aziz/Projects/gviz/examples/treeDemo.cpp",
   "file": "/home/aziz/Projects/gviz/examples/treeDemo.cpp",
   "output": "CMakeFiles/treeDemo.dir/examples/treeDemo.cpp.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIE -o CMakeFiles/sankeyDemo.dir/examples/sankeyDemo.cpp.o -c /home/aziz/Projects/gviz/examples/sankeyDemo.cpp",
+  "file": "/home/aziz/Projects/gviz/examples/sankeyDemo.cpp",
+  "output": "CMakeFiles/sankeyDemo.dir/examples/sankeyDemo.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",

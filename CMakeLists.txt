@@ -19,6 +19,19 @@ option(GVIZ_DEBUG_CHARTS "Enable ChartRecorder instrumentation of component pool
 # on platforms where that isn't the default for static archives.
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Vendored Boyer-Myrvold planarity testing (stays C, linked into gviz).
+add_library(planar STATIC
+    third-party/boyerMyrvold/graphEmbed.c
+    third-party/boyerMyrvold/graphIO.c
+    third-party/boyerMyrvold/graphIsolator.c
+    third-party/boyerMyrvold/graphNonplanar.c
+    third-party/boyerMyrvold/graphPreprocess.c
+    third-party/boyerMyrvold/graphStructure.c
+    third-party/boyerMyrvold/listcoll.c
+    third-party/boyerMyrvold/stack.c
+)
+target_include_directories(planar PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third-party/)
+
 add_library(gviz ${GVIZ_LIB_TYPE}
 	# cpp files here
 	src/ecs/index_space.cpp
@@ -29,6 +42,7 @@ add_library(gviz ${GVIZ_LIB_TYPE}
 	src/ds/bfs_scratch.cpp
 
 	src/layout/placement/helpers.cpp
+	src/layout/planarity/boyer_myrvold.cpp
 )
 
 target_include_directories(gviz
@@ -47,6 +61,7 @@ set_target_properties(gviz PROPERTIES
 target_link_libraries(gviz
     PRIVATE
     m
+    planar
 )
 
 if(GVIZ_DEBUG_CHARTS)
