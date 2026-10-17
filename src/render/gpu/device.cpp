@@ -44,8 +44,18 @@ Renderer::Impl::~Impl() {
     wgpuBufferRelease(colorBuf);
   if (edgeColorBuf)
     wgpuBufferRelease(edgeColorBuf);
+  if (bezierControlPointsBuf)
+    wgpuBufferRelease(bezierControlPointsBuf);
+  if (bezierHalfWidthsBuf)
+    wgpuBufferRelease(bezierHalfWidthsBuf);
+  if (bezierColorsBuf)
+    wgpuBufferRelease(bezierColorsBuf);
+  if (nodeRectHalfHeightsBuf)
+    wgpuBufferRelease(nodeRectHalfHeightsBuf);
   if (globalsBuf)
     wgpuBufferRelease(globalsBuf);
+  if (bezierPipeline)
+    wgpuRenderPipelineRelease(bezierPipeline);
   if (edgePipeline)
     wgpuRenderPipelineRelease(edgePipeline);
   if (nodePipeline)
@@ -110,13 +120,13 @@ bool Renderer::Impl::CreatePipelines() {
   if (!shaderModule)
     return false;
 
-  WGPUBindGroupLayoutEntry entries[7] = {};
+  WGPUBindGroupLayoutEntry entries[11] = {};
   entries[0] = WGPUBindGroupLayoutEntry{
       .binding = 0,
       .visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment,
       .buffer = {.type = WGPUBufferBindingType_Uniform},
   };
-  for (uint32_t i = 1; i < 7; i++) {
+  for (uint32_t i = 1; i < 11; i++) {
     entries[i] = WGPUBindGroupLayoutEntry{
         .binding = i,
         .visibility = WGPUShaderStage_Vertex,
@@ -127,7 +137,7 @@ bool Renderer::Impl::CreatePipelines() {
   bindGroupLayout = wgpuDeviceCreateBindGroupLayout(
       device, WgpuPtr(WGPUBindGroupLayoutDescriptor{
                   .label = {"render bgl", WGPU_STRLEN},
-                  .entryCount = 7,
+                  .entryCount = 11,
                   .entries = entries,
               }));
   pipelineLayout = wgpuDeviceCreatePipelineLayout(
@@ -164,12 +174,15 @@ bool Renderer::Impl::CreatePipelines() {
       .depthCompare = WGPUCompareFunction_LessEqual,
   };
 
-  const char *labels[2] = {"render nodes", "render edges"};
-  const char *vsEntries[2] = {"vsNode", "vsEdge"};
-  const char *fsEntries[2] = {"fsNode", "fsEdge"};
-  WGPURenderPipeline pipelines[2] = {nullptr, nullptr};
+  const char *labels[3] = {"render nodes", "render edges", "render bezier"};
+  const char *vsEntries[3] = {"vsNode", "vsEdge", "vsBezierSegment"};
+  const char *fsEntries[3] = {"fsNode", "fsEdge", "fsBezierSegment"};
+  const WGPUPrimitiveTopology topologies[3] = {WGPUPrimitiveTopology_TriangleList,
+                                               WGPUPrimitiveTopology_TriangleList,
+                                               WGPUPrimitiveTopology_TriangleStrip};
+  WGPURenderPipeline pipelines[3] = {nullptr, nullptr, nullptr};
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 3; i++) {
     pipelines[i] = wgpuDeviceCreateRenderPipeline(
         device,
         WgpuPtr(WGPURenderPipelineDescriptor{
@@ -177,7 +190,7 @@ bool Renderer::Impl::CreatePipelines() {
             .layout = pipelineLayout,
             .vertex = {.module = shaderModule,
                        .entryPoint = {vsEntries[i], WGPU_STRLEN}},
-            .primitive = {.topology = WGPUPrimitiveTopology_TriangleList,
+            .primitive = {.topology = topologies[i],
                           .cullMode = WGPUCullMode_None},
             .depthStencil = &depthStencil,
             .multisample = {.count = 1, .mask = 0xFFFFFFFF},
@@ -193,6 +206,7 @@ bool Renderer::Impl::CreatePipelines() {
   }
   nodePipeline = pipelines[0];
   edgePipeline = pipelines[1];
+  bezierPipeline = pipelines[2];
   return true;
 }
 
@@ -253,6 +267,8 @@ bool Renderer::Impl::Init(uint32_t width, uint32_t height,
   requiredLimits.maxStorageBufferBindingSize =
       adapterLimits.maxStorageBufferBindingSize;
   requiredLimits.maxBufferSize = adapterLimits.maxBufferSize;
+  requiredLimits.maxStorageBuffersPerShaderStage =
+      adapterLimits.maxStorageBuffersPerShaderStage;
 
   wgpuAdapterRequestDevice(
       adapter,

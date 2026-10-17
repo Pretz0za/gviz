@@ -4,6 +4,9 @@
 // GVIZ_BUILD_RENDER.
 
 #include "catch_amalgamated.hpp"
+#include "layout/components/cubic_bezier.hpp"
+#include "layout/components/half_width.hpp"
+#include "layout/components/radius.hpp"
 #include "render/graph_query.hpp"
 
 #include "helpers/graph_helpers.hpp"
@@ -143,4 +146,116 @@ TEST_CASE("ExtractFrameData reuses out's storage: a second call clears prior "
 
   ExtractFrameData(g, false, fd);
   REQUIRE(fd.positions.size() == 3); // not 6
+}
+
+TEST_CASE("An edge with a CubicBezierComponent and HalfWidthComponent is "
+         "rendered as a curve, not a straight edge",
+         "[render][graph_query]") {
+  Graph g = MakeGraph(2, 2);
+  auto *positions = WithPositions(g, 2);
+  SetPosition(positions, 0, {0.0, 0.0});
+  SetPosition(positions, 1, {10.0, 0.0});
+  EdgeID e = g.AddEdge(NodeID(0), NodeID(1));
+
+  auto *curves = g.EdgeSpace().SetPool<CubicBezierComponent>();
+  auto *halfWidths = g.EdgeSpace().SetPool<HalfWidthComponent>();
+  CubicBezierComponent *curve = curves->Find(g.MapToDense(e).Raw());
+  curve->p0[0] = 0.0; curve->p0[1] = 0.0;
+  curve->p1[0] = 3.0; curve->p1[1] = 0.0;
+  curve->p2[0] = 7.0; curve->p2[1] = 0.0;
+  curve->p3[0] = 10.0; curve->p3[1] = 0.0;
+  halfWidths->Find(g.MapToDense(e).Raw())->halfWidth = 2.0;
+
+  FrameData fd;
+  ExtractFrameData(g, false, fd);
+
+  REQUIRE(fd.edges.empty());
+  REQUIRE(fd.bezierControlPoints.size() == 12); // 4 control points * xyz
+  REQUIRE(fd.bezierHalfWidths.size() == 1);
+  REQUIRE(fd.bezierColors.size() == 1);
+
+  REQUIRE(fd.bezierControlPoints[3] == Catch::Approx(3.0f));
+  REQUIRE(fd.bezierControlPoints[9] == Catch::Approx(10.0f));
+  REQUIRE(fd.bezierHalfWidths[0] == Catch::Approx(2.0f));
+}
+
+TEST_CASE("Curved and straight edges coexist, and both contribute to the "
+         "bounding box",
+         "[render][graph_query]") {
+  Graph g = MakeGraph(4, 2);
+  auto *positions = WithPositions(g, 2);
+  SetPosition(positions, 0, {0.0, 0.0});
+  SetPosition(positions, 1, {10.0, 0.0});
+  SetPosition(positions, 2, {0.0, 0.0});
+  SetPosition(positions, 3, {1.0, 1.0});
+
+  EdgeID curvedEdge = g.AddEdge(NodeID(0), NodeID(1));
+  g.AddEdge(NodeID(2), NodeID(3));
+
+  auto *curves = g.EdgeSpace().SetPool<CubicBezierComponent>();
+  auto *halfWidths = g.EdgeSpace().SetPool<HalfWidthComponent>();
+  CubicBezierComponent *curve = curves->Find(g.MapToDense(curvedEdge).Raw());
+  curve->p0[0] = 0.0; curve->p0[1] = 0.0;
+  curve->p1[0] = 3.0; curve->p1[1] = 50.0;
+  curve->p2[0] = 7.0; curve->p2[1] = 50.0;
+  curve->p3[0] = 10.0; curve->p3[1] = 0.0;
+  halfWidths->Find(g.MapToDense(curvedEdge).Raw())->halfWidth = 1.0;
+
+  FrameData fd;
+  ExtractFrameData(g, false, fd);
+
+  REQUIRE(fd.edges.size() == 2); // the (2,3) edge only
+  REQUIRE(fd.bezierHalfWidths.size() == 1);
+  REQUIRE(fd.bboxValid);
+  REQUIRE(fd.bboxMax[1] >= 50.0f);
+}
+
+TEST_CASE("A node's rect half-height is derived from the thickness of its "
+         "incident curved edges, not stored",
+         "[render][graph_query]") {
+  Graph g = MakeGraph(3, 2);
+  auto *positions = WithPositions(g, 2);
+  SetPosition(positions, 0, {0.0, 0.0});
+  SetPosition(positions, 1, {10.0, -5.0});
+  SetPosition(positions, 2, {10.0, 5.0});
+
+  EdgeID e0 = g.AddEdge(NodeID(0), NodeID(1));
+  EdgeID e1 = g.AddEdge(NodeID(0), NodeID(2));
+
+  auto *curves = g.EdgeSpace().SetPool<CubicBezierComponent>();
+  auto *halfWidths = g.EdgeSpace().SetPool<HalfWidthComponent>();
+  for (EdgeID e : {e0, e1}) {
+    CubicBezierComponent *curve = curves->Find(g.MapToDense(e).Raw());
+    curve->p0[0] = 0.0; curve->p0[1] = 0.0;
+    curve->p1[0] = 3.0; curve->p1[1] = 0.0;
+    curve->p2[0] = 7.0; curve->p2[1] = 0.0;
+    curve->p3[0] = 10.0; curve->p3[1] = 0.0;
+  }
+  halfWidths->Find(g.MapToDense(e0).Raw())->halfWidth = 3.0;
+  halfWidths->Find(g.MapToDense(e1).Raw())->halfWidth = 5.0;
+
+  FrameData fd;
+  ExtractFrameData(g, false, fd);
+
+  REQUIRE(fd.nodeRectHalfHeights.size() == 3); // dense, 1 per node
+  REQUIRE(fd.nodeRectHalfHeights[0] == Catch::Approx(8.0f)); // 3 + 5 outgoing
+  REQUIRE(fd.nodeRectHalfHeights[1] == Catch::Approx(3.0f)); // incoming only
+  REQUIRE(fd.nodeRectHalfHeights[2] == Catch::Approx(5.0f)); // incoming only
+}
+
+TEST_CASE("A node touching no curved edges has zero rect half-height, so it "
+         "renders as a circle",
+         "[render][graph_query]") {
+  Graph g = MakeGraph(2, 2);
+  auto *positions = WithPositions(g, 2);
+  SetPosition(positions, 0, {0.0, 0.0});
+  SetPosition(positions, 1, {10.0, 0.0});
+  g.AddEdge(NodeID(0), NodeID(1));
+
+  FrameData fd;
+  ExtractFrameData(g, false, fd);
+
+  REQUIRE(fd.nodeRectHalfHeights.size() == 2);
+  REQUIRE(fd.nodeRectHalfHeights[0] == Catch::Approx(0.0f));
+  REQUIRE(fd.nodeRectHalfHeights[1] == Catch::Approx(0.0f));
 }

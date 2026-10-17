@@ -13,6 +13,12 @@ struct FrameData {
   std::vector<uint32_t> colors;
   std::vector<uint32_t> edgeColors;
 
+  std::vector<float> bezierControlPoints;
+  std::vector<float> bezierHalfWidths;
+  std::vector<uint32_t> bezierColors;
+
+  std::vector<float> nodeRectHalfHeights;
+
   float bboxMin[3] = {0.0f, 0.0f, 0.0f};
   float bboxMax[3] = {0.0f, 0.0f, 0.0f};
   bool bboxValid = false;

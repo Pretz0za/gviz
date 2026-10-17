@@ -8,7 +8,7 @@ void Renderer::Impl::RebuildBindGroup() {
   if (bindGroup)
     wgpuBindGroupRelease(bindGroup);
 
-  WGPUBindGroupEntry entries[7] = {};
+  WGPUBindGroupEntry entries[11] = {};
   entries[0] = WGPUBindGroupEntry{
       .binding = 0, .buffer = globalsBuf, .size = sizeof(GlobalsUBO)};
   entries[1] = WGPUBindGroupEntry{
@@ -23,12 +23,23 @@ void Renderer::Impl::RebuildBindGroup() {
       .binding = 5, .buffer = colorBuf, .size = colorCapacity};
   entries[6] = WGPUBindGroupEntry{
       .binding = 6, .buffer = edgeColorBuf, .size = edgeColorCapacity};
+  entries[7] = WGPUBindGroupEntry{.binding = 7,
+                                  .buffer = bezierControlPointsBuf,
+                                  .size = bezierControlPointsCapacity};
+  entries[8] = WGPUBindGroupEntry{.binding = 8,
+                                  .buffer = bezierHalfWidthsBuf,
+                                  .size = bezierHalfWidthsCapacity};
+  entries[9] = WGPUBindGroupEntry{
+      .binding = 9, .buffer = bezierColorsBuf, .size = bezierColorsCapacity};
+  entries[10] = WGPUBindGroupEntry{.binding = 10,
+                                   .buffer = nodeRectHalfHeightsBuf,
+                                   .size = nodeRectHalfHeightsCapacity};
 
   bindGroup = wgpuDeviceCreateBindGroup(
       device, WgpuPtr(WGPUBindGroupDescriptor{
                   .label = {"render bind group", WGPU_STRLEN},
                   .layout = bindGroupLayout,
-                  .entryCount = 7,
+                  .entryCount = 11,
                   .entries = entries,
               }));
   bindGroupDirty = false;
@@ -60,6 +71,14 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   size_t colorBytes = std::max<size_t>(fd.colors.size() * sizeof(uint32_t), 1);
   size_t edgeColorBytes =
       std::max<size_t>(fd.edgeColors.size() * sizeof(uint32_t), 1);
+  size_t bezierControlPointsBytes =
+      std::max<size_t>(fd.bezierControlPoints.size() * sizeof(float), 1);
+  size_t bezierHalfWidthsBytes =
+      std::max<size_t>(fd.bezierHalfWidths.size() * sizeof(float), 1);
+  size_t bezierColorsBytes =
+      std::max<size_t>(fd.bezierColors.size() * sizeof(uint32_t), 1);
+  size_t nodeRectHalfHeightsBytes =
+      std::max<size_t>(fd.nodeRectHalfHeights.size() * sizeof(float), 1);
 
   EnsureBuffer(positionsBuf, positionsCapacity, posBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
@@ -79,6 +98,21 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   EnsureBuffer(edgeColorBuf, edgeColorCapacity, edgeColorBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
               "render edge color");
+  EnsureBuffer(bezierControlPointsBuf, bezierControlPointsCapacity,
+              bezierControlPointsBytes,
+              WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+              "render bezier control points");
+  EnsureBuffer(bezierHalfWidthsBuf, bezierHalfWidthsCapacity,
+              bezierHalfWidthsBytes,
+              WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+              "render bezier half widths");
+  EnsureBuffer(bezierColorsBuf, bezierColorsCapacity, bezierColorsBytes,
+              WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+              "render bezier colors");
+  EnsureBuffer(nodeRectHalfHeightsBuf, nodeRectHalfHeightsCapacity,
+              nodeRectHalfHeightsBytes,
+              WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
+              "render node rect half heights");
 
   if (!fd.positions.empty())
     wgpuQueueWriteBuffer(queue, positionsBuf, 0, fd.positions.data(),
@@ -98,6 +132,21 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   if (!fd.edgeColors.empty())
     wgpuQueueWriteBuffer(queue, edgeColorBuf, 0, fd.edgeColors.data(),
                          fd.edgeColors.size() * sizeof(uint32_t));
+  if (!fd.bezierControlPoints.empty())
+    wgpuQueueWriteBuffer(queue, bezierControlPointsBuf, 0,
+                         fd.bezierControlPoints.data(),
+                         fd.bezierControlPoints.size() * sizeof(float));
+  if (!fd.bezierHalfWidths.empty())
+    wgpuQueueWriteBuffer(queue, bezierHalfWidthsBuf, 0,
+                         fd.bezierHalfWidths.data(),
+                         fd.bezierHalfWidths.size() * sizeof(float));
+  if (!fd.bezierColors.empty())
+    wgpuQueueWriteBuffer(queue, bezierColorsBuf, 0, fd.bezierColors.data(),
+                         fd.bezierColors.size() * sizeof(uint32_t));
+  if (!fd.nodeRectHalfHeights.empty())
+    wgpuQueueWriteBuffer(queue, nodeRectHalfHeightsBuf, 0,
+                         fd.nodeRectHalfHeights.data(),
+                         fd.nodeRectHalfHeights.size() * sizeof(float));
 
   if (bindGroupDirty)
     RebuildBindGroup();
@@ -161,6 +210,10 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   wgpuRenderPassEncoderSetBindGroup(pass, 0, bindGroup, 0, nullptr);
   wgpuRenderPassEncoderSetPipeline(pass, edgePipeline);
   wgpuRenderPassEncoderDraw(pass, 6, static_cast<uint32_t>(fd.edges.size() / 2),
+                           0, 0);
+  wgpuRenderPassEncoderSetPipeline(pass, bezierPipeline);
+  wgpuRenderPassEncoderDraw(pass, 2 * (kBezierSegmentsPerCurve + 1),
+                           static_cast<uint32_t>(fd.bezierHalfWidths.size()),
                            0, 0);
   wgpuRenderPassEncoderSetPipeline(pass, nodePipeline);
   wgpuRenderPassEncoderDraw(pass, 6, static_cast<uint32_t>(fd.nodeIds.size()),

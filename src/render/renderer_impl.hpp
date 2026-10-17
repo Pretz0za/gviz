@@ -44,6 +44,7 @@ struct Renderer::Impl {
   WGPUPipelineLayout pipelineLayout = nullptr;
   WGPURenderPipeline nodePipeline = nullptr;
   WGPURenderPipeline edgePipeline = nullptr;
+  WGPURenderPipeline bezierPipeline = nullptr;
 
   WGPUTextureFormat depthFormat = WGPUTextureFormat_Depth24Plus;
   WGPUTexture depthTexture = nullptr;
@@ -56,6 +57,10 @@ struct Renderer::Impl {
   WGPUBuffer radiusBuf = nullptr;
   WGPUBuffer colorBuf = nullptr;
   WGPUBuffer edgeColorBuf = nullptr;
+  WGPUBuffer bezierControlPointsBuf = nullptr;
+  WGPUBuffer bezierHalfWidthsBuf = nullptr;
+  WGPUBuffer bezierColorsBuf = nullptr;
+  WGPUBuffer nodeRectHalfHeightsBuf = nullptr;
   WGPUBindGroup bindGroup = nullptr;
 
   size_t positionsCapacity = 0;
@@ -64,6 +69,10 @@ struct Renderer::Impl {
   size_t radiusCapacity = 0;
   size_t colorCapacity = 0;
   size_t edgeColorCapacity = 0;
+  size_t bezierControlPointsCapacity = 0;
+  size_t bezierHalfWidthsCapacity = 0;
+  size_t bezierColorsCapacity = 0;
+  size_t nodeRectHalfHeightsCapacity = 0;
   bool bindGroupDirty = true;
 
   FrameData frameData;
