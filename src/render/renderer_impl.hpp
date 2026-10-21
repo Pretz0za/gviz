@@ -15,9 +15,9 @@
 struct GlobalsUBO {
   float viewProj[16];
   float viewport[2];
-  float edgeWidthPx;
   float worldPerPixel; // world-space size of one screen pixel; used to keep
                        // node antialiasing ~1px wide regardless of zoom
+  float _padV;         // WGSL aligns the next vec4f to 16 bytes
   float nodeColor[4];
   float edgeColor[4];
   float cameraRight[3]; // billboard basis nodes are expanded along, in world
@@ -58,8 +58,7 @@ struct Renderer::Impl {
   WGPUBuffer colorBuf = nullptr;
   WGPUBuffer edgeColorBuf = nullptr;
   WGPUBuffer bezierControlPointsBuf = nullptr;
-  WGPUBuffer bezierHalfWidthsBuf = nullptr;
-  WGPUBuffer bezierColorsBuf = nullptr;
+  WGPUBuffer halfWidthsBuf = nullptr;
   WGPUBuffer nodeRectHalfHeightsBuf = nullptr;
   WGPUBindGroup bindGroup = nullptr;
 
@@ -70,8 +69,7 @@ struct Renderer::Impl {
   size_t colorCapacity = 0;
   size_t edgeColorCapacity = 0;
   size_t bezierControlPointsCapacity = 0;
-  size_t bezierHalfWidthsCapacity = 0;
-  size_t bezierColorsCapacity = 0;
+  size_t halfWidthsCapacity = 0;
   size_t nodeRectHalfHeightsCapacity = 0;
   bool bindGroupDirty = true;
 

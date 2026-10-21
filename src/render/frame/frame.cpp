@@ -3,12 +3,13 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <cstring>
+#include <vector>
 
 void Renderer::Impl::RebuildBindGroup() {
   if (bindGroup)
     wgpuBindGroupRelease(bindGroup);
 
-  WGPUBindGroupEntry entries[11] = {};
+  WGPUBindGroupEntry entries[10] = {};
   entries[0] = WGPUBindGroupEntry{
       .binding = 0, .buffer = globalsBuf, .size = sizeof(GlobalsUBO)};
   entries[1] = WGPUBindGroupEntry{
@@ -26,20 +27,17 @@ void Renderer::Impl::RebuildBindGroup() {
   entries[7] = WGPUBindGroupEntry{.binding = 7,
                                   .buffer = bezierControlPointsBuf,
                                   .size = bezierControlPointsCapacity};
-  entries[8] = WGPUBindGroupEntry{.binding = 8,
-                                  .buffer = bezierHalfWidthsBuf,
-                                  .size = bezierHalfWidthsCapacity};
-  entries[9] = WGPUBindGroupEntry{
-      .binding = 9, .buffer = bezierColorsBuf, .size = bezierColorsCapacity};
-  entries[10] = WGPUBindGroupEntry{.binding = 10,
-                                   .buffer = nodeRectHalfHeightsBuf,
-                                   .size = nodeRectHalfHeightsCapacity};
+  entries[8] = WGPUBindGroupEntry{
+      .binding = 8, .buffer = halfWidthsBuf, .size = halfWidthsCapacity};
+  entries[9] = WGPUBindGroupEntry{.binding = 9,
+                                  .buffer = nodeRectHalfHeightsBuf,
+                                  .size = nodeRectHalfHeightsCapacity};
 
   bindGroup = wgpuDeviceCreateBindGroup(
       device, WgpuPtr(WGPUBindGroupDescriptor{
                   .label = {"render bind group", WGPU_STRLEN},
                   .layout = bindGroupLayout,
-                  .entryCount = 11,
+                  .entryCount = 10,
                   .entries = entries,
               }));
   bindGroupDirty = false;
@@ -73,10 +71,22 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
       std::max<size_t>(fd.edgeColors.size() * sizeof(uint32_t), 1);
   size_t bezierControlPointsBytes =
       std::max<size_t>(fd.bezierControlPoints.size() * sizeof(float), 1);
-  size_t bezierHalfWidthsBytes =
-      std::max<size_t>(fd.bezierHalfWidths.size() * sizeof(float), 1);
-  size_t bezierColorsBytes =
-      std::max<size_t>(fd.bezierColors.size() * sizeof(uint32_t), 1);
+
+  // Straight edges without their own HalfWidthComponent fall back to the
+  // uniform pixel width; bezier and straight edges are mutually exclusive
+  // within a frame, so this only runs when there are no curves to draw.
+  std::vector<float> straightHalfWidths;
+  const std::vector<float> *halfWidthsToUpload = &fd.halfWidths;
+  if (fd.bezierControlPoints.empty() && !fd.edges.empty()) {
+    straightHalfWidths.resize(fd.edges.size() / 2);
+    for (size_t i = 0; i < straightHalfWidths.size(); i++)
+      straightHalfWidths[i] =
+          fd.halfWidths[i] > 0.0f ? fd.halfWidths[i] : edgeWidthPx;
+    halfWidthsToUpload = &straightHalfWidths;
+  }
+  size_t halfWidthsBytes =
+      std::max<size_t>(halfWidthsToUpload->size() * sizeof(float), 1);
+
   size_t nodeRectHalfHeightsBytes =
       std::max<size_t>(fd.nodeRectHalfHeights.size() * sizeof(float), 1);
 
@@ -102,13 +112,9 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
               bezierControlPointsBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
               "render bezier control points");
-  EnsureBuffer(bezierHalfWidthsBuf, bezierHalfWidthsCapacity,
-              bezierHalfWidthsBytes,
+  EnsureBuffer(halfWidthsBuf, halfWidthsCapacity, halfWidthsBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
-              "render bezier half widths");
-  EnsureBuffer(bezierColorsBuf, bezierColorsCapacity, bezierColorsBytes,
-              WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
-              "render bezier colors");
+              "render half widths");
   EnsureBuffer(nodeRectHalfHeightsBuf, nodeRectHalfHeightsCapacity,
               nodeRectHalfHeightsBytes,
               WGPUBufferUsage_Storage | WGPUBufferUsage_CopyDst,
@@ -136,13 +142,9 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
     wgpuQueueWriteBuffer(queue, bezierControlPointsBuf, 0,
                          fd.bezierControlPoints.data(),
                          fd.bezierControlPoints.size() * sizeof(float));
-  if (!fd.bezierHalfWidths.empty())
-    wgpuQueueWriteBuffer(queue, bezierHalfWidthsBuf, 0,
-                         fd.bezierHalfWidths.data(),
-                         fd.bezierHalfWidths.size() * sizeof(float));
-  if (!fd.bezierColors.empty())
-    wgpuQueueWriteBuffer(queue, bezierColorsBuf, 0, fd.bezierColors.data(),
-                         fd.bezierColors.size() * sizeof(uint32_t));
+  if (!halfWidthsToUpload->empty())
+    wgpuQueueWriteBuffer(queue, halfWidthsBuf, 0, halfWidthsToUpload->data(),
+                         halfWidthsToUpload->size() * sizeof(float));
   if (!fd.nodeRectHalfHeights.empty())
     wgpuQueueWriteBuffer(queue, nodeRectHalfHeightsBuf, 0,
                          fd.nodeRectHalfHeights.data(),
@@ -158,7 +160,6 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
                  static_cast<uint32_t>(fbh));
   globals.viewport[0] = static_cast<float>(fbw);
   globals.viewport[1] = static_cast<float>(fbh);
-  globals.edgeWidthPx = edgeWidthPx;
   globals.worldPerPixel = camera.WorldPerPixel(static_cast<float>(fbh));
   camera.Basis(globals.cameraRight, globals.cameraUp);
   std::memcpy(globals.nodeColor, nodeColor, sizeof(globals.nodeColor));
@@ -213,7 +214,7 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
                            0, 0);
   wgpuRenderPassEncoderSetPipeline(pass, bezierPipeline);
   wgpuRenderPassEncoderDraw(pass, 2 * (kBezierSegmentsPerCurve + 1),
-                           static_cast<uint32_t>(fd.bezierHalfWidths.size()),
+                           static_cast<uint32_t>(fd.halfWidths.size()),
                            0, 0);
   wgpuRenderPassEncoderSetPipeline(pass, nodePipeline);
   wgpuRenderPassEncoderDraw(pass, 6, static_cast<uint32_t>(fd.nodeIds.size()),

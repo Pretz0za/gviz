@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/graph_query.hpp"
+#include "render/render_query_system.hpp"
 #include <cstdint>
 #include <memory>
 #include <string>

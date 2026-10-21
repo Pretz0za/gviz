@@ -126,6 +126,30 @@ if(GVIZ_BUILD_RENDER)
     set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
     add_subdirectory("${GVIZ_GLFW_DIR}" glfw-build EXCLUDE_FROM_ALL)
 
+    set(GVIZ_WGSL_SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/render/gpu/shaders")
+    set(GVIZ_WGSL_SOURCES
+        "${GVIZ_WGSL_SHADER_DIR}/common.wgsl"
+        "${GVIZ_WGSL_SHADER_DIR}/node.wgsl"
+        "${GVIZ_WGSL_SHADER_DIR}/edge.wgsl"
+        "${GVIZ_WGSL_SHADER_DIR}/bezier.wgsl"
+    )
+    set(GVIZ_WGSL_GENERATED_DIR "${CMAKE_BINARY_DIR}/generated/render")
+    set(GVIZ_WGSL_GENERATED_HEADER "${GVIZ_WGSL_GENERATED_DIR}/gpu/shaders.hpp")
+
+    list(JOIN GVIZ_WGSL_SOURCES "|" GVIZ_WGSL_SOURCES_JOINED)
+    add_custom_command(
+        OUTPUT "${GVIZ_WGSL_GENERATED_HEADER}"
+        COMMAND ${CMAKE_COMMAND}
+            "-DWGSL_INPUTS=${GVIZ_WGSL_SOURCES_JOINED}"
+            "-DWGSL_OUTPUT=${GVIZ_WGSL_GENERATED_HEADER}"
+            "-DWGSL_VARNAME=kRenderWgslSource"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateWgslHeader.cmake"
+        DEPENDS ${GVIZ_WGSL_SOURCES} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateWgslHeader.cmake"
+        COMMENT "Embedding WGSL shaders into shaders.hpp"
+        VERBATIM
+    )
+    add_custom_target(gviz_shaders DEPENDS "${GVIZ_WGSL_GENERATED_HEADER}")
+
     add_library(gvizRender STATIC
         src/render/renderer.cpp
         src/render/gpu/device.cpp
@@ -133,6 +157,7 @@ if(GVIZ_BUILD_RENDER)
         src/render/camera/camera_control.cpp
         src/render/frame/frame.cpp
     )
+    add_dependencies(gvizRender gviz_shaders)
 
     if(GVIZ_DEBUG_CHARTS)
         set(GVIZ_IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third-party/imgui" CACHE PATH
@@ -178,6 +203,7 @@ if(GVIZ_BUILD_RENDER)
     target_include_directories(gvizRender
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
         PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/render
+        PRIVATE ${GVIZ_WGSL_GENERATED_DIR}
     )
     target_link_libraries(gvizRender
         PUBLIC gviz wgpu_native
@@ -195,6 +221,12 @@ if(GVIZ_BUILD_RENDER)
 
     add_executable(sankeyDemo examples/sankeyDemo.cpp)
     target_link_libraries(sankeyDemo PRIVATE gvizRender gviz)
+
+    add_executable(schnyderDemo examples/schnyderDemo.cpp)
+    target_link_libraries(schnyderDemo PRIVATE gvizRender gviz)
+
+    add_executable(springDemo examples/springDemo.cpp)
+    target_link_libraries(springDemo PRIVATE gvizRender gviz)
 endif()
 
 option(GVIZ_BUILD_TESTS "Build the gviz unit test suite" OFF)
