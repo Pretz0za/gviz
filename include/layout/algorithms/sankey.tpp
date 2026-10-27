@@ -20,6 +20,12 @@ double SankeyLayoutAlgorithm<G>::EdgeWeight(EdgeID id) const {
   return static_cast<double>(m_graph->GetWeight(id));
 }
 
+template <GraphLike G>
+double SankeyLayoutAlgorithm<G>::EdgeHalfWidth(EdgeID id) const {
+  double weight = EdgeWeight(id) * m_config->thicknessScale;
+  return std::max(weight / 2.0, m_config->minThickness / 2.0);
+}
+
 template <GraphLike G> void SankeyLayoutAlgorithm<G>::AssignLayers() {
   uint32_t n = m_graph->Size();
   std::vector<uint32_t> indegree(n, 0);
@@ -88,15 +94,17 @@ template <GraphLike G> void SankeyLayoutAlgorithm<G>::ComputeExtents() {
   uint32_t n = m_graph->Size();
   for (uint32_t i = 0; i < n; i++) {
     NodeID sparse = m_graph->MapToSparse(DenseNodeID{i});
-    double inSum = 0.0;
+    double inHalf = 0.0;
     for (const AdjEntry &adj : m_graph->InNeighbors(sparse))
-      inSum += EdgeWeight(adj.edge);
-    double outSum = 0.0;
+      inHalf += EdgeHalfWidth(adj.edge);
+    double outHalf = 0.0;
     for (const AdjEntry &adj : m_graph->OutNeighbors(sparse))
-      outSum += EdgeWeight(adj.edge);
-    double flow = std::max(inSum, outSum);
-    m_info->Find(i)->extent =
-        std::max(flow * m_config->thicknessScale, m_config->minThickness);
+      outHalf += EdgeHalfWidth(adj.edge);
+    SankeyNodeDecorator *info = m_info->Find(i);
+    info->inHalf = inHalf;
+    info->outHalf = outHalf;
+    info->extent =
+        std::max(2.0 * std::max(inHalf, outHalf), m_config->minThickness);
   }
 }
 
@@ -113,8 +121,8 @@ template <GraphLike G> void SankeyLayoutAlgorithm<G>::PlaceNodes() {
       double center = y + info->extent / 2.0;
       pos[v.Raw()].pos[0] = m_columnX[i];
       pos[v.Raw()].pos[1] = center;
-      info->inCursor = y;
-      info->outCursor = y;
+      info->inCursor = center - info->inHalf;
+      info->outCursor = center - info->outHalf;
       y += info->extent + m_config->nodeSpacing;
     }
   }
@@ -138,9 +146,8 @@ void SankeyLayoutAlgorithm<G>::AssignPortsAndBuildCurves() {
         DenseNodeID target = m_graph->MapToDense(adj.other);
         SankeyNodeDecorator *dstInfo = m_info->Find(target.Raw());
 
-        double weight = EdgeWeight(adj.edge) * m_config->thicknessScale;
-        double halfWidth =
-            std::max(weight / 2.0, m_config->minThickness / 2.0);
+        double halfWidth = EdgeHalfWidth(adj.edge);
+        double weight = halfWidth * 2.0;
 
         double sy = srcInfo->outCursor + halfWidth;
         srcInfo->outCursor += weight;

@@ -125,9 +125,12 @@ bool Renderer::Impl::CreatePipelines() {
       .buffer = {.type = WGPUBufferBindingType_Uniform},
   };
   for (uint32_t i = 1; i < 10; i++) {
+    WGPUShaderStage visibility = WGPUShaderStage_Vertex;
+    if (i == 7)
+      visibility = WGPUShaderStage_Vertex | WGPUShaderStage_Fragment;
     entries[i] = WGPUBindGroupLayoutEntry{
         .binding = i,
-        .visibility = WGPUShaderStage_Vertex,
+        .visibility = visibility,
         .buffer = {.type = WGPUBufferBindingType_ReadOnlyStorage},
     };
   }
@@ -173,11 +176,11 @@ bool Renderer::Impl::CreatePipelines() {
   };
 
   const char *labels[3] = {"render nodes", "render edges", "render bezier"};
-  const char *vsEntries[3] = {"vsNode", "vsEdge", "vsBezierSegment"};
-  const char *fsEntries[3] = {"fsNode", "fsEdge", "fsBezierSegment"};
+  const char *vsEntries[3] = {"vsNode", "vsEdge", "vsBezier"};
+  const char *fsEntries[3] = {"fsNode", "fsEdge", "fsBezier"};
   const WGPUPrimitiveTopology topologies[3] = {WGPUPrimitiveTopology_TriangleList,
                                                WGPUPrimitiveTopology_TriangleList,
-                                               WGPUPrimitiveTopology_TriangleStrip};
+                                               WGPUPrimitiveTopology_TriangleList};
   WGPURenderPipeline pipelines[3] = {nullptr, nullptr, nullptr};
 
   for (int i = 0; i < 3; i++) {

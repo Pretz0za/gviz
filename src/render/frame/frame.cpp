@@ -213,7 +213,7 @@ bool Renderer::Impl::ApplyFrame(const FrameData &fd) {
   wgpuRenderPassEncoderDraw(pass, 6, static_cast<uint32_t>(fd.edges.size() / 2),
                            0, 0);
   wgpuRenderPassEncoderSetPipeline(pass, bezierPipeline);
-  wgpuRenderPassEncoderDraw(pass, 2 * (kBezierSegmentsPerCurve + 1),
+  wgpuRenderPassEncoderDraw(pass, 6,
                            static_cast<uint32_t>(fd.halfWidths.size()),
                            0, 0);
   wgpuRenderPassEncoderSetPipeline(pass, nodePipeline);

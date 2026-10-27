@@ -64,6 +64,7 @@ private:
   void AssignPortsAndBuildCurves();
 
   double EdgeWeight(EdgeID id) const;
+  double EdgeHalfWidth(EdgeID id) const;
 
   Configuration *m_config;
   DecoratedGraph<G> m_dg;
