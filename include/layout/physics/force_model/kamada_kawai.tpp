@@ -4,16 +4,10 @@
 #include "layout/physics/force_model/kamada_kawai.hpp"
 
 template <GraphLike G>
-GRIPKamadaKawai<G>::GRIPKamadaKawai(G &graph, Configuration *config)
+GRIPKamadaKawai<G>::GRIPKamadaKawai(DecoratedGraph<G> &dg, Configuration *config)
     : m_config(RequireConfiguration(config)),
-      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
-      m_distanceCalc(graph) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr) {
-    throw MissingResourceException<DimensionResource>();
-  }
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+      m_physics(dg.nodeSpace.template GetPool<PhysicsComponent>()),
+      m_distanceCalc(dg), m_dimension(dg.dimension) {}
 
 template <GraphLike G>
 void GRIPKamadaKawai<G>::Tick(DenseNodeID v, DenseNodeID u,

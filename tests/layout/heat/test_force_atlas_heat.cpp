@@ -6,14 +6,15 @@
 #include "catch_amalgamated.hpp"
 #include "layout/heat/force_atlas.hpp"
 
+#include "graph/decorated_graph.hpp"
 #include "helpers/graph_helpers.hpp"
 
 #include <cmath>
 
 namespace {
 DenseComponentPool<ForceAtlasHeatComponent> *
-WithForceAtlasHeat(Graph &g) {
-  return g.NodeSpace().SetPool<ForceAtlasHeatComponent>();
+WithForceAtlasHeat(DecoratedGraph<Graph> &dg) {
+  return dg.nodeSpace.SetPool<ForceAtlasHeatComponent>();
 }
 } // namespace
 
@@ -21,11 +22,12 @@ using test_helpers::MakeGraph;
 
 TEST_CASE("Observe measures swinging as the change in force since last tick",
          "[layout][heat][force_atlas]") {
-  Graph g = MakeGraph(1, 2);
-  auto *heatPool = WithForceAtlasHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *heatPool = WithForceAtlasHeat(dg);
 
   ForceAtlasHeat<Graph>::Configuration heatConfig;
-  ForceAtlasHeat<Graph> heat(g, &heatConfig);
+  ForceAtlasHeat<Graph> heat(dg, &heatConfig);
   heat.BeginTick();
 
   double force[2] = {1.0, 0.0};
@@ -38,11 +40,12 @@ TEST_CASE("Observe measures swinging as the change in force since last tick",
 
 TEST_CASE("Observe with a repeated identical force reports zero swinging",
          "[layout][heat][force_atlas]") {
-  Graph g = MakeGraph(1, 2);
-  WithForceAtlasHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  WithForceAtlasHeat(dg);
 
   ForceAtlasHeat<Graph>::Configuration heatConfig;
-  ForceAtlasHeat<Graph> heat(g, &heatConfig);
+  ForceAtlasHeat<Graph> heat(dg, &heatConfig);
   double force[2] = {2.0, 3.0};
 
   heat.BeginTick();
@@ -57,11 +60,12 @@ TEST_CASE("Observe with a repeated identical force reports zero swinging",
 }
 
 TEST_CASE("SpeedFactor decreases as a node's swinging increases", "[layout][heat][force_atlas]") {
-  Graph g = MakeGraph(2, 2);
-  WithForceAtlasHeat(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  WithForceAtlasHeat(dg);
 
   ForceAtlasHeat<Graph>::Configuration heatConfig;
-  ForceAtlasHeat<Graph> heat(g, &heatConfig);
+  ForceAtlasHeat<Graph> heat(dg, &heatConfig);
 
   heat.BeginTick();
   double smallForce[2] = {0.1, 0.0};
@@ -78,11 +82,12 @@ TEST_CASE("SpeedFactor decreases as a node's swinging increases", "[layout][heat
 TEST_CASE("UpdateGlobalSpeed leaves the global speed at its initial value "
          "when no traction has been observed",
          "[layout][heat][force_atlas]") {
-  Graph g = MakeGraph(1, 2);
-  WithForceAtlasHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  WithForceAtlasHeat(dg);
 
   ForceAtlasHeat<Graph>::Configuration heatConfig;
-  ForceAtlasHeat<Graph> heat(g, &heatConfig);
+  ForceAtlasHeat<Graph> heat(dg, &heatConfig);
   heat.BeginTick();
   // No Observe() call: totalTraction stays 0, below the epsilon guard.
   heat.UpdateGlobalSpeed(1);
@@ -94,11 +99,12 @@ TEST_CASE("UpdateGlobalSpeed leaves the global speed at its initial value "
 TEST_CASE("UpdateGlobalSpeed drops global speed toward the jitter-tolerance-"
          "derived target on its first update",
          "[layout][heat][force_atlas]") {
-  Graph g = MakeGraph(1, 2);
-  WithForceAtlasHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  WithForceAtlasHeat(dg);
 
   ForceAtlasHeat<Graph>::Configuration heatConfig;
-  ForceAtlasHeat<Graph> heat(g, &heatConfig);
+  ForceAtlasHeat<Graph> heat(dg, &heatConfig);
 
   double force[2] = {1.0, 0.0};
   heat.BeginTick();

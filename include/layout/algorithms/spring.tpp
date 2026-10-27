@@ -10,25 +10,23 @@
 
 template <GraphLike G>
 SpringLayoutAlgorithm<G>::SpringLayoutAlgorithm(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
+    : m_config(RequireConfiguration(config)), m_dg(graph), m_graph(&graph),
+      m_dimension(m_config->dimension) {
+  m_dg.dimension = m_dimension;
 
   m_positions =
-      graph.NodeSpace().template SetPool<PositionComponent>(m_dimension);
-  m_velocity = graph.NodeSpace().template SetPool<VelocityComponent>();
-  m_physics = graph.NodeSpace().template SetPool<PhysicsComponent>();
-  m_mass = graph.NodeSpace().template SetPool<MassComponent>();
-  m_springs = graph.EdgeSpace().template SetPool<SpringComponent>();
+      m_dg.nodeSpace.template SetPool<PositionComponent>(m_dimension);
+  m_velocity = m_dg.nodeSpace.template SetPool<VelocityComponent>();
+  m_physics = m_dg.nodeSpace.template SetPool<PhysicsComponent>();
+  m_mass = m_dg.nodeSpace.template SetPool<MassComponent>();
+  m_springs = m_dg.edgeSpace.template SetPool<SpringComponent>();
 
   for (SpringComponent &spring : m_springs->Data()) {
     spring.stiffness = m_config->stiffness;
     spring.restLength = m_config->restLength;
   }
 
-  m_fixed = &graph.template SetResource<FixedNodesResource>(graph.Size(), 0);
+  m_fixed = &m_dg.template SetResource<FixedNodesResource>(graph.Size(), 0);
 }
 
 template <GraphLike G>

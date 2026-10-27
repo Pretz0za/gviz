@@ -185,24 +185,3 @@ TEST_CASE("Version increases when the graph is mutated", "[graph]") {
   uint64_t v3 = g.Version();
   REQUIRE(v3 > v2);
 }
-
-TEST_CASE("Resources can be set, fetched, and queried for presence",
-         "[graph]") {
-  Graph g;
-  REQUIRE_FALSE(g.HasResource<int>());
-  REQUIRE(g.GetResource<int>() == nullptr);
-
-  int &value = g.SetResource<int>(7);
-  REQUIRE(value == 7);
-  REQUIRE(g.HasResource<int>());
-  REQUIRE(*g.GetResource<int>() == 7);
-}
-
-TEST_CASE("SetResource does not overwrite an already-set resource",
-         "[graph]") {
-  Graph g;
-  g.SetResource<int>(1);
-  int &second = g.SetResource<int>(2);
-  REQUIRE(second == 1);
-  REQUIRE(*g.GetResource<int>() == 1);
-}

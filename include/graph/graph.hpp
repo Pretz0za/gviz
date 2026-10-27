@@ -2,17 +2,13 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <ranges>
-#include <typeindex>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "ds/flags.hpp"
 #include "ecs/components.hpp"
 #include "ecs/index_space.hpp"
-#include "ecs/resource.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/components/degree.hpp"
 #include "graph/components/edge.hpp"
@@ -34,6 +30,7 @@ public:
   std::pair<EdgeID, EdgeID> AddUndirectedEdge(NodeID a, NodeID b, float weight);
   bool HasEdge(EdgeID id) const;
   EdgeComponent GetEdge(EdgeID id) const;
+  float GetWeight(EdgeID id) const;
 
   const std::vector<AdjEntry> &OutNeighbors(NodeID id) const;
   const std::vector<AdjEntry> &InNeighbors(NodeID id) const;
@@ -77,13 +74,6 @@ public:
 
   bool IsDirected() const { return m_flags.Has(GraphFlags::Directed); }
 
-  IndexSpace &NodeSpace();
-  IndexSpace &EdgeSpace();
-
-  template <typename T, typename... Args> T &SetResource(Args &&...args);
-  template <typename T> T *GetResource();
-  template <typename T> bool HasResource() const;
-
 private:
   IndexSpace m_nodeSpace;
   IndexSpace m_edgeSpace;
@@ -94,11 +84,7 @@ private:
   DenseComponentPool<WeightComponent> *m_weightPool;
   uint64_t m_version = 0;
   Flags<GraphFlags> m_flags = GraphFlags::None;
-  std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
-      m_resources;
 };
-
-#include "graph/graph.tpp"
 
 #include "concept/graphLike.hpp"
 static_assert(GraphLike<Graph>);

@@ -19,7 +19,7 @@ using test_helpers::MakeGraph;
 
 namespace {
 Graph MakePathGraph(uint32_t length) {
-  Graph g = MakeGraph(length, 2);
+  Graph g = MakeGraph(length);
   for (uint32_t i = 0; i + 1 < length; i++)
     g.AddUndirectedEdge(NodeID(i), NodeID(i + 1));
   return g;
@@ -34,7 +34,7 @@ TEST_CASE("RunFiltration builds the same nested layers MisFiltrationSystem "
   GRIPLayoutAlgorithm<Graph> alg(g, &algConfig);
   alg.RunFiltration();
 
-  auto *filtration = g.GetResource<NestedFiltrationResult>();
+  auto *filtration = alg.Decorated().GetResource<NestedFiltrationResult>();
   REQUIRE(filtration->m_layerCount == 2);
   REQUIRE(filtration->m_borders[0] == 6);
   REQUIRE(filtration->m_borders[1] == 3);
@@ -65,14 +65,14 @@ TEST_CASE("Walking TransitionState down to 0 places every node with finite "
 
   REQUIRE(guard < 100); // didn't loop forever
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   for (uint32_t i = 0; i < g.Size(); i++) {
     PositionComponent *p = positions->Find(i);
     REQUIRE(std::isfinite(p->pos[0]));
     REQUIRE(std::isfinite(p->pos[1]));
   }
 
-  auto *visible = g.GetResource<VisibleNodesResource>();
+  auto *visible = alg.Decorated().GetResource<VisibleNodesResource>();
   for (uint32_t i = 0; i < g.Size(); i++)
     REQUIRE(visible->Test(DenseNodeID(i)));
 }
@@ -93,7 +93,7 @@ TEST_CASE("Tick after the full transition sequence runs without error and "
 
   REQUIRE_NOTHROW(alg.Tick());
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   for (uint32_t i = 0; i < g.Size(); i++) {
     PositionComponent *p = positions->Find(i);
     REQUIRE(std::isfinite(p->pos[0]));

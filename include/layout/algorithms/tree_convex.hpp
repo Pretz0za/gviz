@@ -5,6 +5,7 @@
 #include "ds/state_machine.hpp"
 #include "ecs/components.hpp"
 #include "graph/components/adjacency.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
 #include "layout/animation.hpp"
@@ -24,6 +25,7 @@ public:
     double minSeparation = 40.0;
     double depthDecay = 0.7;
     double subtreeSizeScale = 1.0;
+    uint8_t dimension = 2;
 
     Configuration WithEdgeLength(double v) { edgeLength = v; return *this; }
     Configuration WithMinSeparation(double v) { minSeparation = v; return *this; }
@@ -57,6 +59,8 @@ public:
 
   PositionAnimationSystem<G> &Animation() { return m_animation; }
 
+  DecoratedGraph<G> &Decorated() { return m_dg; }
+
 private:
   struct ForkSegment {
     uint32_t begin;
@@ -89,6 +93,7 @@ private:
   double EdgeLengthFor(DenseNodeID topVertex) const;
 
   Configuration *m_config;
+  DecoratedGraph<G> m_dg;
   G *m_graph;
   bool m_respectEmbedding;
   DenseComponentPool<ConvexNodeDecorator> *m_info;

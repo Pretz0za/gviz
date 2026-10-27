@@ -9,6 +9,7 @@
 #include "catch_amalgamated.hpp"
 #include "layout/heat/localheat_grip.hpp"
 
+#include "graph/decorated_graph.hpp"
 #include "helpers/graph_helpers.hpp"
 
 using test_helpers::MakeGraph;
@@ -17,13 +18,14 @@ using test_helpers::WithPhysics;
 
 TEST_CASE("With no displacement history, heat is set to the fixed initial value",
          "[layout][heat][localheat_grip]") {
-  Graph g = MakeGraph(1, 2);
-  auto *physics = WithPhysics(g);
-  auto *heat = WithLocalHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *physics = WithPhysics(dg);
+  auto *heat = WithLocalHeat(dg);
   heat->Find(0)->heat = 99.0; // should be overwritten, not accumulated
 
   LocalHeatGrip<Graph>::Configuration systemConfig;
-  LocalHeatGrip<Graph> system(g, &systemConfig);
+  LocalHeatGrip<Graph> system(dg, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   REQUIRE(heat->Find(0)->heat == Catch::Approx(10.0 / 6.0));
@@ -32,9 +34,10 @@ TEST_CASE("With no displacement history, heat is set to the fixed initial value"
 
 TEST_CASE("A displacement pointing the same way as last tick raises the heat",
          "[layout][heat][localheat_grip]") {
-  Graph g = MakeGraph(1, 2);
-  auto *physics = WithPhysics(g);
-  auto *heat = WithLocalHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *physics = WithPhysics(dg);
+  auto *heat = WithLocalHeat(dg);
 
   PhysicsComponent *p = physics->Find(0);
   p->disp[0] = 1.0;
@@ -45,7 +48,7 @@ TEST_CASE("A displacement pointing the same way as last tick raises the heat",
   heat->Find(0)->oldCos = 0.0; // not > 0, so the "steady streak" bonus doesn't apply yet
 
   LocalHeatGrip<Graph>::Configuration systemConfig;
-  LocalHeatGrip<Graph> system(g, &systemConfig);
+  LocalHeatGrip<Graph> system(dg, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   // cos = 1, oldCos was 0 (not > 0) -> heat *= (1 + cos * 0.15) = 1.15
@@ -55,9 +58,10 @@ TEST_CASE("A displacement pointing the same way as last tick raises the heat",
 
 TEST_CASE("Two consecutive ticks pointing the same way compound the bonus",
          "[layout][heat][localheat_grip]") {
-  Graph g = MakeGraph(1, 2);
-  auto *physics = WithPhysics(g);
-  auto *heat = WithLocalHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *physics = WithPhysics(dg);
+  auto *heat = WithLocalHeat(dg);
 
   PhysicsComponent *p = physics->Find(0);
   p->disp[0] = 1.0;
@@ -68,7 +72,7 @@ TEST_CASE("Two consecutive ticks pointing the same way compound the bonus",
   heat->Find(0)->oldCos = 0.5; // already positive from a prior tick
 
   LocalHeatGrip<Graph>::Configuration systemConfig;
-  LocalHeatGrip<Graph> system(g, &systemConfig);
+  LocalHeatGrip<Graph> system(dg, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   // cos = 1, oldCos > 0 -> heat *= (1 + cos * 0.15 * 3.0) = 1.45
@@ -77,9 +81,10 @@ TEST_CASE("Two consecutive ticks pointing the same way compound the bonus",
 
 TEST_CASE("A displacement reversing direction cools the node down",
          "[layout][heat][localheat_grip]") {
-  Graph g = MakeGraph(1, 2);
-  auto *physics = WithPhysics(g);
-  auto *heat = WithLocalHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *physics = WithPhysics(dg);
+  auto *heat = WithLocalHeat(dg);
 
   PhysicsComponent *p = physics->Find(0);
   p->disp[0] = -1.0;
@@ -90,7 +95,7 @@ TEST_CASE("A displacement reversing direction cools the node down",
   heat->Find(0)->oldCos = 1.0;
 
   LocalHeatGrip<Graph>::Configuration systemConfig;
-  LocalHeatGrip<Graph> system(g, &systemConfig);
+  LocalHeatGrip<Graph> system(dg, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   // cos = -1 -> heat *= (1 + (-1) * 0.15) = 0.85
@@ -100,9 +105,10 @@ TEST_CASE("A displacement reversing direction cools the node down",
 
 TEST_CASE("A zero displacement leaves heat and oldCos unchanged",
          "[layout][heat][localheat_grip]") {
-  Graph g = MakeGraph(1, 2);
-  auto *physics = WithPhysics(g);
-  auto *heat = WithLocalHeat(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *physics = WithPhysics(dg);
+  auto *heat = WithLocalHeat(dg);
 
   PhysicsComponent *p = physics->Find(0);
   p->disp[0] = 0.0;
@@ -113,7 +119,7 @@ TEST_CASE("A zero displacement leaves heat and oldCos unchanged",
   heat->Find(0)->oldCos = 0.7;
 
   LocalHeatGrip<Graph>::Configuration systemConfig;
-  LocalHeatGrip<Graph> system(g, &systemConfig);
+  LocalHeatGrip<Graph> system(dg, &systemConfig);
   system.Tick(DenseNodeID(0));
 
   REQUIRE(heat->Find(0)->heat == Catch::Approx(3.0));

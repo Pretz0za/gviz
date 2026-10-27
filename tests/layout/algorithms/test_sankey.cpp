@@ -23,12 +23,12 @@ TEST_CASE("Linear chain is assigned one node per layer",
 
   REQUIRE(alg.LayerCount() == 3);
 
-  auto *info = g.NodeSpace().GetPool<SankeyNodeDecorator>();
+  auto *info = alg.Decorated().nodeSpace.GetPool<SankeyNodeDecorator>();
   REQUIRE(info->Find(0)->layer == 0);
   REQUIRE(info->Find(1)->layer == 1);
   REQUIRE(info->Find(2)->layer == 2);
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   REQUIRE(positions->Find(1)->pos[0] > positions->Find(0)->pos[0]);
   REQUIRE(positions->Find(2)->pos[0] > positions->Find(1)->pos[0]);
 }
@@ -43,8 +43,8 @@ TEST_CASE("Edges receive a bezier control-point curve with positive width",
   SankeyLayoutAlgorithm<Graph> alg(g, &config);
   alg.Layout();
 
-  auto *curves = g.EdgeSpace().GetPool<CubicBezierComponent>();
-  auto *halfWidths = g.EdgeSpace().GetPool<HalfWidthComponent>();
+  auto *curves = alg.Decorated().edgeSpace.GetPool<CubicBezierComponent>();
+  auto *halfWidths = alg.Decorated().edgeSpace.GetPool<HalfWidthComponent>();
   CubicBezierComponent *curve = curves->Find(g.MapToDense(e).Raw());
   HalfWidthComponent *halfWidth = halfWidths->Find(g.MapToDense(e).Raw());
 
@@ -65,8 +65,8 @@ TEST_CASE("Diverging flow splits a node's outgoing ports without overlap",
   SankeyLayoutAlgorithm<Graph> alg(g, &config);
   alg.Layout();
 
-  auto *curves = g.EdgeSpace().GetPool<CubicBezierComponent>();
-  auto *halfWidths = g.EdgeSpace().GetPool<HalfWidthComponent>();
+  auto *curves = alg.Decorated().edgeSpace.GetPool<CubicBezierComponent>();
+  auto *halfWidths = alg.Decorated().edgeSpace.GetPool<HalfWidthComponent>();
   CubicBezierComponent *ca = curves->Find(g.MapToDense(a).Raw());
   CubicBezierComponent *cb = curves->Find(g.MapToDense(b).Raw());
 

@@ -3,6 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/physics.hpp"
@@ -35,7 +36,7 @@ public:
     }
   };
 
-  VanillaFruchtermanReingold(G &graph, Configuration *config);
+  VanillaFruchtermanReingold(DecoratedGraph<G> &dg, Configuration *config);
 
   Configuration *Config() { return m_config; }
 
@@ -73,7 +74,7 @@ public:
     }
   };
 
-  GRIPFruchtermanReingold(G &graph, Configuration *config);
+  GRIPFruchtermanReingold(DecoratedGraph<G> &dg, Configuration *config);
 
   Configuration *Config() { return m_config; }
 

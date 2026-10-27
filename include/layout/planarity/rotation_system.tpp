@@ -10,9 +10,9 @@
 #include <vector>
 
 template <GraphLike G>
-PlanarRotationSystem<G>::PlanarRotationSystem(G &graph)
-    : m_graph(&graph),
-      m_rotation(graph.NodeSpace().template SetPool<PlanarRotationAdjacencyComponent>()) {}
+PlanarRotationSystem<G>::PlanarRotationSystem(DecoratedGraph<G> &dg)
+    : m_graph(dg.graph),
+      m_rotation(dg.nodeSpace.template SetPool<PlanarRotationAdjacencyComponent>()) {}
 
 template <GraphLike G> void PlanarRotationSystem<G>::Compute() {
   uint32_t n = m_graph->Size();

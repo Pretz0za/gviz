@@ -13,29 +13,23 @@
 #include <limits>
 
 template <GraphLike G>
-GRIPPhysicsSystem<G>::GRIPPhysicsSystem(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph),
-      m_knnSystem(graph), m_kkForces(graph, &m_config->kkConfig),
-      m_frForces(graph, &m_config->frConfig),
-      m_knearest(graph.NodeSpace().template GetPool<KNearestComponent>()),
-      m_positions(graph.NodeSpace().template GetPool<PositionComponent>()),
-      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
-      m_heat(graph.NodeSpace().template GetPool<LocalHeatComponent>()),
-      m_filtration(graph.template GetResource<NestedFiltrationResult>()),
-      m_visible(graph.template GetResource<VisibleNodesResource>()),
-      m_heatsystem(graph, &m_config->heatConfig) {
+GRIPPhysicsSystem<G>::GRIPPhysicsSystem(DecoratedGraph<G> &dg, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_graph(dg.graph),
+      m_knnSystem(dg), m_kkForces(dg, &m_config->kkConfig),
+      m_frForces(dg, &m_config->frConfig),
+      m_knearest(dg.nodeSpace.template GetPool<KNearestComponent>()),
+      m_positions(dg.nodeSpace.template GetPool<PositionComponent>()),
+      m_physics(dg.nodeSpace.template GetPool<PhysicsComponent>()),
+      m_heat(dg.nodeSpace.template GetPool<LocalHeatComponent>()),
+      m_filtration(dg.template GetResource<NestedFiltrationResult>()),
+      m_visible(dg.template GetResource<VisibleNodesResource>()),
+      m_heatsystem(dg, &m_config->heatConfig), m_dimension(dg.dimension) {
 
   if (m_filtration == nullptr)
     throw MissingResourceException<NestedFiltrationResult>();
 
   if (m_visible == nullptr)
     throw MissingResourceException<VisibleNodesResource>();
-
-  DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
-  if (dim == nullptr) {
-    throw MissingResourceException<DimensionResource>();
-  }
-  m_dimension = static_cast<uint8_t>(*dim);
 }
 
 template <GraphLike G>

@@ -2,6 +2,7 @@
 
 #include "concept/graphLike.hpp"
 #include "ds/vector.hpp"
+#include "graph/decorated_graph.hpp"
 #include "memory/arena.hpp"
 #include <array>
 #include <cmath>
@@ -129,7 +130,7 @@ private:
 };
 
 namespace Helpers {
-template <GraphLike G> AABB GetBoundingBox(G *graph);
+template <GraphLike G> AABB GetBoundingBox(DecoratedGraph<G> *dg);
 };
 
 }; // namespace SpacialIndex

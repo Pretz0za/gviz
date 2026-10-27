@@ -1,3 +1,4 @@
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "layout/algorithms/sankey.hpp"
 #include "layout/components/radius.hpp"
@@ -51,23 +52,24 @@ int main() {
   SankeyLayoutAlgorithm<Graph> layout(g, &layoutConfig);
   layout.Tick();
 
-  auto *radii = g.NodeSpace().SetPool<RadiusComponent>(MANUAL);
+  DecoratedGraph<Graph> &dg = layout.Decorated();
+  auto *radii = dg.nodeSpace.SetPool<RadiusComponent>(MANUAL);
   for (NodeID nid : g.Nodes())
     radii->Find(g.MapToDense(nid).Raw())->radius = layoutConfig.nodeWidth / 2.0;
 
-  auto *edgeColors = g.EdgeSpace().SetPool<ColorComponent>();
+  auto *edgeColors = dg.edgeSpace.SetPool<ColorComponent>();
   for (EdgeID eid : g.Edges())
     edgeColors->Find(g.MapToDense(eid).Raw())->color =
         PackColor(0.3f, 0.55f, 0.85f, 0.65f);
 
-  Renderer renderer(1280, 720, "gviz sankeyDemo", g);
+  Renderer renderer(1280, 720, "gviz sankeyDemo", dg);
   renderer.SetLockToFit(true);
 
 #ifdef GVIZ_DEBUG_CHARTS
   renderer.DebugConfigs().Add("Sankey", layoutConfig);
 #endif
 
-  while (renderer.Frame(g)) {
+  while (renderer.Frame(dg)) {
     layout.Tick();
   }
 

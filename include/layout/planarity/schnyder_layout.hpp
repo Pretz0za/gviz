@@ -3,6 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "layout/components/position.hpp"
 #include "layout/planarity/rotation_system.hpp"
 #include "layout/planarity/schnyder_wood.hpp"
@@ -40,12 +41,15 @@ public:
   void Tick();
   void RandomizeRoots();
 
+  DecoratedGraph<G> &Decorated() { return m_dg; }
+
 private:
   void RebuildWood(NodeID s0, NodeID s1);
   void ComputeCoordinates();
 
   Configuration *m_config;
   G *m_graph;
+  DecoratedGraph<G> m_dg;
   DenseComponentPool<PositionComponent> *m_positions;
   PlanarRotationSystem<G> m_rotation;
   std::unique_ptr<SchnyderWood<G>> m_wood;

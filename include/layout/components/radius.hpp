@@ -22,8 +22,9 @@ enum RadiusFunction {
 template <>
 class DenseComponentPool<RadiusComponent> : public IDenseStorageListener {
 public:
-  DenseComponentPool(const IndexSpace &admin, RadiusFunction function = MANUAL)
-      : m_data(), m_function(function), m_degreeView(admin, michaelisMenten) {}
+  DenseComponentPool(const IndexSpace &, RadiusFunction function = MANUAL,
+                     DenseComponentPool<DegreeComponent> *degreePool = nullptr)
+      : m_data(), m_function(function), m_degreeView(degreePool, michaelisMenten) {}
   ~DenseComponentPool() override = default;
 
   void SetFunction(RadiusFunction target) {

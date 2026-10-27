@@ -12,15 +12,10 @@ constexpr double kForceAtlasEpsilon = 1e-7;
 } // namespace
 
 template <GraphLike G>
-ForceAtlasHeat<G>::ForceAtlasHeat(G &graph, Configuration *config)
+ForceAtlasHeat<G>::ForceAtlasHeat(DecoratedGraph<G> &dg, Configuration *config)
     : m_config(RequireConfiguration(config)),
-      m_heatPool(
-          graph.NodeSpace().template GetPool<ForceAtlasHeatComponent>()) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+      m_heatPool(dg.nodeSpace.template GetPool<ForceAtlasHeatComponent>()),
+      m_dimension(dg.dimension) {}
 
 template <GraphLike G> void ForceAtlasHeat<G>::BeginTick() {
   m_totalSwinging = 0.0;

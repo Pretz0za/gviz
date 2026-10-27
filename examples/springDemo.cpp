@@ -1,3 +1,4 @@
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "layout/algorithms/spring.hpp"
 #include "layout/components/radius.hpp"
@@ -35,7 +36,6 @@ int main() {
 
   std::vector<std::vector<NodeID>> nodes;
   Graph g = BuildGrid(rows, cols, nodes);
-  g.SetResource<DimensionResource>(DimensionResource::D2);
 
   SpringLayoutAlgorithm<Graph>::Configuration layoutConfig;
   layoutConfig.stiffness = 2.0;
@@ -43,10 +43,11 @@ int main() {
   layoutConfig.damping = 1.5;
   layoutConfig.timeStep = 0.08;
   SpringLayoutAlgorithm<Graph> layout(g, &layoutConfig);
+  DecoratedGraph<Graph> &dg = layout.Decorated();
 
   PositionRandomized<Graph>::Configuration randomConfig;
   randomConfig.boundingBoxWidth = static_cast<uint32_t>(squareSide * 0.6);
-  PositionRandomized<Graph> randomizer(g, &randomConfig);
+  PositionRandomized<Graph> randomizer(dg, &randomConfig);
   randomizer.PlaceAll();
 
   NodeID topLeft = nodes[0][0];
@@ -68,11 +69,11 @@ int main() {
   layout.Fix(bottomLeft);
   layout.Fix(bottomRight);
 
-  auto *radii = g.NodeSpace().SetPool<RadiusComponent>(MANUAL);
+  auto *radii = dg.nodeSpace.SetPool<RadiusComponent>(MANUAL);
   for (uint32_t i = 0; i < radii->Size(); i++)
     radii->Data()[i].radius = 6.0;
 
-  Renderer renderer(1280, 720, "gviz springDemo", g);
+  Renderer renderer(1280, 720, "gviz springDemo", dg);
   renderer.SetLockToFit(true);
   renderer.SetNodeColor(0.95f, 0.55f, 0.15f, 1.0f);
   renderer.SetEdgeColor(0.3f, 0.55f, 0.85f, 0.55f);
@@ -83,7 +84,7 @@ int main() {
 
   NodeID center = nodes[static_cast<size_t>(rows / 2)][static_cast<size_t>(cols / 2)];
 
-  while (renderer.Frame(g)) {
+  while (renderer.Frame(dg)) {
     layout.Tick();
 
     if (renderer.KeyPressed('F')) {

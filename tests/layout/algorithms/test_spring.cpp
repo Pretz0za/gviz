@@ -18,33 +18,33 @@ void SetPos(SpringLayoutAlgorithm<Graph> &alg, NodeID n, double x, double y) {
 TEST_CASE("Construction registers the position/velocity/physics/mass/spring "
          "pools and a FixedNodesResource",
          "[layout][algorithms][spring]") {
-  Graph g = MakeGraph(2, 2);
+  Graph g = MakeGraph(2);
   g.AddUndirectedEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
   SpringLayoutAlgorithm<Graph> alg(g, &algConfig);
 
-  REQUIRE(g.NodeSpace().GetPool<PositionComponent>() != nullptr);
-  REQUIRE(g.NodeSpace().GetPool<VelocityComponent>() != nullptr);
-  REQUIRE(g.NodeSpace().GetPool<PhysicsComponent>() != nullptr);
-  REQUIRE(g.NodeSpace().GetPool<MassComponent>() != nullptr);
-  REQUIRE(g.EdgeSpace().GetPool<SpringComponent>() != nullptr);
-  REQUIRE(g.HasResource<FixedNodesResource>());
+  REQUIRE(alg.Decorated().nodeSpace.GetPool<PositionComponent>() != nullptr);
+  REQUIRE(alg.Decorated().nodeSpace.GetPool<VelocityComponent>() != nullptr);
+  REQUIRE(alg.Decorated().nodeSpace.GetPool<PhysicsComponent>() != nullptr);
+  REQUIRE(alg.Decorated().nodeSpace.GetPool<MassComponent>() != nullptr);
+  REQUIRE(alg.Decorated().edgeSpace.GetPool<SpringComponent>() != nullptr);
+  REQUIRE(alg.Decorated().HasResource<FixedNodesResource>());
 }
 
-TEST_CASE("Missing DimensionResource is reported instead of silently defaulting",
+TEST_CASE("Dimension defaults to 2 when not configured",
          "[layout][algorithms][spring]") {
   Graph g;
   g.AddNode();
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
-  REQUIRE_THROWS_AS((SpringLayoutAlgorithm<Graph>(g, &algConfig)),
-                    MissingResourceException<DimensionResource>);
+  SpringLayoutAlgorithm<Graph> alg(g, &algConfig);
+  REQUIRE(alg.Decorated().dimension == 2);
 }
 
 TEST_CASE("A stretched spring pulls its two free endpoints toward the rest length",
          "[layout][algorithms][spring]") {
-  Graph g = MakeGraph(2, 2);
+  Graph g = MakeGraph(2);
   g.AddUndirectedEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
@@ -60,7 +60,7 @@ TEST_CASE("A stretched spring pulls its two free endpoints toward the rest lengt
   for (int i = 0; i < 400; i++)
     alg.Tick();
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   double finalDist =
       std::abs(positions->Find(1)->pos[0] - positions->Find(0)->pos[0]);
 
@@ -71,7 +71,7 @@ TEST_CASE("A stretched spring pulls its two free endpoints toward the rest lengt
 TEST_CASE("A compressed spring pushes its two free endpoints apart toward the "
          "rest length",
          "[layout][algorithms][spring]") {
-  Graph g = MakeGraph(2, 2);
+  Graph g = MakeGraph(2);
   g.AddUndirectedEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
@@ -87,7 +87,7 @@ TEST_CASE("A compressed spring pushes its two free endpoints apart toward the "
   for (int i = 0; i < 400; i++)
     alg.Tick();
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   double finalDist =
       std::abs(positions->Find(1)->pos[0] - positions->Find(0)->pos[0]);
 
@@ -98,7 +98,7 @@ TEST_CASE("A compressed spring pushes its two free endpoints apart toward the "
 TEST_CASE("A fixed vertex never moves no matter the spring force on it, "
          "while its free neighbor still does",
          "[layout][algorithms][spring]") {
-  Graph g = MakeGraph(2, 2);
+  Graph g = MakeGraph(2);
   g.AddUndirectedEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
@@ -117,7 +117,7 @@ TEST_CASE("A fixed vertex never moves no matter the spring force on it, "
   for (int i = 0; i < 100; i++)
     alg.Tick();
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   REQUIRE(positions->Find(0)->pos[0] == Catch::Approx(0.0));
   REQUIRE(positions->Find(0)->pos[1] == Catch::Approx(0.0));
   REQUIRE(positions->Find(1)->pos[0] < 5.0);
@@ -125,7 +125,7 @@ TEST_CASE("A fixed vertex never moves no matter the spring force on it, "
 
 TEST_CASE("Unfix lets a previously fixed vertex move again",
          "[layout][algorithms][spring]") {
-  Graph g = MakeGraph(2, 2);
+  Graph g = MakeGraph(2);
   g.AddUndirectedEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
@@ -142,7 +142,7 @@ TEST_CASE("Unfix lets a previously fixed vertex move again",
   for (int i = 0; i < 20; i++)
     alg.Tick();
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   REQUIRE(positions->Find(0)->pos[0] == Catch::Approx(0.0));
 
   alg.Unfix(NodeID(0));
@@ -156,7 +156,7 @@ TEST_CASE("Unfix lets a previously fixed vertex move again",
 
 TEST_CASE("SetPosition both teleports a vertex and clears its carried velocity",
          "[layout][algorithms][spring]") {
-  Graph g = MakeGraph(2, 2);
+  Graph g = MakeGraph(2);
   g.AddUndirectedEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
@@ -170,7 +170,7 @@ TEST_CASE("SetPosition both teleports a vertex and clears its carried velocity",
   SetPos(alg, NodeID(0), 0.0, 0.0);
   SetPos(alg, NodeID(1), 5.0, 0.0);
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
 
   double prev = positions->Find(1)->pos[0];
   for (int i = 0; i < 20; i++)

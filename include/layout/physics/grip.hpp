@@ -3,6 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/search/knearest.hpp"
 #include "layout/components/heat.hpp"
 #include "layout/components/knearest.hpp"
@@ -31,7 +32,7 @@ public:
     std::vector<ConfigField> Fields() override { return {}; }
   };
 
-  GRIPPhysicsSystem(G &graph, Configuration *config);
+  GRIPPhysicsSystem(DecoratedGraph<G> &dg, Configuration *config);
 
   Configuration *Config() { return m_config; }
 

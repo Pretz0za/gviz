@@ -3,6 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "layout/components/position.hpp"
 #include "layout/types.hpp"
 #include <cstdint>
@@ -26,8 +27,8 @@ public:
     }
   };
 
-  PositionRandomized(G &graph, Configuration *config);
-  PositionRandomized(G &graph, uint32_t seed, Configuration *config);
+  PositionRandomized(DecoratedGraph<G> &dg, Configuration *config);
+  PositionRandomized(DecoratedGraph<G> &dg, uint32_t seed, Configuration *config);
   ~PositionRandomized() = default;
 
   Configuration *Config() { return m_config; }
@@ -42,7 +43,6 @@ private:
   std::uniform_real_distribution<double> m_dist;
   uint8_t m_dimension;
   DenseComponentPool<PositionComponent> *m_positionPool;
-  G *m_graph;
 };
 
 #include "layout/placement/randomized.tpp"

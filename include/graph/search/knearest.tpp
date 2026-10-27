@@ -4,10 +4,10 @@
 #include "graph/search/knearest.hpp"
 
 template <GraphLike G>
-KNearestSearch<G>::KNearestSearch(G &graph) : m_graph(&graph) {
-  m_scratch = m_graph->template GetResource<BFSScratch>();
+KNearestSearch<G>::KNearestSearch(DecoratedGraph<G> &dg) : m_graph(dg.graph) {
+  m_scratch = dg.template GetResource<BFSScratch>();
   if (m_scratch == nullptr) {
-    m_scratch = &m_graph->template SetResource<BFSScratch>(m_graph->Size());
+    m_scratch = &dg.template SetResource<BFSScratch>(m_graph->Size());
   }
 }
 

@@ -14,22 +14,20 @@ template <GraphLike G>
 TreeConvexLayoutAlgorithm<G>::TreeConvexLayoutAlgorithm(G &graph,
                                                         bool respectEmbedding,
                                                         Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph),
+    : m_config(RequireConfiguration(config)), m_dg(graph), m_graph(&graph),
       m_respectEmbedding(respectEmbedding) {
-  m_info = graph.NodeSpace().template SetPool<ConvexNodeDecorator>();
-  m_edgeInfo = graph.EdgeSpace().template SetPool<ConvexEdgeDecorator>();
+  uint8_t dimension = m_config->dimension;
+  m_dg.dimension = dimension;
 
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  uint8_t dimension = static_cast<uint8_t>(*dim);
+  m_info = m_dg.nodeSpace.template SetPool<ConvexNodeDecorator>();
+  m_edgeInfo = m_dg.edgeSpace.template SetPool<ConvexEdgeDecorator>();
   m_positions =
-      graph.NodeSpace().template SetPool<PositionComponent>(dimension);
-  m_animation.Init(graph);
+      m_dg.nodeSpace.template SetPool<PositionComponent>(dimension);
+  m_animation.Init(m_dg);
 
   bool isNewEdgeLengthMode =
-      !graph.template HasResource<StateMachine<EdgeLengthMode>>();
-  m_edgeLengthMode = &graph.template SetResource<StateMachine<EdgeLengthMode>>(
+      !m_dg.template HasResource<StateMachine<EdgeLengthMode>>();
+  m_edgeLengthMode = &m_dg.template SetResource<StateMachine<EdgeLengthMode>>(
       EdgeLengthMode::Uniform);
   if (isNewEdgeLengthMode) {
     constexpr EdgeLengthMode kModes[] = {

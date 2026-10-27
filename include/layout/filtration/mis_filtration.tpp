@@ -9,17 +9,12 @@
 #include <cstdint>
 
 template <GraphLike G>
-MisFiltrationSystem<G>::MisFiltrationSystem(G &graph)
-    : m_graph(&graph),
-      m_scratch(&graph.template SetResource<BFSScratch>(graph.Size())) {
-  DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
-
-  m_output = m_graph->template GetResource<NestedFiltrationResult>();
+MisFiltrationSystem<G>::MisFiltrationSystem(DecoratedGraph<G> &dg)
+    : m_scratch(&dg.template SetResource<BFSScratch>(dg.graph->Size())),
+      m_graph(dg.graph), m_dimension(dg.dimension) {
+  m_output = dg.template GetResource<NestedFiltrationResult>();
   if (m_output == nullptr)
-    m_output = &m_graph->template SetResource<NestedFiltrationResult>();
+    m_output = &dg.template SetResource<NestedFiltrationResult>();
 
   m_output->m_layerCount = 0xFFFFFFFF;
 }

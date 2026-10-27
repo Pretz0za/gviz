@@ -7,22 +7,17 @@
 
 template <GraphLike G>
 SankeyLayoutAlgorithm<G>::SankeyLayoutAlgorithm(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph) {
-  m_info = graph.NodeSpace().template SetPool<SankeyNodeDecorator>();
-  m_curves = graph.EdgeSpace().template SetPool<CubicBezierComponent>();
-  m_halfWidths = graph.EdgeSpace().template SetPool<HalfWidthComponent>();
-  m_positions = graph.NodeSpace().template SetPool<PositionComponent>(2);
-  m_weights = graph.EdgeSpace().template GetPool<WeightComponent>();
-
-  graph.template SetResource<DimensionResource>(DimensionResource::D2);
+    : m_config(RequireConfiguration(config)), m_dg(graph), m_graph(&graph) {
+  m_dg.dimension = 2;
+  m_info = m_dg.nodeSpace.template SetPool<SankeyNodeDecorator>();
+  m_curves = m_dg.edgeSpace.template SetPool<CubicBezierComponent>();
+  m_halfWidths = m_dg.edgeSpace.template SetPool<HalfWidthComponent>();
+  m_positions = m_dg.nodeSpace.template SetPool<PositionComponent>(2);
 }
 
 template <GraphLike G>
 double SankeyLayoutAlgorithm<G>::EdgeWeight(EdgeID id) const {
-  if (!m_weights)
-    return 1.0;
-  const WeightComponent *w = m_weights->Find(m_graph->MapToDense(id).Raw());
-  return w ? static_cast<double>(w->value) : 1.0;
+  return static_cast<double>(m_graph->GetWeight(id));
 }
 
 template <GraphLike G> void SankeyLayoutAlgorithm<G>::AssignLayers() {

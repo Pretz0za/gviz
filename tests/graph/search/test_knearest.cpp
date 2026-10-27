@@ -3,6 +3,7 @@
 // reuses a BFSScratch resource stashed on the graph across calls.
 
 #include "catch_amalgamated.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "graph/search/knearest.hpp"
 
@@ -24,7 +25,8 @@ Graph MakeChain(uint32_t length) {
 TEST_CASE("Find returns immediate neighbors first, in BFS order",
          "[graph][search][knearest]") {
   Graph g = MakeChain(5);
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
 
   std::vector<FoundNode> found = search.Find(NodeID(0), 3);
 
@@ -39,7 +41,8 @@ TEST_CASE("Find returns immediate neighbors first, in BFS order",
 
 TEST_CASE("Find stops early once k results are collected", "[graph][search][knearest]") {
   Graph g = MakeChain(10);
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
 
   std::vector<FoundNode> found = search.Find(NodeID(0), 1);
   REQUIRE(found.size() == 1);
@@ -49,7 +52,8 @@ TEST_CASE("Find stops early once k results are collected", "[graph][search][knea
 TEST_CASE("Find returns fewer than k results when the graph is exhausted",
          "[graph][search][knearest]") {
   Graph g = MakeChain(3); // node 2 has no outgoing edges
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
 
   std::vector<FoundNode> found = search.Find(NodeID(0), 100);
   REQUIRE(found.size() == 2);
@@ -58,7 +62,8 @@ TEST_CASE("Find returns fewer than k results when the graph is exhausted",
 TEST_CASE("Find on an isolated node returns nothing", "[graph][search][knearest]") {
   Graph g;
   g.AddNode();
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
 
   std::vector<FoundNode> found = search.Find(NodeID(0), 5);
   REQUIRE(found.empty());
@@ -77,7 +82,8 @@ TEST_CASE("A node is never visited/returned twice, even with converging paths",
   g.AddEdge(n1, n3);
   g.AddEdge(n2, n3);
 
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
   std::vector<FoundNode> found = search.Find(n0, 100);
 
   REQUIRE(found.size() == 3); // n1, n2, n3 -- n3 only counted once
@@ -92,7 +98,8 @@ TEST_CASE("The filtered overload only returns nodes present in the filter, "
          "but still traverses through nodes that aren't",
          "[graph][search][knearest]") {
   Graph g = MakeChain(5); // 0 -> 1 -> 2 -> 3 -> 4
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
 
   DenseNodeSet filter(5, 0);
   filter.Set(DenseNodeID(3)); // only node 3 is "interesting"
@@ -107,7 +114,8 @@ TEST_CASE("The filtered overload only returns nodes present in the filter, "
 TEST_CASE("The filtered overload returns nothing if no reachable node matches",
          "[graph][search][knearest]") {
   Graph g = MakeChain(3);
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
 
   DenseNodeSet filter(3, 0); // nothing marked
 
@@ -119,7 +127,8 @@ TEST_CASE("Repeated calls on the same KNearestSearch reset cleanly between "
          "searches",
          "[graph][search][knearest]") {
   Graph g = MakeChain(4);
-  KNearestSearch<Graph> search(g);
+  DecoratedGraph<Graph> dg(g);
+  KNearestSearch<Graph> search(dg);
 
   std::vector<FoundNode> first = search.Find(NodeID(0), 100);
   std::vector<FoundNode> second = search.Find(NodeID(0), 100);

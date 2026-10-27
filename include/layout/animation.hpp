@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "graph/decorated_graph.hpp"
 #include "layout/components/animation_position.hpp"
 #include "layout/components/position.hpp"
 #include <chrono>
@@ -24,7 +25,7 @@ template <GraphLike G> class PositionAnimationSystem {
 public:
   PositionAnimationSystem() = default;
 
-  void Init(G &graph);
+  void Init(DecoratedGraph<G> &dg);
 
   void Begin();
 

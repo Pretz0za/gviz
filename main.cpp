@@ -1,3 +1,4 @@
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "graph/subgraph.hpp"
 #include "graph/types.hpp"
@@ -32,27 +33,10 @@ Graph BuildRectMesh(size_t length, size_t width) {
   return g;
 }
 
-void InitializePositionComponents(Graph &g) {
-  auto *pool = g.NodeSpace().GetPool<PositionComponent>();
-  for (NodeID nid : g.Nodes()) {
-    PositionComponent *c = pool->Find(nid.Raw());
-    c->pos[0] = 0;
-    c->pos[1] = 0;
-    c->pos[2] = 0;
-  }
-}
-
-void PrintPositions(Graph &g) {
-  auto *pool = g.NodeSpace().GetPool<PositionComponent>();
-  for (NodeID nid : g.Nodes()) {
-    PositionComponent *c = pool->Find(nid.Raw());
-    printf("node %u: (%f, %f)\n", nid.Raw(), c->pos[0], c->pos[1]);
-  }
-}
-
-void PrintGripLayerPositions(Graph *g, NestedFiltrationResult *filtration,
+void PrintGripLayerPositions(DecoratedGraph<Graph> &dg,
+                             NestedFiltrationResult *filtration,
                              uint8_t layer) {
-  auto *pool = g->NodeSpace().GetPool<PositionComponent>();
+  auto *pool = dg.nodeSpace.GetPool<PositionComponent>();
   for (uint32_t i = 0; i < filtration->m_borders[layer]; i++) {
     DenseNodeID nid = filtration->m_filtration[i];
     PositionComponent *c = pool->Find(nid.Raw());
@@ -62,10 +46,10 @@ void PrintGripLayerPositions(Graph *g, NestedFiltrationResult *filtration,
 
 // Prints "(x1,y1),(x2,y2),..." for every node's position -- paste directly
 // into a Desmos expression to plot the list as points.
-void PrintPositionsDesmos(Graph &g) {
-  auto *pool = g.NodeSpace().GetPool<PositionComponent>();
+void PrintPositionsDesmos(DecoratedGraph<Graph> &dg) {
+  auto *pool = dg.nodeSpace.GetPool<PositionComponent>();
   bool first = true;
-  for (NodeID nid : g.Nodes()) {
+  for (NodeID nid : dg.graph->Nodes()) {
     PositionComponent *c = pool->Find(nid.Raw());
     if (!first)
       printf(",");
@@ -84,25 +68,12 @@ int main() {
     sg.AddNode(nid);
   }
 
-  // InitializePositionComponents(g);
-  sg.SetResource<DimensionResource>(DimensionResource::D2);
-  g.SetResource<DimensionResource>(DimensionResource::D2);
-  // PositionRandomizerSystem Randomizer{g};
-
-  // printf("initial positions:\n");
-  // PrintPositions(g);
-  //
-  // for (int i = 0; i < 3; i++) {
-  //   Randomizer.Tick();
-  //   printf("after tick %d:\n", i + 1);
-  //   PrintPositions(g);
-  // }
-
   GRIPLayoutAlgorithm<Graph>::Configuration gripConfig;
   GRIPLayoutAlgorithm grip{g, &gripConfig};
   grip.RunFiltration();
 
-  NestedFiltrationResult result = *g.GetResource<NestedFiltrationResult>();
+  NestedFiltrationResult result =
+      *grip.Decorated().template GetResource<NestedFiltrationResult>();
 
   uint8_t layer = grip.TransitionState();
   layer = grip.TransitionState();
@@ -120,7 +91,7 @@ int main() {
   //   grip.Tick();
   // }
 
-  PrintPositionsDesmos(g);
+  PrintPositionsDesmos(grip.Decorated());
 
   // MisFiltrationSystem filtration(sg);
   // filtration.Tick();

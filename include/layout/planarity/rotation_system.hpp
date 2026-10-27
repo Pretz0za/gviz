@@ -2,6 +2,7 @@
 
 #include "concept/graphLike.hpp"
 #include "ecs/index_space.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/planar_rotation.hpp"
 #include <cstddef>
@@ -9,7 +10,7 @@
 
 template <GraphLike G> class PlanarRotationSystem {
 public:
-  explicit PlanarRotationSystem(G &graph);
+  explicit PlanarRotationSystem(DecoratedGraph<G> &dg);
 
   void Compute();
 

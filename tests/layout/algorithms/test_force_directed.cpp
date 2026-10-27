@@ -23,25 +23,25 @@ using test_helpers::MakeGraph;
 
 TEST_CASE("Construction registers position/physics/heat pools and a QuadTreeResource",
          "[layout][algorithms][force_directed]") {
-  Graph g = MakeGraph(5, 2);
+  Graph g = MakeGraph(5);
 
   ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>::Configuration algConfig;
   ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>> alg(g, &algConfig);
 
-  REQUIRE(g.NodeSpace().GetPool<PositionComponent>() != nullptr);
-  REQUIRE(g.NodeSpace().GetPool<PhysicsComponent>() != nullptr);
-  REQUIRE(g.NodeSpace().GetPool<ForceAtlasHeatComponent>() != nullptr);
-  REQUIRE(g.HasResource<QuadTreeResource>());
+  REQUIRE(alg.Decorated().nodeSpace.GetPool<PositionComponent>() != nullptr);
+  REQUIRE(alg.Decorated().nodeSpace.GetPool<PhysicsComponent>() != nullptr);
+  REQUIRE(alg.Decorated().nodeSpace.GetPool<ForceAtlasHeatComponent>() != nullptr);
+  REQUIRE(alg.Decorated().HasResource<QuadTreeResource>());
 }
 
 TEST_CASE("Construction randomizes every node's initial position within the "
          "default bounding box",
          "[layout][algorithms][force_directed]") {
-  Graph g = MakeGraph(10, 2);
+  Graph g = MakeGraph(10);
   ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>::Configuration algConfig;
   ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>> alg(g, &algConfig);
 
-  auto *positions = g.NodeSpace().GetPool<PositionComponent>();
+  auto *positions = alg.Decorated().nodeSpace.GetPool<PositionComponent>();
   bool anyNonZero = false;
   for (uint32_t i = 0; i < 10; i++) {
     PositionComponent *p = positions->Find(i);
@@ -54,13 +54,13 @@ TEST_CASE("Construction randomizes every node's initial position within the "
   REQUIRE(anyNonZero);
 }
 
-TEST_CASE("Missing DimensionResource is reported instead of silently defaulting",
+TEST_CASE("Dimension defaults to 2 when not configured",
          "[layout][algorithms][force_directed]") {
-  Graph g; // no DimensionResource set
+  Graph g;
   g.AddNode();
 
   ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>::Configuration algConfig;
-  REQUIRE_THROWS_AS(
-      (ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>>(g, &algConfig)),
-      MissingResourceException<DimensionResource>);
+  ForceDirectedLayoutAlgorithm<Graph, VanillaFruchtermanReingold<Graph>> alg(g, &algConfig);
+
+  REQUIRE(alg.Decorated().dimension == 2);
 }

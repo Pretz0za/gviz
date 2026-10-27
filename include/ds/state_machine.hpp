@@ -24,6 +24,7 @@ public:
 
 private:
   Graph m_graph;
+  IndexSpace m_stateSpace;
   DenseComponentPool<DataComponent<T>> *m_statePool;
   NodeID m_current;
 };

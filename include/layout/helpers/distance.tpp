@@ -10,17 +10,13 @@
 #include "layout/types.hpp"
 
 template <GraphLike G>
-DistanceCalculationSystem<G>::DistanceCalculationSystem(G &graph)
+DistanceCalculationSystem<G>::DistanceCalculationSystem(DecoratedGraph<G> &dg)
     : m_positionData(
-          (graph.NodeSpace().template GetPool<PositionComponent>())->Data()),
-      m_radius(graph.NodeSpace().template GetPool<RadiusComponent>()) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr) {
-    throw MissingResourceException<DimensionResource>();
-  }
-  m_dimension = static_cast<uint8_t>(*dim);
+          (dg.nodeSpace.template GetPool<PositionComponent>())->Data()),
+      m_radius(dg.nodeSpace.template GetPool<RadiusComponent>()),
+      m_dimension(dg.dimension) {
   if (!m_radius) {
-    m_radius = graph.NodeSpace().template SetPool<RadiusComponent>();
+    m_radius = dg.nodeSpace.template SetPool<RadiusComponent>();
   }
 }
 

@@ -4,6 +4,7 @@
 #include "catch_amalgamated.hpp"
 #include "layout/physics/force_model/kamada_kawai.hpp"
 
+#include "graph/decorated_graph.hpp"
 #include "helpers/graph_helpers.hpp"
 
 using test_helpers::MakeGraph;
@@ -20,17 +21,18 @@ void SetRadius(DenseComponentPool<RadiusComponent> *pool, uint32_t id, double r)
 
 TEST_CASE("Tick pulls v toward u when the gap is smaller than the ideal distance",
          "[layout][physics][kamada_kawai]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  auto *radii = WithRadius(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  auto *radii = WithRadius(dg);
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
   GRIPKamadaKawai<Graph>::Configuration kkConfig;
-  GRIPKamadaKawai<Graph> kk(g, &kkConfig);
+  GRIPKamadaKawai<Graph> kk(dg, &kkConfig);
   kk.Tick(DenseNodeID(0), DenseNodeID(1), /*graphDist=*/2);
 
   // gap = 10, factor = 10 / (2 * 100) - 1 = -0.95, direction (1, 0) * gap
@@ -41,17 +43,18 @@ TEST_CASE("Tick pulls v toward u when the gap is smaller than the ideal distance
 
 TEST_CASE("A larger graphDist lowers the ideal distance, making the pull stronger",
          "[layout][physics][kamada_kawai]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  auto *radii = WithRadius(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  auto *radii = WithRadius(dg);
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
   GRIPKamadaKawai<Graph>::Configuration kkConfig;
-  GRIPKamadaKawai<Graph> kk(g, &kkConfig);
+  GRIPKamadaKawai<Graph> kk(dg, &kkConfig);
   kk.Tick(DenseNodeID(0), DenseNodeID(1), /*graphDist=*/1);
 
   // factor = 10 / (1 * 100) - 1 = -0.9
@@ -61,10 +64,11 @@ TEST_CASE("A larger graphDist lowers the ideal distance, making the pull stronge
 
 TEST_CASE("Tick accumulates into any pre-existing displacement",
          "[layout][physics][kamada_kawai]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  auto *radii = WithRadius(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  auto *radii = WithRadius(dg);
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
   SetRadius(radii, 0, 0.0);
@@ -72,7 +76,7 @@ TEST_CASE("Tick accumulates into any pre-existing displacement",
   physics->Find(0)->disp[0] = 1.0;
 
   GRIPKamadaKawai<Graph>::Configuration kkConfig;
-  GRIPKamadaKawai<Graph> kk(g, &kkConfig);
+  GRIPKamadaKawai<Graph> kk(dg, &kkConfig);
   kk.Tick(DenseNodeID(0), DenseNodeID(1), 2);
 
   double *disp = physics->Find(0)->disp;

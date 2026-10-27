@@ -4,7 +4,7 @@
 
 template <typename T>
 StateMachine<T>::StateMachine(T initial)
-    : m_statePool(m_graph.NodeSpace().SetPool<DataComponent<T>>()),
+    : m_statePool(m_stateSpace.SetPool<DataComponent<T>>()),
       m_current(AddState(initial)) {}
 
 template <typename T> NodeID StateMachine<T>::FindState(T state) const {
@@ -23,6 +23,7 @@ template <typename T> NodeID StateMachine<T>::AddState(T state) {
   if (existing.IsValid())
     return existing;
   NodeID id = m_graph.AddNode();
+  m_stateSpace.Create(id.Raw());
   m_statePool->Find(id.Raw())->data = state;
   return id;
 }

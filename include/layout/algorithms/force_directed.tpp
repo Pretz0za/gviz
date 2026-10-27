@@ -17,30 +17,28 @@
 
 template <GraphLike G, ForceModel F>
 ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph),
-      m_positions(nullptr), m_mass(nullptr) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
+    : m_config(RequireConfiguration(config)), m_dg(graph), m_graph(&graph),
+      m_positions(nullptr), m_mass(nullptr),
+      m_dimension(m_config->dimension) {
+  m_dg.dimension = m_dimension;
 
-  m_quadtree = &graph.template SetResource<QuadTreeResource>();
+  m_quadtree = &m_dg.template SetResource<QuadTreeResource>();
 
   // pools the force model, gravity system, randomizer, and heat control all
   // rely on
-  m_mass = graph.NodeSpace().template SetPool<MassComponent>();
+  m_mass = m_dg.nodeSpace.template SetPool<MassComponent>();
   m_positions =
-      graph.NodeSpace().template SetPool<PositionComponent>(m_dimension);
-  graph.NodeSpace().template SetPool<PhysicsComponent>();
-  graph.NodeSpace().template SetPool<ForceAtlasHeatComponent>();
+      m_dg.nodeSpace.template SetPool<PositionComponent>(m_dimension);
+  m_dg.nodeSpace.template SetPool<PhysicsComponent>();
+  m_dg.nodeSpace.template SetPool<ForceAtlasHeatComponent>();
 
-  m_forceModel = std::make_unique<F>(graph, &m_config->forceModelConfig);
-  m_gravity = std::make_unique<GravityForceSystem<G>>(graph, &m_config->gravityConfig);
-  m_randomizer = std::make_unique<PositionRandomized<G>>(graph, &m_config->randomizedConfig);
-  m_heat = std::make_unique<ForceAtlasHeat<G>>(graph, &m_config->heatConfig);
+  m_forceModel = std::make_unique<F>(m_dg, &m_config->forceModelConfig);
+  m_gravity = std::make_unique<GravityForceSystem<G>>(m_dg, &m_config->gravityConfig);
+  m_randomizer = std::make_unique<PositionRandomized<G>>(m_dg, &m_config->randomizedConfig);
+  m_heat = std::make_unique<ForceAtlasHeat<G>>(m_dg, &m_config->heatConfig);
 
 #ifdef GVIZ_DEBUG_CHARTS
-  m_chart = graph.template SetResource<ChartRecorderResource>(graph.NodeSpace())
+  m_chart = m_dg.template SetResource<ChartRecorderResource>(m_dg.nodeSpace)
                 .recorder.get();
 #endif
 
@@ -54,7 +52,7 @@ ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph, Confi
 
 template <GraphLike G, ForceModel F>
 void ForceDirectedLayoutAlgorithm<G, F>::RebuildQuadTree() {
-  SpacialIndex::AABB bbox = SpacialIndex::Helpers::GetBoundingBox(m_graph);
+  SpacialIndex::AABB bbox = SpacialIndex::Helpers::GetBoundingBox(&m_dg);
   m_quadtree->root->Reset(bbox);
 
   auto &positions = m_positions->Data();
@@ -108,9 +106,9 @@ void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
   RebuildQuadTree();
   uint32_t size = m_graph->Size();
   DenseComponentPool<PhysicsComponent> *physics =
-      m_graph->NodeSpace().template GetPool<PhysicsComponent>();
+      m_dg.nodeSpace.template GetPool<PhysicsComponent>();
   DenseComponentPool<PositionComponent> *positions =
-      m_graph->NodeSpace().template GetPool<PositionComponent>();
+      m_dg.nodeSpace.template GetPool<PositionComponent>();
 
   for (uint32_t i = 0; i < size; i++) {
     ZeroOut(physics->Find(i)->disp, m_dimension);

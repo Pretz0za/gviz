@@ -9,8 +9,8 @@
 
 template <typename T, typename U> class ComponentPoolView {
 public:
-  ComponentPoolView(const IndexSpace &admin, std::function<U(const T &)> map)
-      : m_pool(admin.GetPool<T>()), m_map(std::move(map)) {}
+  ComponentPoolView(DenseComponentPool<T> *pool, std::function<U(const T &)> map)
+      : m_pool(pool), m_map(std::move(map)) {}
   ~ComponentPoolView() = default;
 
   inline U *Find(EntityID id) {

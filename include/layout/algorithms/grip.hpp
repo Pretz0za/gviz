@@ -3,9 +3,11 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "debug/chart_recorder.hpp"
+#include "graph/decorated_graph.hpp"
 #include "layout/filtration/mis_filtration.hpp"
 #include "layout/physics/grip.hpp"
 #include "layout/placement/barrycenter.hpp"
+#include "layout/types.hpp"
 #include <memory>
 
 // implementation of the GRIP algorithm by Gajer and Kobourov
@@ -18,6 +20,7 @@ public:
 
     uint32_t placementKNearest = 10;
     double simplexExtent = 100000.0;
+    uint8_t dimension = 2;
     typename GRIPPhysicsSystem<G>::Configuration physicsConfig;
 
     Configuration WithPlacementKNearest(uint32_t v) { placementKNearest = v; return *this; }
@@ -35,6 +38,8 @@ public:
 
   Configuration *Config() { return m_config; }
 
+  DecoratedGraph<G> &Decorated() { return m_dg; }
+
   void RunFiltration();
   uint32_t TransitionState();
   inline void Tick();
@@ -42,11 +47,12 @@ public:
 private:
   void placeLayer();
 
+
   Configuration *m_config;
   uint32_t m_currLayer;
   DenseNodeSet *m_visible;
   uint8_t m_dimension;
-  G *m_graph;
+  DecoratedGraph<G> m_dg;
   NestedFiltrationResult *m_filtrationOutput;
   std::unique_ptr<MisFiltrationSystem<G>> m_filtrationSystem = nullptr;
   std::unique_ptr<PositionBarrycentric<G>> m_placementSystem = nullptr;

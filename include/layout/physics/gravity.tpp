@@ -9,15 +9,11 @@
 #include "layout/types.hpp"
 
 template <GraphLike G>
-GravityForceSystem<G>::GravityForceSystem(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph),
-      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
-      m_positions(graph.NodeSpace().template GetPool<PositionComponent>()) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+GravityForceSystem<G>::GravityForceSystem(DecoratedGraph<G> &dg, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_graph(dg.graph),
+      m_physics(dg.nodeSpace.template GetPool<PhysicsComponent>()),
+      m_positions(dg.nodeSpace.template GetPool<PositionComponent>()),
+      m_dimension(dg.dimension) {}
 
 template <GraphLike G> void GravityForceSystem<G>::Tick() {
   for (NodeID nid : m_graph->Nodes()) {

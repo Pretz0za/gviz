@@ -8,13 +8,6 @@
 #include <cstdint>
 #include <ranges>
 
-namespace detail {
-// Stand-in type used only to prove GraphLike's resource accessors are
-// generic member templates, without the concept naming any real resource
-// type (e.g. DimensionResource).
-struct GraphLikeResourceProbe {};
-} // namespace detail
-
 template <typename G>
 concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   { graph.Nodes() } -> std::ranges::input_range;
@@ -44,19 +37,9 @@ concept GraphLike = requires(G graph, const G cgraph, NodeID nid, EdgeID eid) {
   { cgraph.HasNode(nid) } -> std::convertible_to<bool>;
   { cgraph.HasEdge(eid) } -> std::convertible_to<bool>;
   { cgraph.GetEdge(eid) } -> std::same_as<EdgeComponent>;
+  { cgraph.GetWeight(eid) } -> std::convertible_to<float>;
   { cgraph.MapToSparse(DenseNodeID{}) } -> std::same_as<NodeID>;
   { cgraph.MapToDense(nid) } -> std::same_as<DenseNodeID>;
   { cgraph.MapToSparse(DenseEdgeID{}) } -> std::same_as<EdgeID>;
   { cgraph.MapToDense(eid) } -> std::same_as<DenseEdgeID>;
-  { graph.NodeSpace() } -> std::same_as<IndexSpace &>;
-  { graph.EdgeSpace() } -> std::same_as<IndexSpace &>;
-
-  // Generic resource-template interface (see GraphLikeResourceProbe above).
-  { graph.template SetResource<detail::GraphLikeResourceProbe>() };
-  {
-    graph.template GetResource<detail::GraphLikeResourceProbe>()
-  } -> std::same_as<detail::GraphLikeResourceProbe *>;
-  {
-    cgraph.template HasResource<detail::GraphLikeResourceProbe>()
-  } -> std::convertible_to<bool>;
 };

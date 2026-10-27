@@ -11,14 +11,9 @@
 #include <vector>
 
 template <GraphLike G>
-PositionBarrycentric<G>::PositionBarrycentric(G &graph)
-    : m_graph(&graph), m_knnSystem(graph) {
-  m_positions = m_graph->NodeSpace().template GetPool<PositionComponent>();
-  DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
-  if (dim == nullptr) {
-    throw MissingResourceException<DimensionResource>();
-  }
-  m_dimension = static_cast<uint8_t>(*dim);
+PositionBarrycentric<G>::PositionBarrycentric(DecoratedGraph<G> &dg)
+    : m_graph(dg.graph), m_dimension(dg.dimension), m_knnSystem(dg) {
+  m_positions = dg.nodeSpace.template GetPool<PositionComponent>();
 }
 
 template <GraphLike G>

@@ -1,4 +1,5 @@
 #include "ds/state_machine.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "layout/algorithms/tree_convex.hpp"
 #include "layout/types.hpp"
@@ -37,13 +38,13 @@ static Graph BuildRandomTree(int maxDepth, int branchingFactor, bool exact,
 
 int main() {
   Graph g = BuildRandomTree(8, 4, false, std::random_device{}());
-  g.SetResource<DimensionResource>(DimensionResource::D2);
 
   TreeConvexLayoutAlgorithm<Graph>::Configuration layoutConfig;
   TreeConvexLayoutAlgorithm<Graph> layout(g, false, &layoutConfig);
   layout.Tick();
 
-  Renderer renderer(1280, 720, "gviz treeDemo", g);
+  DecoratedGraph<Graph> &dg = layout.Decorated();
+  Renderer renderer(1280, 720, "gviz treeDemo", dg);
   renderer.SetLockToFit(true);
 
 #ifdef GVIZ_DEBUG_CHARTS
@@ -52,9 +53,9 @@ int main() {
 
   std::mt19937 rng(std::random_device{}());
   StateMachine<EdgeLengthMode> *edgeLengthMode =
-      g.GetResource<StateMachine<EdgeLengthMode>>();
+      dg.GetResource<StateMachine<EdgeLengthMode>>();
 
-  while (renderer.Frame(g)) {
+  while (renderer.Frame(dg)) {
     layout.Tick();
 
     if (renderer.KeyPressed('T')) {

@@ -4,15 +4,15 @@
 
 template <GraphLike G>
 Renderer::Renderer(uint32_t width, uint32_t height, const std::string &title,
-                   G &graph)
-    : Renderer(width, height, title, ReadIs3D(graph)) {}
+                   DecoratedGraph<G> &dg)
+    : Renderer(width, height, title, ReadIs3D(dg)) {}
 
-template <GraphLike G> bool Renderer::Frame(G &graph) {
+template <GraphLike G> bool Renderer::Frame(DecoratedGraph<G> &dg) {
   FrameData &fd = FrameBuffer();
-  RenderQuerySystem<G> query(graph);
+  RenderQuerySystem<G> query(dg);
   query.ExtractFrameData(Is3D(), fd);
 #ifdef GVIZ_DEBUG_CHARTS
-  SyncChartRecorder(graph.template GetResource<ChartRecorderResource>());
+  SyncChartRecorder(dg.template GetResource<ChartRecorderResource>());
 #endif
   return ApplyFrame(fd);
 }

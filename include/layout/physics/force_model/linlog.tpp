@@ -8,21 +8,14 @@
 #include <cstdint>
 
 template <GraphLike G>
-LinLog<G>::LinLog(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_distanceCalc(graph),
-      m_positions(graph.NodeSpace().template GetPool<PositionComponent>()),
-      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
-      m_degree(graph.NodeSpace().template GetPool<DegreeComponent>()) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr) {
-    throw MissingResourceException<DimensionResource>();
-  }
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+LinLog<G>::LinLog(DecoratedGraph<G> &dg, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_dimension(dg.dimension),
+      m_distanceCalc(dg), m_graph(dg.graph),
+      m_positions(dg.nodeSpace.template GetPool<PositionComponent>()),
+      m_physics(dg.nodeSpace.template GetPool<PhysicsComponent>()) {}
 
 template <GraphLike G> double LinLog<G>::VertexMass(DenseNodeID v) const {
-  const DegreeComponent *deg = m_degree->Find(v.Raw());
-  return 1.0 + static_cast<double>(deg->in + deg->out);
+  return 1.0 + static_cast<double>(m_graph->Degree(m_graph->MapToSparse(v)));
 }
 
 template <GraphLike G>

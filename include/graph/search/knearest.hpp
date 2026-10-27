@@ -2,13 +2,14 @@
 
 #include "concept/graphLike.hpp"
 #include "ds/bfs_scratch.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/search/types.hpp"
 #include "graph/types.hpp"
 #include <cstdint>
 #include <vector>
 template <GraphLike G> class KNearestSearch {
 public:
-  KNearestSearch(G &graph);
+  explicit KNearestSearch(DecoratedGraph<G> &dg);
 
   std::vector<FoundNode> Find(NodeID id, uint32_t k);
   std::vector<FoundNode> Find(NodeID id, uint32_t k, DenseNodeSet filter);

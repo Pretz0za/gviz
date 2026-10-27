@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graph/decorated_graph.hpp"
 #include "render/render_query_system.hpp"
 #include <cstdint>
 #include <memory>
@@ -15,13 +16,13 @@ class Renderer {
 public:
   template <GraphLike G>
   Renderer(uint32_t width, uint32_t height, const std::string &title,
-           G &graph);
+           DecoratedGraph<G> &dg);
   ~Renderer();
 
   Renderer(const Renderer &) = delete;
   Renderer &operator=(const Renderer &) = delete;
 
-  template <GraphLike G> bool Frame(G &graph);
+  template <GraphLike G> bool Frame(DecoratedGraph<G> &dg);
 
   void SetEdgeWidthPixels(float width);
   void SetNodeColor(float r, float g, float b, float a);

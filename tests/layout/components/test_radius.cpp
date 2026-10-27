@@ -52,7 +52,7 @@ TEST_CASE("MICHEALIS_MENTEN mode derives radius from an entity's degree",
          "[layout][components][radius]") {
   IndexSpace space;
   auto *degrees = space.SetPool<DegreeComponent>();
-  auto *pool = space.SetPool<RadiusComponent>(MICHEALIS_MENTEN);
+  auto *pool = space.SetPool<RadiusComponent>(MICHEALIS_MENTEN, degrees);
   space.Create();
 
   degrees->Set(0, DegreeComponent{{}, /*in=*/3, /*out=*/3});
@@ -67,7 +67,7 @@ TEST_CASE("MICHEALIS_MENTEN mode gives a zero-degree entity the minimum radius",
          "[layout][components][radius]") {
   IndexSpace space;
   auto *degrees = space.SetPool<DegreeComponent>();
-  auto *pool = space.SetPool<RadiusComponent>(MICHEALIS_MENTEN);
+  auto *pool = space.SetPool<RadiusComponent>(MICHEALIS_MENTEN, degrees);
   space.Create();
   degrees->Set(0, DegreeComponent{{}, 0, 0});
 
@@ -78,8 +78,8 @@ TEST_CASE("SetFunction from a degree-derived mode back to MANUAL "
          "allocates explicit storage sized to match",
          "[layout][components][radius]") {
   IndexSpace space;
-  space.SetPool<DegreeComponent>();
-  auto *pool = space.SetPool<RadiusComponent>(MICHEALIS_MENTEN);
+  auto *degrees = space.SetPool<DegreeComponent>();
+  auto *pool = space.SetPool<RadiusComponent>(MICHEALIS_MENTEN, degrees);
   space.Create();
   space.Create();
 

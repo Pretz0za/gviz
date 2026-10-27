@@ -8,24 +8,21 @@
 #include <algorithm>
 #include <limits>
 
-template <GraphLike G> bool ReadIs3D(G &graph) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  return *dim == DimensionResource::D3;
+template <GraphLike G> bool ReadIs3D(DecoratedGraph<G> &dg) {
+  return dg.dimension == 3;
 }
 
 template <GraphLike G>
-RenderQuerySystem<G>::RenderQuerySystem(G &graph)
-    : m_graph(&graph),
-      m_position(graph.NodeSpace().template GetPool<PositionComponent>()),
-      m_radius(graph.NodeSpace().template GetPool<RadiusComponent>()),
-      m_nodeColor(graph.NodeSpace().template GetPool<ColorComponent>()),
-      m_edgeColor(graph.EdgeSpace().template GetPool<ColorComponent>()),
-      m_bezier(graph.EdgeSpace().template GetPool<CubicBezierComponent>()),
-      m_halfWidth(graph.EdgeSpace().template GetPool<HalfWidthComponent>()),
-      m_visible(graph.template HasResource<VisibleNodesResource>()
-                    ? graph.template GetResource<VisibleNodesResource>()
+RenderQuerySystem<G>::RenderQuerySystem(DecoratedGraph<G> &dg)
+    : m_graph(dg.graph),
+      m_position(dg.nodeSpace.template GetPool<PositionComponent>()),
+      m_radius(dg.nodeSpace.template GetPool<RadiusComponent>()),
+      m_nodeColor(dg.nodeSpace.template GetPool<ColorComponent>()),
+      m_edgeColor(dg.edgeSpace.template GetPool<ColorComponent>()),
+      m_bezier(dg.edgeSpace.template GetPool<CubicBezierComponent>()),
+      m_halfWidth(dg.edgeSpace.template GetPool<HalfWidthComponent>()),
+      m_visible(dg.template HasResource<VisibleNodesResource>()
+                    ? dg.template GetResource<VisibleNodesResource>()
                     : nullptr) {}
 
 template <GraphLike G>

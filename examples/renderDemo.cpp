@@ -1,4 +1,5 @@
 #include "ds/vector.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "graph/subgraph.hpp"
 #include "layout/algorithms/force_directed.hpp"
@@ -54,21 +55,20 @@ int main() {
     g.AddNode(nid);
     // }
   }
-  g.SetResource<DimensionResource>(DimensionResource::D2);
+  ForceDirectedLayoutAlgorithm<Subgraph, LinLog<Subgraph>>::Configuration
+      forceDirectedConfig;
+  ForceDirectedLayoutAlgorithm<Subgraph, LinLog<Subgraph>>
+      forceDirected{g, &forceDirectedConfig};
+  DecoratedGraph<Subgraph> &dg = forceDirected.Decorated();
 
-  auto radii = g.NodeSpace().SetPool<RadiusComponent>(RadiusFunction::MANUAL);
+  auto radii = dg.nodeSpace.SetPool<RadiusComponent>(RadiusFunction::MANUAL);
   for (uint32_t i = 0; i < radii->Size(); i++) {
     if (i % 5 == 7) {
       radii->Data()[i].radius *= 4;
     }
   }
 
-  ForceDirectedLayoutAlgorithm<Subgraph, LinLog<Subgraph>>::Configuration
-      forceDirectedConfig;
-  ForceDirectedLayoutAlgorithm<Subgraph, LinLog<Subgraph>>
-      forceDirected{g, &forceDirectedConfig};
-
-  Renderer renderer(1280, 720, "gviz renderDemo", g);
+  Renderer renderer(1280, 720, "gviz renderDemo", dg);
 
 #ifdef GVIZ_DEBUG_CHARTS
   renderer.DebugConfigs().Add("Force Directed", forceDirectedConfig);
@@ -110,7 +110,7 @@ int main() {
 
   renderer.SetLockToFit(true);
 
-  while (renderer.Frame(g)) {
+  while (renderer.Frame(dg)) {
     for (size_t i = 0; i < 20; i++)
       forceDirected.Tick();
   }

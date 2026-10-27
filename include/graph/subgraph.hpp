@@ -19,6 +19,7 @@ public:
   inline bool HasEdge(EdgeID id) const { return m_edgeSet.Test(id); }
 
   EdgeComponent GetEdge(EdgeID id) const;
+  float GetWeight(EdgeID id) const { return m_parent->GetWeight(id); }
 
   auto OutNeighbors(NodeID id) const {
     return m_parent->OutNeighbors(id) |
@@ -69,14 +70,6 @@ public:
 
   bool IsDirected() const { return m_parent->IsDirected(); }
 
-  IndexSpace &NodeSpace();
-
-  IndexSpace &EdgeSpace();
-
-  template <typename T, typename... Args> T &SetResource(Args &&...args);
-  template <typename T> T *GetResource();
-  template <typename T> bool HasResource() const;
-
 private:
   void setEdgesAndDegrees(NodeID id);
 
@@ -87,11 +80,7 @@ private:
   SparseNodeSet m_nodeSet;
   SparseEdgeSet m_edgeSet;
   DenseComponentPool<DegreeComponent> *m_degrees;
-  std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
-      m_resources;
 };
-
-#include "graph/subgraph.tpp"
 
 #include "concept/graphLike.hpp"
 static_assert(GraphLike<Subgraph>);

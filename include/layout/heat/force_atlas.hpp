@@ -2,6 +2,7 @@
 
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/force_atlas_heat.hpp"
 
@@ -38,7 +39,7 @@ public:
     }
   };
 
-  ForceAtlasHeat(G &graph, Configuration *config);
+  ForceAtlasHeat(DecoratedGraph<G> &dg, Configuration *config);
 
   Configuration *Config() { return m_config; }
 

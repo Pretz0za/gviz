@@ -1,6 +1,7 @@
 #pragma once
 
 #include "concept/graphLike.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/cubic_bezier.hpp"
 #include "layout/components/half_width.hpp"
@@ -29,11 +30,11 @@ struct FrameData {
   bool bboxValid = false;
 };
 
-template <GraphLike G> bool ReadIs3D(G &graph);
+template <GraphLike G> bool ReadIs3D(DecoratedGraph<G> &dg);
 
 template <GraphLike G> class RenderQuerySystem {
 public:
-  explicit RenderQuerySystem(G &graph);
+  explicit RenderQuerySystem(DecoratedGraph<G> &dg);
 
   // Reuses out's vectors across calls (clears, doesn't reallocate).
   void ExtractFrameData(bool is3D, FrameData &out);

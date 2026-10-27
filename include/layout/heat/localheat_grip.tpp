@@ -8,16 +8,11 @@
 #include "layout/types.hpp"
 
 template <GraphLike G>
-LocalHeatGrip<G>::LocalHeatGrip(G &graph, Configuration *config)
+LocalHeatGrip<G>::LocalHeatGrip(DecoratedGraph<G> &dg, Configuration *config)
     : m_config(RequireConfiguration(config)),
-      m_heatPool(graph.NodeSpace().template GetPool<LocalHeatComponent>()),
-      m_physicsPool(graph.NodeSpace().template GetPool<PhysicsComponent>()),
-      m_dimension(0) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+      m_heatPool(dg.nodeSpace.template GetPool<LocalHeatComponent>()),
+      m_physicsPool(dg.nodeSpace.template GetPool<PhysicsComponent>()),
+      m_dimension(dg.dimension) {}
 
 template <GraphLike G> void LocalHeatGrip<G>::Tick(DenseNodeID id) {
   LocalHeatComponent *heat = &m_heatPool->Data()[id.Raw()];

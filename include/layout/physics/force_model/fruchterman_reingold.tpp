@@ -8,16 +8,11 @@
 #include <cstdint>
 
 template <GraphLike G>
-VanillaFruchtermanReingold<G>::VanillaFruchtermanReingold(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_distanceCalc(graph),
-      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()),
-      m_positions(graph.NodeSpace().template GetPool<PositionComponent>()) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr) {
-    throw MissingResourceException<DimensionResource>();
-  }
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+VanillaFruchtermanReingold<G>::VanillaFruchtermanReingold(DecoratedGraph<G> &dg, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_dimension(dg.dimension),
+      m_distanceCalc(dg),
+      m_positions(dg.nodeSpace.template GetPool<PositionComponent>()),
+      m_physics(dg.nodeSpace.template GetPool<PhysicsComponent>()) {}
 
 template <GraphLike G>
 void VanillaFruchtermanReingold<G>::AttractiveTick(DenseNodeID v,
@@ -62,15 +57,10 @@ void VanillaFruchtermanReingold<G>::RepulsiveTick(DenseNodeID v, const double *u
 }
 
 template <GraphLike G>
-GRIPFruchtermanReingold<G>::GRIPFruchtermanReingold(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_distanceCalc(graph),
-      m_physics(graph.NodeSpace().template GetPool<PhysicsComponent>()) {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr) {
-    throw MissingResourceException<DimensionResource>();
-  }
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+GRIPFruchtermanReingold<G>::GRIPFruchtermanReingold(DecoratedGraph<G> &dg, Configuration *config)
+    : m_config(RequireConfiguration(config)),
+      m_physics(dg.nodeSpace.template GetPool<PhysicsComponent>()),
+      m_distanceCalc(dg), m_dimension(dg.dimension) {}
 
 template <GraphLike G>
 void GRIPFruchtermanReingold<G>::AttractiveTick(DenseNodeID v, DenseNodeID u) {

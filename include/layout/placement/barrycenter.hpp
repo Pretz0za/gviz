@@ -2,6 +2,7 @@
 
 #include "concept/graphLike.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/search/knearest.hpp"
 #include "graph/search/types.hpp"
 #include "graph/types.hpp"
@@ -11,7 +12,7 @@
 
 template <GraphLike G> class PositionBarrycentric {
 public:
-  PositionBarrycentric(G &graph);
+  explicit PositionBarrycentric(DecoratedGraph<G> &dg);
 
   // NOTE: this currently only iterates out neighbors.
   void PlaceBetweenNeighbors(NodeID id);

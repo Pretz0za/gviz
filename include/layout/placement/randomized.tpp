@@ -7,26 +7,16 @@
 #include <random>
 
 template <GraphLike G>
-PositionRandomized<G>::PositionRandomized(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)),
-      m_positionPool{graph.NodeSpace().template GetPool<PositionComponent>()},
-      m_graph(&graph), m_dist{-1, 1}, m_rng{std::random_device{}()} {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+PositionRandomized<G>::PositionRandomized(DecoratedGraph<G> &dg, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_rng{std::random_device{}()},
+      m_dist{-1, 1}, m_dimension(dg.dimension),
+      m_positionPool{dg.nodeSpace.template GetPool<PositionComponent>()} {}
 
 template <GraphLike G>
-PositionRandomized<G>::PositionRandomized(G &graph, uint32_t seed, Configuration *config)
-    : m_config(RequireConfiguration(config)),
-      m_positionPool{graph.NodeSpace().template GetPool<PositionComponent>()},
-      m_graph(&graph), m_dist{-1, 1}, m_rng{seed} {
-  DimensionResource *dim = graph.template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
-}
+PositionRandomized<G>::PositionRandomized(DecoratedGraph<G> &dg, uint32_t seed, Configuration *config)
+    : m_config(RequireConfiguration(config)), m_rng{seed}, m_dist{-1, 1},
+      m_dimension(dg.dimension),
+      m_positionPool{dg.nodeSpace.template GetPool<PositionComponent>()} {}
 
 template <GraphLike G>
 void PositionRandomized<G>::SetSeed(uint32_t seed) {

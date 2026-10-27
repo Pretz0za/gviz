@@ -3,6 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "layout/components/physics.hpp"
 #include "layout/components/position.hpp"
 
@@ -24,7 +25,7 @@ public:
     }
   };
 
-  GravityForceSystem(G &graph, Configuration *config);
+  GravityForceSystem(DecoratedGraph<G> &dg, Configuration *config);
 
   Configuration *Config() { return m_config; }
 

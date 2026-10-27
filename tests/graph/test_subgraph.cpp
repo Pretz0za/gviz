@@ -177,17 +177,3 @@ TEST_CASE("Version tracks how many nodes have been added", "[graph][subgraph]") 
   sub.AddNode(b);
   REQUIRE(sub.Version() == 2);
 }
-
-TEST_CASE("Subgraph resources are independent of the parent graph's resources",
-         "[graph][subgraph]") {
-  Graph g;
-  g.AddNode();
-  g.SetResource<int>(100);
-
-  Subgraph sub(g);
-  REQUIRE_FALSE(sub.HasResource<int>());
-
-  sub.SetResource<int>(7);
-  REQUIRE(*sub.GetResource<int>() == 7);
-  REQUIRE(*g.GetResource<int>() == 100);
-}

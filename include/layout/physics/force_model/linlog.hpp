@@ -3,7 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
-#include "graph/components/degree.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/physics.hpp"
@@ -32,7 +32,7 @@ public:
     }
   };
 
-  LinLog(G &graph, Configuration *config);
+  LinLog(DecoratedGraph<G> &dg, Configuration *config);
 
   Configuration *Config() { return m_config; }
 
@@ -49,9 +49,9 @@ private:
   Configuration *m_config;
   uint8_t m_dimension;
   DistanceCalculationSystem<G> m_distanceCalc;
+  G *m_graph;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<PhysicsComponent> *m_physics;
-  DenseComponentPool<DegreeComponent> *m_degree;
 };
 
 #include "layout/physics/force_model/linlog.tpp"

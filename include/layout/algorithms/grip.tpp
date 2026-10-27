@@ -16,41 +16,30 @@
 
 template <GraphLike G>
 GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph),
-      m_visible(
-          &graph.template SetResource<VisibleNodesResource>(graph.Size(), 0)),
-      m_filtrationOutput(
-          &graph.template SetResource<NestedFiltrationResult>()) {
+    : m_config(RequireConfiguration(config)),
+      m_dimension(m_config->dimension), m_dg(graph) {
 
-  DimensionResource *dim = m_graph->template GetResource<DimensionResource>();
-  if (dim == nullptr)
-    throw MissingResourceException<DimensionResource>();
-  m_dimension = static_cast<uint8_t>(*dim);
-
-  BFSScratch *scratch =
-      &m_graph->template SetResource<BFSScratch>(m_graph->Size());
-  if (scratch == nullptr) {
-    throw MissingResourceException<BFSScratch>();
-  }
-
-  m_filtrationOutput = m_graph->template GetResource<NestedFiltrationResult>();
+  m_dg.dimension = m_dimension;
+  m_visible = &m_dg.template SetResource<VisibleNodesResource>(graph.Size(), 0);
+  m_filtrationOutput = &m_dg.template SetResource<NestedFiltrationResult>();
+  m_dg.template SetResource<BFSScratch>(graph.Size());
 
   // pools grip's systems use
-  m_graph->NodeSpace().template SetPool<PositionComponent>(m_dimension);
-  m_graph->NodeSpace().template SetPool<KNearestComponent>(
+  m_dg.nodeSpace.template SetPool<PositionComponent>(m_dimension);
+  m_dg.nodeSpace.template SetPool<KNearestComponent>(
       m_config->physicsConfig.refinementKNearest);
-  m_graph->NodeSpace().template SetPool<LocalHeatComponent>();
-  m_graph->NodeSpace()
-      .template SetPool<PhysicsComponent>(); // TODO: this should be m_dimension
-                                             // based
+  m_dg.nodeSpace.template SetPool<LocalHeatComponent>();
+  m_dg.nodeSpace.template SetPool<PhysicsComponent>(); // TODO: this should be
+                                                       // m_dimension based
 
   // systems grip uses
-  m_placementSystem = std::make_unique<PositionBarrycentric<G>>(graph);
-  m_filtrationSystem = std::make_unique<MisFiltrationSystem<G>>(graph);
-  m_physicsSystem = std::make_unique<GRIPPhysicsSystem<G>>(graph, &m_config->physicsConfig);
+  m_placementSystem = std::make_unique<PositionBarrycentric<G>>(m_dg);
+  m_filtrationSystem = std::make_unique<MisFiltrationSystem<G>>(m_dg);
+  m_physicsSystem =
+      std::make_unique<GRIPPhysicsSystem<G>>(m_dg, &m_config->physicsConfig);
 
 #ifdef GVIZ_DEBUG_CHARTS
-  m_chart = graph.template SetResource<ChartRecorderResource>(graph.NodeSpace())
+  m_chart = m_dg.template SetResource<ChartRecorderResource>(m_dg.nodeSpace)
                 .recorder.get();
 #endif
 }
@@ -93,7 +82,7 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {
     RegularSimplexPoints(m_dimension, m_config->simplexExtent, simplex.data());
 
     DenseComponentPool<PositionComponent> *positions =
-        m_graph->NodeSpace().template GetPool<PositionComponent>();
+        m_dg.nodeSpace.template GetPool<PositionComponent>();
 
     uint32_t count = filtration->m_borders[m_currLayer];
     std::vector<double> simplexPositions(count * m_dimension);
@@ -115,7 +104,8 @@ template <GraphLike G> void GRIPLayoutAlgorithm<G>::placeLayer() {
   for (uint32_t i = filtration->m_borders[m_currLayer + 1];
        i < filtration->m_borders[m_currLayer]; i++) {
     m_placementSystem->PlaceBetweenKNearest(
-        m_graph->MapToSparse(filtration->m_filtration[i]), m_config->placementKNearest, *m_visible);
+        m_dg.graph->MapToSparse(filtration->m_filtration[i]),
+        m_config->placementKNearest, *m_visible);
   }
   for (uint32_t i = filtration->m_borders[m_currLayer + 1];
        i < filtration->m_borders[m_currLayer]; i++) {

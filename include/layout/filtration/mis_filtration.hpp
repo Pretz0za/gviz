@@ -2,13 +2,14 @@
 
 #include "concept/graphLike.hpp"
 #include "ds/bfs_scratch.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/filtration/types.hpp"
 #include "layout/types.hpp"
 
 template <GraphLike G> class MisFiltrationSystem {
 public:
-  explicit MisFiltrationSystem(G &graph);
+  explicit MisFiltrationSystem(DecoratedGraph<G> &dg);
   void Tick();
 
 private:

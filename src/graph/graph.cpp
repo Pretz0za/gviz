@@ -69,6 +69,11 @@ EdgeComponent Graph::GetEdge(EdgeID id) const {
   return edge ? *edge : INVALID_EDGE;
 }
 
+float Graph::GetWeight(EdgeID id) const {
+  auto *weight = m_weightPool->Find(id.Raw());
+  return weight ? weight->value : 1.0f;
+}
+
 const std::vector<AdjEntry> &Graph::OutNeighbors(NodeID id) const {
   static const std::vector<AdjEntry> kEmpty;
   auto *adj = m_outAdjPool->Find(id.Raw());
@@ -96,6 +101,3 @@ uint32_t Graph::Degree(NodeID id) const {
 uint32_t Graph::Size() const {
   return static_cast<uint32_t>(m_nodeSpace.Size());
 }
-
-IndexSpace &Graph::NodeSpace() { return m_nodeSpace; }
-IndexSpace &Graph::EdgeSpace() { return m_edgeSpace; }

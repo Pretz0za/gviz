@@ -180,9 +180,9 @@ QuadTree<T, S>::QueryRange(const AABB &range) const {
 }
 
 namespace Helpers {
-template <GraphLike G> AABB GetBoundingBox(G *graph) {
+template <GraphLike G> AABB GetBoundingBox(DecoratedGraph<G> *dg) {
   DenseComponentPool<PositionComponent> *pool =
-      graph->NodeSpace().template GetPool<PositionComponent>();
+      dg->nodeSpace.template GetPool<PositionComponent>();
   if (!pool) {
     return {{0, 0}, std::numeric_limits<double>::infinity()};
   }

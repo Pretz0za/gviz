@@ -1,10 +1,12 @@
 #pragma once
 
-#include "graph/graph.hpp"
+#include "graph/decorated_graph.hpp"
 #include <typeindex>
 #include <utility>
 
-template <typename T, typename... Args> T &Graph::SetResource(Args &&...args) {
+template <GraphLike G>
+template <typename T, typename... Args>
+T &DecoratedGraph<G>::SetResource(Args &&...args) {
   auto out = GetResource<T>();
   if (out != nullptr)
     return *out;
@@ -16,7 +18,9 @@ template <typename T, typename... Args> T &Graph::SetResource(Args &&...args) {
   return raw->m_value;
 }
 
-template <typename T> T *Graph::GetResource() {
+template <GraphLike G>
+template <typename T>
+T *DecoratedGraph<G>::GetResource() {
   auto key = std::type_index(typeid(T));
   auto it = m_resources.find(key);
   if (it == m_resources.end())
@@ -24,7 +28,9 @@ template <typename T> T *Graph::GetResource() {
   return &static_cast<ResourceHolder<T> *>(it->second.get())->m_value;
 }
 
-template <typename T> bool Graph::HasResource() const {
+template <GraphLike G>
+template <typename T>
+bool DecoratedGraph<G>::HasResource() const {
   auto key = std::type_index(typeid(T));
   return m_resources.find(key) != m_resources.end();
 }

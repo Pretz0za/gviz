@@ -3,6 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/heat.hpp"
 #include "layout/components/physics.hpp"
@@ -32,7 +33,7 @@ public:
     }
   };
 
-  LocalHeatGrip(G &graph, Configuration *config);
+  LocalHeatGrip(DecoratedGraph<G> &dg, Configuration *config);
 
   Configuration *Config() { return m_config; }
 

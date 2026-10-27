@@ -27,6 +27,7 @@
 #include "catch_amalgamated.hpp"
 #include "layout/filtration/mis_filtration.hpp"
 
+#include "graph/decorated_graph.hpp"
 #include "helpers/graph_helpers.hpp"
 
 #include <vector>
@@ -35,7 +36,7 @@ using test_helpers::MakeGraph;
 
 namespace {
 Graph MakePathGraph(uint32_t length) {
-  Graph g = MakeGraph(length, 2);
+  Graph g = MakeGraph(length);
   for (uint32_t i = 0; i + 1 < length; i++)
     g.AddUndirectedEdge(NodeID(i), NodeID(i + 1));
   return g;
@@ -45,11 +46,12 @@ Graph MakePathGraph(uint32_t length) {
 TEST_CASE("Tick produces the hand-traced two-layer filtration for a 6-node path",
          "[layout][filtration][mis]") {
   Graph g = MakePathGraph(6);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
 
-  MisFiltrationSystem<Graph> system(g);
+  MisFiltrationSystem<Graph> system(dg);
   system.Tick();
 
-  NestedFiltrationResult *result = g.GetResource<NestedFiltrationResult>();
+  NestedFiltrationResult *result = dg.GetResource<NestedFiltrationResult>();
   REQUIRE(result != nullptr);
   REQUIRE(result->m_layerCount == 2);
   REQUIRE(result->m_borders.size() == 2);
@@ -68,10 +70,11 @@ TEST_CASE("Tick produces the hand-traced two-layer filtration for a 6-node path"
 TEST_CASE("The coarsest layer always has at least dimension+1 border width",
          "[layout][filtration][mis]") {
   Graph g = MakePathGraph(6);
-  MisFiltrationSystem<Graph> system(g);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  MisFiltrationSystem<Graph> system(dg);
   system.Tick();
 
-  NestedFiltrationResult *result = g.GetResource<NestedFiltrationResult>();
+  NestedFiltrationResult *result = dg.GetResource<NestedFiltrationResult>();
   uint32_t lastBorder = result->m_borders[result->m_layerCount - 1];
   REQUIRE(lastBorder >= 3); // dimension(2) + 1
 }
@@ -79,14 +82,15 @@ TEST_CASE("The coarsest layer always has at least dimension+1 border width",
 TEST_CASE("Calling Tick again rebuilds the filtration from scratch",
          "[layout][filtration][mis]") {
   Graph g = MakePathGraph(6);
-  MisFiltrationSystem<Graph> system(g);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  MisFiltrationSystem<Graph> system(dg);
 
   system.Tick();
-  NestedFiltrationResult *first = g.GetResource<NestedFiltrationResult>();
+  NestedFiltrationResult *first = dg.GetResource<NestedFiltrationResult>();
   uint32_t firstLayerCount = first->m_layerCount;
 
   system.Tick();
-  NestedFiltrationResult *second = g.GetResource<NestedFiltrationResult>();
+  NestedFiltrationResult *second = dg.GetResource<NestedFiltrationResult>();
 
   REQUIRE(second == first); // same resource object, rebuilt in place
   REQUIRE(second->m_layerCount == firstLayerCount);
@@ -96,10 +100,11 @@ TEST_CASE("Calling Tick again rebuilds the filtration from scratch",
 TEST_CASE("The union of every layer's nodes covers the whole graph exactly once",
          "[layout][filtration][mis]") {
   Graph g = MakePathGraph(6);
-  MisFiltrationSystem<Graph> system(g);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  MisFiltrationSystem<Graph> system(dg);
   system.Tick();
 
-  NestedFiltrationResult *result = g.GetResource<NestedFiltrationResult>();
+  NestedFiltrationResult *result = dg.GetResource<NestedFiltrationResult>();
   REQUIRE(result->m_filtration.size() == g.Size());
 
   std::vector<bool> seen(g.Size(), false);

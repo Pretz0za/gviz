@@ -5,7 +5,7 @@
 Subgraph::Subgraph(Graph &parent)
     : m_parent(&parent), m_compactEdgeSpace(), m_compactNodeSpace(),
       m_nodeSet(m_parent->Size(), 0), m_edgeSet(parent.EdgeCount(), 0) {
-  m_degrees = NodeSpace().SetPool<DegreeComponent>();
+  m_degrees = m_compactNodeSpace.SetPool<DegreeComponent>();
 }
 
 DenseNodeID Subgraph::AddNode(NodeID id) {
@@ -60,6 +60,3 @@ uint32_t Subgraph::Degree(NodeID id) const {
   auto *res = m_degrees->Find(MapToDense(id).Raw());
   return res ? res->in + res->out : 0;
 }
-
-IndexSpace &Subgraph::NodeSpace() { return m_compactNodeSpace; }
-IndexSpace &Subgraph::EdgeSpace() { return m_compactEdgeSpace; }

@@ -2,6 +2,7 @@
 
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/mass.hpp"
 #include "layout/components/physics.hpp"
@@ -21,6 +22,7 @@ public:
     double restLength = 1.0;
     double damping = 0.5;
     double timeStep = 0.1;
+    uint8_t dimension = 2;
 
     Configuration WithStiffness(double v) { stiffness = v; return *this; }
     Configuration WithRestLength(double v) { restLength = v; return *this; }
@@ -48,8 +50,11 @@ public:
 
   Configuration *Config() { return m_config; }
 
+  DecoratedGraph<G> &Decorated() { return m_dg; }
+
 private:
   Configuration *m_config;
+  DecoratedGraph<G> m_dg;
   G *m_graph;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<VelocityComponent> *m_velocity;

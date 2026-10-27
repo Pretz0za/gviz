@@ -2,13 +2,14 @@
 
 #include "concept/graphLike.hpp"
 #include "ecs/components.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/position.hpp"
 #include "layout/components/radius.hpp"
 
 template <GraphLike G> class DistanceCalculationSystem {
 public:
-  DistanceCalculationSystem(G &graph);
+  explicit DistanceCalculationSystem(DecoratedGraph<G> &dg);
 
   inline double BetweenNodes(DenseNodeID v, DenseNodeID u);
 

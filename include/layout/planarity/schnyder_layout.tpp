@@ -9,9 +9,10 @@
 
 template <GraphLike G>
 SchnyderLayoutAlgorithm<G>::SchnyderLayoutAlgorithm(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph), m_rotation(graph) {
-  m_positions = graph.NodeSpace().template SetPool<PositionComponent>(2);
-  graph.template SetResource<DimensionResource>(DimensionResource::D2);
+    : m_config(RequireConfiguration(config)), m_graph(&graph), m_dg(graph),
+      m_rotation(m_dg) {
+  m_dg.dimension = 2;
+  m_positions = m_dg.nodeSpace.template SetPool<PositionComponent>(2);
 }
 
 template <GraphLike G> void SchnyderLayoutAlgorithm<G>::RebuildWood(NodeID s0, NodeID s1) {

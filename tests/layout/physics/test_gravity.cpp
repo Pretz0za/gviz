@@ -5,6 +5,7 @@
 #include "catch_amalgamated.hpp"
 #include "layout/physics/gravity.hpp"
 
+#include "graph/decorated_graph.hpp"
 #include "helpers/graph_helpers.hpp"
 
 using test_helpers::MakeGraph;
@@ -14,14 +15,15 @@ using test_helpers::WithPositions;
 
 TEST_CASE("An isolated node is pulled toward the origin by -magnitude/dist * pos",
          "[layout][physics][gravity]") {
-  Graph g = MakeGraph(1, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
   SetPosition(positions, 0, {3.0, 4.0});
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
   gravityConfig.magnitude = 0.2;
-  GravityForceSystem<Graph> gravity(g, &gravityConfig);
+  GravityForceSystem<Graph> gravity(dg, &gravityConfig);
   gravity.Tick();
 
   // dist = 5, degree = 0 -> factor = -0.2 * 1 / 5 = -0.04
@@ -32,9 +34,10 @@ TEST_CASE("An isolated node is pulled toward the origin by -magnitude/dist * pos
 
 TEST_CASE("Higher degree nodes are pulled proportionally harder",
          "[layout][physics][gravity]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
   g.AddEdge(NodeID(0), NodeID(1)); // gives node 0 degree 1
 
   SetPosition(positions, 0, {6.0, 8.0});
@@ -42,7 +45,7 @@ TEST_CASE("Higher degree nodes are pulled proportionally harder",
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
   gravityConfig.magnitude = 0.2;
-  GravityForceSystem<Graph> gravity(g, &gravityConfig);
+  GravityForceSystem<Graph> gravity(dg, &gravityConfig);
   gravity.Tick();
 
   // dist = 10, degree = 1 -> factor = -0.2 * 2 / 10 = -0.04
@@ -52,13 +55,14 @@ TEST_CASE("Higher degree nodes are pulled proportionally harder",
 }
 
 TEST_CASE("A node already at the origin is left untouched", "[layout][physics][gravity]") {
-  Graph g = MakeGraph(1, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
   SetPosition(positions, 0, {0.0, 0.0});
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
-  GravityForceSystem<Graph> gravity(g, &gravityConfig);
+  GravityForceSystem<Graph> gravity(dg, &gravityConfig);
   gravity.Tick();
 
   double *disp = physics->Find(0)->disp;
@@ -67,13 +71,14 @@ TEST_CASE("A node already at the origin is left untouched", "[layout][physics][g
 }
 
 TEST_CASE("SetMagnitude scales the pull linearly", "[layout][physics][gravity]") {
-  Graph g = MakeGraph(1, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
   SetPosition(positions, 0, {3.0, 4.0});
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
-  GravityForceSystem<Graph> gravity(g, &gravityConfig);
+  GravityForceSystem<Graph> gravity(dg, &gravityConfig);
   gravity.Config()->WithMagnitude(1.0);
   gravity.Tick();
 
@@ -85,16 +90,17 @@ TEST_CASE("SetMagnitude scales the pull linearly", "[layout][physics][gravity]")
 
 TEST_CASE("Tick accumulates into existing displacement rather than overwriting it",
          "[layout][physics][gravity]") {
-  Graph g = MakeGraph(1, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
+  Graph g = MakeGraph(1);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
   SetPosition(positions, 0, {3.0, 4.0});
   physics->Find(0)->disp[0] = 100.0;
   physics->Find(0)->disp[1] = 100.0;
 
   GravityForceSystem<Graph>::Configuration gravityConfig;
   gravityConfig.magnitude = 0.2;
-  GravityForceSystem<Graph> gravity(g, &gravityConfig);
+  GravityForceSystem<Graph> gravity(dg, &gravityConfig);
   gravity.Tick();
 
   double *disp = physics->Find(0)->disp;

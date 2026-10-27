@@ -1,6 +1,7 @@
 #include "catch_amalgamated.hpp"
 #include "layout/physics/force_model/linlog.hpp"
 
+#include "graph/decorated_graph.hpp"
 #include "helpers/graph_helpers.hpp"
 
 using test_helpers::MakeGraph;
@@ -17,17 +18,18 @@ void SetRadius(DenseComponentPool<RadiusComponent> *pool, uint32_t id, double r)
 
 TEST_CASE("LinLog AttractiveTick pulls v toward u by log(1 + gap)",
          "[layout][physics][linlog]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  auto *radii = WithRadius(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  auto *radii = WithRadius(dg);
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
   LinLog<Graph>::Configuration config;
-  LinLog<Graph> model(g, &config);
+  LinLog<Graph> model(dg, &config);
   model.AttractiveTick(DenseNodeID(0), DenseNodeID(1));
 
   // gap = 10, magnitude = log(1 + 10), direction toward u is (1, 0).
@@ -38,17 +40,18 @@ TEST_CASE("LinLog AttractiveTick pulls v toward u by log(1 + gap)",
 
 TEST_CASE("LinLog RepulsiveTick(v, u) pushes v away from u, scaled by mass product / gap",
          "[layout][physics][linlog]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  auto *radii = WithRadius(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  auto *radii = WithRadius(dg);
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
   SetRadius(radii, 0, 0.0);
   SetRadius(radii, 1, 0.0);
 
   LinLog<Graph>::Configuration config;
-  LinLog<Graph> model(g, &config);
+  LinLog<Graph> model(dg, &config);
   model.RepulsiveTick(DenseNodeID(0), DenseNodeID(1));
 
   // Neither node has any edges, so both masses are (1 + 0) = 1.
@@ -60,10 +63,11 @@ TEST_CASE("LinLog RepulsiveTick(v, u) pushes v away from u, scaled by mass produ
 
 TEST_CASE("LinLog RepulsiveTick(v, u) scales with degree-derived vertex mass",
          "[layout][physics][linlog]") {
-  Graph g = MakeGraph(3, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  auto *radii = WithRadius(g);
+  Graph g = MakeGraph(3);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  auto *radii = WithRadius(dg);
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
   SetPosition(positions, 2, {-10.0, 0.0});
@@ -77,7 +81,7 @@ TEST_CASE("LinLog RepulsiveTick(v, u) scales with degree-derived vertex mass",
   g.AddEdge(NodeID(2), NodeID(1));
 
   LinLog<Graph>::Configuration config;
-  LinLog<Graph> model(g, &config);
+  LinLog<Graph> model(dg, &config);
   model.RepulsiveTick(DenseNodeID(0), DenseNodeID(1));
 
   // gap = 10, mag = (1 * 3) / 10 = 0.3, direction away from u is (-1, 0).
@@ -89,15 +93,16 @@ TEST_CASE("LinLog RepulsiveTick(v, u) scales with degree-derived vertex mass",
 TEST_CASE("LinLog RepulsiveTick(v, pointer, mass) matches the two-node form "
          "when passed u's own position and mass",
          "[layout][physics][linlog]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  WithRadius(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  WithRadius(dg);
   SetPosition(positions, 0, {0.0, 0.0});
   SetPosition(positions, 1, {10.0, 0.0});
 
   LinLog<Graph>::Configuration config;
-  LinLog<Graph> model(g, &config);
+  LinLog<Graph> model(dg, &config);
   double uPos[2] = {10.0, 0.0};
   model.RepulsiveTick(DenseNodeID(0), uPos, 1.0);
 
@@ -108,15 +113,16 @@ TEST_CASE("LinLog RepulsiveTick(v, pointer, mass) matches the two-node form "
 
 TEST_CASE("LinLog ticks stay finite when nodes exactly coincide",
          "[layout][physics][linlog]") {
-  Graph g = MakeGraph(2, 2);
-  auto *positions = WithPositions(g, 2);
-  auto *physics = WithPhysics(g);
-  WithRadius(g);
+  Graph g = MakeGraph(2);
+  DecoratedGraph<Graph> dg = test_helpers::Decorate(g);
+  auto *positions = WithPositions(dg, 2);
+  auto *physics = WithPhysics(dg);
+  WithRadius(dg);
   SetPosition(positions, 0, {5.0, 5.0});
   SetPosition(positions, 1, {5.0, 5.0});
 
   LinLog<Graph>::Configuration config;
-  LinLog<Graph> model(g, &config);
+  LinLog<Graph> model(dg, &config);
 
   model.AttractiveTick(DenseNodeID(0), DenseNodeID(1));
   double *attractiveDisp = physics->Find(0)->disp;

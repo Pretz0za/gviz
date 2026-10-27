@@ -3,12 +3,12 @@
 #include "layout/animation.hpp"
 #include <algorithm>
 
-template <GraphLike G> void PositionAnimationSystem<G>::Init(G &graph) {
-  m_position = graph.NodeSpace().template GetPool<PositionComponent>();
+template <GraphLike G> void PositionAnimationSystem<G>::Init(DecoratedGraph<G> &dg) {
+  m_position = dg.nodeSpace.template GetPool<PositionComponent>();
   uint8_t dimension = m_position->Dimension();
-  m_from = graph.NodeSpace()
+  m_from = dg.nodeSpace
                .template SetPool<AnimationFromPositionComponent>(dimension);
-  m_to = graph.NodeSpace()
+  m_to = dg.nodeSpace
              .template SetPool<AnimationToPositionComponent>(dimension);
 }
 

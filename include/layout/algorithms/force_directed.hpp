@@ -4,6 +4,7 @@
 #include "config/configuration.hpp"
 #include "debug/chart_recorder.hpp"
 #include "ds/quadtree.hpp"
+#include "graph/decorated_graph.hpp"
 #include "layout/algorithms/types.hpp"
 #include "layout/components/mass.hpp"
 #include "layout/components/position.hpp"
@@ -11,6 +12,7 @@
 #include "layout/heat/force_atlas.hpp"
 #include "layout/physics/gravity.hpp"
 #include "layout/placement/randomized.hpp"
+#include "layout/types.hpp"
 #include <cstdint>
 #include <memory>
 
@@ -24,6 +26,7 @@ public:
     // Barnes-Hut opening-angle threshold: a quadtree node is treated as a
     // single mass once (2 * halfLength / distance) falls below this.
     double theta = 1.0;
+    uint8_t dimension = 2;
     typename F::Configuration forceModelConfig;
     typename GravityForceSystem<G>::Configuration gravityConfig;
     typename PositionRandomized<G>::Configuration randomizedConfig;
@@ -43,10 +46,13 @@ public:
 
   Configuration *Config() { return m_config; }
 
+  DecoratedGraph<G> &Decorated() { return m_dg; }
+
 private:
   void RepulsiveTick(SpacialIndex::QuadTree<DenseNodeID, 1> *node, DenseNodeID v);
   void RebuildQuadTree();
   Configuration *m_config;
+  DecoratedGraph<G> m_dg;
   G *m_graph;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<MassComponent> *m_mass;

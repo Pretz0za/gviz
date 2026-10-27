@@ -1,3 +1,4 @@
+#include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "layout/components/radius.hpp"
 #include "layout/planarity/schnyder_layout.hpp"
@@ -49,11 +50,12 @@ int main() {
   SchnyderLayoutAlgorithm<Graph> layout(g, &layoutConfig);
   layout.Tick();
 
-  auto *radii = g.NodeSpace().SetPool<RadiusComponent>(MANUAL);
+  DecoratedGraph<Graph> &dg = layout.Decorated();
+  auto *radii = dg.nodeSpace.SetPool<RadiusComponent>(MANUAL);
   for (uint32_t i = 0; i < radii->Size(); i++)
     radii->Data()[i].radius = 8.0;
 
-  Renderer renderer(1280, 720, "gviz schnyderDemo", g);
+  Renderer renderer(1280, 720, "gviz schnyderDemo", dg);
   renderer.SetLockToFit(true);
   renderer.SetNodeColor(0.95f, 0.55f, 0.15f, 1.0f);
   renderer.SetEdgeColor(0.3f, 0.55f, 0.85f, 0.55f);
@@ -62,7 +64,7 @@ int main() {
   renderer.DebugConfigs().Add("Schnyder Layout", layoutConfig);
 #endif
 
-  while (renderer.Frame(g)) {
+  while (renderer.Frame(dg)) {
     layout.Tick();
 
     if (renderer.KeyPressed('R'))

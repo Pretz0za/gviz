@@ -3,7 +3,7 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
-#include "graph/components/weight.hpp"
+#include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "layout/components/cubic_bezier.hpp"
 #include "layout/components/half_width.hpp"
@@ -49,6 +49,8 @@ public:
 
   Configuration *Config() { return m_config; }
 
+  DecoratedGraph<G> &Decorated() { return m_dg; }
+
   void Layout();
   void Tick();
 
@@ -64,12 +66,12 @@ private:
   double EdgeWeight(EdgeID id) const;
 
   Configuration *m_config;
+  DecoratedGraph<G> m_dg;
   G *m_graph;
   DenseComponentPool<SankeyNodeDecorator> *m_info;
   DenseComponentPool<CubicBezierComponent> *m_curves;
   DenseComponentPool<HalfWidthComponent> *m_halfWidths;
   DenseComponentPool<PositionComponent> *m_positions;
-  DenseComponentPool<WeightComponent> *m_weights;
   uint32_t m_layerCount = 0;
   std::vector<std::vector<DenseNodeID>> m_layers;
   std::vector<double> m_columnX;
