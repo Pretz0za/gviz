@@ -8,11 +8,18 @@
 
 #include "helpers/graph_helpers.hpp"
 
-using test_helpers::MakeGraph;
+namespace {
+Graph MakeDirectedGraph(uint32_t nodeCount) {
+  Graph g(Graph::GraphFlags::Directed);
+  for (uint32_t i = 0; i < nodeCount; i++)
+    g.AddNode();
+  return g;
+}
+} // namespace
 
 TEST_CASE("Linear chain is assigned one node per layer",
          "[layout][algorithms][sankey]") {
-  Graph g = MakeGraph(3);
+  Graph g = MakeDirectedGraph(3);
   auto nodes = std::vector<NodeID>(g.Nodes().begin(), g.Nodes().end());
   g.AddEdge(nodes[0], nodes[1], 2.0f);
   g.AddEdge(nodes[1], nodes[2], 2.0f);
@@ -35,7 +42,7 @@ TEST_CASE("Linear chain is assigned one node per layer",
 
 TEST_CASE("Edges receive a bezier control-point curve with positive width",
          "[layout][algorithms][sankey]") {
-  Graph g = MakeGraph(2);
+  Graph g = MakeDirectedGraph(2);
   auto nodes = std::vector<NodeID>(g.Nodes().begin(), g.Nodes().end());
   EdgeID e = g.AddEdge(nodes[0], nodes[1], 4.0f);
 
@@ -56,7 +63,7 @@ TEST_CASE("Edges receive a bezier control-point curve with positive width",
 
 TEST_CASE("Diverging flow splits a node's outgoing ports without overlap",
          "[layout][algorithms][sankey]") {
-  Graph g = MakeGraph(3);
+  Graph g = MakeDirectedGraph(3);
   auto nodes = std::vector<NodeID>(g.Nodes().begin(), g.Nodes().end());
   EdgeID a = g.AddEdge(nodes[0], nodes[1], 3.0f);
   EdgeID b = g.AddEdge(nodes[0], nodes[2], 5.0f);

@@ -22,11 +22,11 @@ Graph BuildRectMesh(size_t length, size_t width) {
 
       // right neighbor
       if (j + 1 < width)
-        g.AddUndirectedEdge(NodeID(idx), NodeID(i * width + (j + 1)), 1.0);
+        g.AddEdge(NodeID(idx), NodeID(i * width + (j + 1)), 1.0);
 
       // down neighbor
       if (i + 1 < length)
-        g.AddUndirectedEdge(NodeID(idx), NodeID((i + 1) * width + j), 1.0);
+        g.AddEdge(NodeID(idx), NodeID((i + 1) * width + j), 1.0);
     }
   }
 

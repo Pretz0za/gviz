@@ -17,17 +17,18 @@
 
 class Graph {
 public:
-  enum class GraphFlags : uint8_t { None = 0, Directed = 1 << 0 };
+  enum class GraphFlags : uint8_t {
+    None = 0,
+    Directed = 1 << 0,
+  };
 
-  Graph();
+  Graph(Flags<GraphFlags> flags = Flags<GraphFlags>{GraphFlags::None});
 
   NodeID AddNode();
   bool HasNode(NodeID id) const;
 
   EdgeID AddEdge(NodeID from, NodeID to);
   EdgeID AddEdge(NodeID from, NodeID to, float weight);
-  std::pair<EdgeID, EdgeID> AddUndirectedEdge(NodeID a, NodeID b);
-  std::pair<EdgeID, EdgeID> AddUndirectedEdge(NodeID a, NodeID b, float weight);
   bool HasEdge(EdgeID id) const;
   EdgeComponent GetEdge(EdgeID id) const;
   float GetWeight(EdgeID id) const;
@@ -83,7 +84,7 @@ private:
   DenseComponentPool<EdgeComponent> *m_edgePool;
   DenseComponentPool<WeightComponent> *m_weightPool;
   uint64_t m_version = 0;
-  Flags<GraphFlags> m_flags = GraphFlags::None;
+  const Flags<GraphFlags> m_flags = GraphFlags::None;
 };
 
 #include "concept/graphLike.hpp"

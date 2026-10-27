@@ -133,7 +133,7 @@ TEST_CASE("Edges() filters the parent's edges down to fully-visible ones",
 
 TEST_CASE("Degree counts within the subgraph ignore edges to excluded nodes",
          "[graph][subgraph]") {
-  Graph g;
+  Graph g(Graph::GraphFlags::Directed);
   NodeID a = g.AddNode();
   NodeID b = g.AddNode();
   NodeID c = g.AddNode();

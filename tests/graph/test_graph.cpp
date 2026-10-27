@@ -68,7 +68,7 @@ TEST_CASE("A weighted AddEdge stores the given weight", "[graph]") {
 
 TEST_CASE("AddEdge registers the edge in both endpoints' adjacency lists",
          "[graph]") {
-  Graph g;
+  Graph g(Graph::GraphFlags::Directed);
   NodeID a = g.AddNode();
   NodeID b = g.AddNode();
   EdgeID e = g.AddEdge(a, b);
@@ -86,7 +86,7 @@ TEST_CASE("AddEdge registers the edge in both endpoints' adjacency lists",
 
 TEST_CASE("An edge does not appear as an in-neighbor of its source",
          "[graph]") {
-  Graph g;
+  Graph g(Graph::GraphFlags::Directed);
   NodeID a = g.AddNode();
   NodeID b = g.AddNode();
   g.AddEdge(a, b);
@@ -95,14 +95,14 @@ TEST_CASE("An edge does not appear as an in-neighbor of its source",
   REQUIRE(g.OutNeighbors(b).empty());
 }
 
-TEST_CASE("AddUndirectedEdge creates edges in both directions", "[graph]") {
+TEST_CASE("AddEdge on an undirected graph connects both endpoints",
+         "[graph]") {
   Graph g;
   NodeID a = g.AddNode();
   NodeID b = g.AddNode();
 
-  auto [ab, ba] = g.AddUndirectedEdge(a, b);
-  REQUIRE(ab.IsValid());
-  REQUIRE(ba.IsValid());
+  EdgeID e = g.AddEdge(a, b);
+  REQUIRE(e.IsValid());
 
   REQUIRE(g.OutNeighbors(a).size() == 1);
   REQUIRE(g.OutNeighbors(b).size() == 1);
@@ -112,7 +112,7 @@ TEST_CASE("AddUndirectedEdge creates edges in both directions", "[graph]") {
 
 TEST_CASE("Degree counts are consistent with in/out neighbor list sizes",
          "[graph]") {
-  Graph g;
+  Graph g(Graph::GraphFlags::Directed);
   NodeID a = g.AddNode();
   NodeID b = g.AddNode();
   NodeID c = g.AddNode();

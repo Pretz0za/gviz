@@ -15,6 +15,7 @@ template <GraphLike G>
 std::vector<FoundNode> KNearestSearch<G>::Find(NodeID id, uint32_t k) {
   std::vector<FoundNode> knearset{};
   m_scratch->InitNew();
+  m_scratch->Visit(m_graph->MapToDense(id));
   m_scratch->Push(id, 0);
 
   while (!m_scratch->Empty()) {
@@ -41,6 +42,7 @@ std::vector<FoundNode> KNearestSearch<G>::Find(NodeID id, uint32_t k,
                                                DenseNodeSet filter) {
   std::vector<FoundNode> knearset{};
   m_scratch->InitNew();
+  m_scratch->Visit(m_graph->MapToDense(id));
   m_scratch->Push(id, 0);
 
   while (!m_scratch->Empty()) {

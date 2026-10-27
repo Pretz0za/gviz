@@ -27,9 +27,9 @@ Graph BuildRectMesh(size_t length, size_t width) {
     for (size_t j = 0; j < width; j++) {
       size_t idx = i * width + j;
       if (j + 1 < width)
-        g.AddUndirectedEdge(NodeID(idx), NodeID(i * width + (j + 1)), 1.0f);
+        g.AddEdge(NodeID(idx), NodeID(i * width + (j + 1)), 1.0f);
       if (i + 1 < length)
-        g.AddUndirectedEdge(NodeID(idx), NodeID((i + 1) * width + j), 1.0f);
+        g.AddEdge(NodeID(idx), NodeID((i + 1) * width + j), 1.0f);
     }
   }
 

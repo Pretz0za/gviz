@@ -21,7 +21,7 @@ static void AddRandomChildren(Graph &g, NodeID root, int depth, int maxDepth,
 
   for (int i = 0; i < count; i++) {
     NodeID child = g.AddNode();
-    g.AddUndirectedEdge(root, child);
+    g.AddEdge(root, child);
     AddRandomChildren(g, child, depth + 1, maxDepth, branchingFactor, exact,
                       rng);
   }

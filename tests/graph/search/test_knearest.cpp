@@ -12,7 +12,7 @@
 namespace {
 // 0 -> 1 -> 2 -> 3 -> 4
 Graph MakeChain(uint32_t length) {
-  Graph g;
+  Graph g(Graph::GraphFlags::Directed);
   std::vector<NodeID> nodes;
   for (uint32_t i = 0; i < length; i++)
     nodes.push_back(g.AddNode());
@@ -72,7 +72,7 @@ TEST_CASE("Find on an isolated node returns nothing", "[graph][search][knearest]
 TEST_CASE("A node is never visited/returned twice, even with converging paths",
          "[graph][search][knearest]") {
   // 0 -> 1, 0 -> 2, 1 -> 3, 2 -> 3 (diamond)
-  Graph g;
+  Graph g(Graph::GraphFlags::Directed);
   NodeID n0 = g.AddNode();
   NodeID n1 = g.AddNode();
   NodeID n2 = g.AddNode();

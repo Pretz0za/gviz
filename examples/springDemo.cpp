@@ -18,10 +18,10 @@ static Graph BuildGrid(int rows, int cols, std::vector<std::vector<NodeID>> &nod
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
       if (c + 1 < cols)
-        g.AddUndirectedEdge(nodes[static_cast<size_t>(r)][static_cast<size_t>(c)],
+        g.AddEdge(nodes[static_cast<size_t>(r)][static_cast<size_t>(c)],
                             nodes[static_cast<size_t>(r)][static_cast<size_t>(c + 1)]);
       if (r + 1 < rows)
-        g.AddUndirectedEdge(nodes[static_cast<size_t>(r)][static_cast<size_t>(c)],
+        g.AddEdge(nodes[static_cast<size_t>(r)][static_cast<size_t>(c)],
                             nodes[static_cast<size_t>(r + 1)][static_cast<size_t>(c)]);
     }
   }

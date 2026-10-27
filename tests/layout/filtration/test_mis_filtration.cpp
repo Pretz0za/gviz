@@ -38,7 +38,7 @@ namespace {
 Graph MakePathGraph(uint32_t length) {
   Graph g = MakeGraph(length);
   for (uint32_t i = 0; i + 1 < length; i++)
-    g.AddUndirectedEdge(NodeID(i), NodeID(i + 1));
+    g.AddEdge(NodeID(i), NodeID(i + 1));
   return g;
 }
 } // namespace

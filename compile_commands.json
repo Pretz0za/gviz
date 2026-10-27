@@ -127,55 +127,55 @@
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o -c /home/aziz/Projects/gviz/src/render/renderer.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o -c /home/aziz/Projects/gviz/src/render/renderer.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/renderer.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/renderer.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/device.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/device.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/gpu/device.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/gpu/device.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/screenshot.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/screenshot.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/screenshot.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/screenshot.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/gpu/screenshot.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/gpu/screenshot.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o -c /home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o -c /home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/camera/camera_control.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/camera/camera_control.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o -c /home/aziz/Projects/gviz/src/render/frame/frame.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o -c /home/aziz/Projects/gviz/src/render/frame/frame.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/frame/frame.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/frame/frame.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/debug/chart_window.cpp.o -c /home/aziz/Projects/gviz/src/render/debug/chart_window.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/debug/chart_window.cpp.o -c /home/aziz/Projects/gviz/src/render/debug/chart_window.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/debug/chart_window.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/debug/chart_window.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/debug/chart_overlay.cpp.o -c /home/aziz/Projects/gviz/src/render/debug/chart_overlay.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/debug/chart_overlay.cpp.o -c /home/aziz/Projects/gviz/src/render/debug/chart_overlay.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/debug/chart_overlay.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/debug/chart_overlay.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/debug/config_window.cpp.o -c /home/aziz/Projects/gviz/src/render/debug/config_window.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/debug/config_window.cpp.o -c /home/aziz/Projects/gviz/src/render/debug/config_window.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/debug/config_window.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/debug/config_window.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render",
-  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/src/render -I/home/aziz/Projects/gviz/build-render/generated/render -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIC -Wall -Wextra -o CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o -c /home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
   "file": "/home/aziz/Projects/gviz/src/render/gpu/surface_linux.cpp",
   "output": "CMakeFiles/gvizRender.dir/src/render/gpu/surface_linux.cpp.o"
 },
@@ -196,6 +196,18 @@
   "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIE -o CMakeFiles/sankeyDemo.dir/examples/sankeyDemo.cpp.o -c /home/aziz/Projects/gviz/examples/sankeyDemo.cpp",
   "file": "/home/aziz/Projects/gviz/examples/sankeyDemo.cpp",
   "output": "CMakeFiles/sankeyDemo.dir/examples/sankeyDemo.cpp.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIE -o CMakeFiles/schnyderDemo.dir/examples/schnyderDemo.cpp.o -c /home/aziz/Projects/gviz/examples/schnyderDemo.cpp",
+  "file": "/home/aziz/Projects/gviz/examples/schnyderDemo.cpp",
+  "output": "CMakeFiles/schnyderDemo.dir/examples/schnyderDemo.cpp.o"
+},
+{
+  "directory": "/home/aziz/Projects/gviz/build-render",
+  "command": "/usr/bin/c++ -DGVIZ_DEBUG_CHARTS -DIMGUI_IMPL_WEBGPU_BACKEND_WGPU -I/home/aziz/Projects/gviz/include -I/home/aziz/Projects/gviz/third-party/imgui -I/home/aziz/Projects/gviz/third-party/imgui/backends -I/home/aziz/Projects/gviz/third-party/glfw/include -isystem /home/aziz/Projects/gviz/third-party/wgpu-native/include -g -std=gnu++23 -fPIE -o CMakeFiles/springDemo.dir/examples/springDemo.cpp.o -c /home/aziz/Projects/gviz/examples/springDemo.cpp",
+  "file": "/home/aziz/Projects/gviz/examples/springDemo.cpp",
+  "output": "CMakeFiles/springDemo.dir/examples/springDemo.cpp.o"
 },
 {
   "directory": "/home/aziz/Projects/gviz/build-render/glfw-build/src",

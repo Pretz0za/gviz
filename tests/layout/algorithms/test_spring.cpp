@@ -19,7 +19,7 @@ TEST_CASE("Construction registers the position/velocity/physics/mass/spring "
          "pools and a FixedNodesResource",
          "[layout][algorithms][spring]") {
   Graph g = MakeGraph(2);
-  g.AddUndirectedEdge(NodeID(0), NodeID(1));
+  g.AddEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
   SpringLayoutAlgorithm<Graph> alg(g, &algConfig);
@@ -45,7 +45,7 @@ TEST_CASE("Dimension defaults to 2 when not configured",
 TEST_CASE("A stretched spring pulls its two free endpoints toward the rest length",
          "[layout][algorithms][spring]") {
   Graph g = MakeGraph(2);
-  g.AddUndirectedEdge(NodeID(0), NodeID(1));
+  g.AddEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
   algConfig.stiffness = 1.0;
@@ -72,7 +72,7 @@ TEST_CASE("A compressed spring pushes its two free endpoints apart toward the "
          "rest length",
          "[layout][algorithms][spring]") {
   Graph g = MakeGraph(2);
-  g.AddUndirectedEdge(NodeID(0), NodeID(1));
+  g.AddEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
   algConfig.stiffness = 1.0;
@@ -99,7 +99,7 @@ TEST_CASE("A fixed vertex never moves no matter the spring force on it, "
          "while its free neighbor still does",
          "[layout][algorithms][spring]") {
   Graph g = MakeGraph(2);
-  g.AddUndirectedEdge(NodeID(0), NodeID(1));
+  g.AddEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
   algConfig.stiffness = 1.0;
@@ -126,7 +126,7 @@ TEST_CASE("A fixed vertex never moves no matter the spring force on it, "
 TEST_CASE("Unfix lets a previously fixed vertex move again",
          "[layout][algorithms][spring]") {
   Graph g = MakeGraph(2);
-  g.AddUndirectedEdge(NodeID(0), NodeID(1));
+  g.AddEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
   algConfig.stiffness = 1.0;
@@ -157,7 +157,7 @@ TEST_CASE("Unfix lets a previously fixed vertex move again",
 TEST_CASE("SetPosition both teleports a vertex and clears its carried velocity",
          "[layout][algorithms][spring]") {
   Graph g = MakeGraph(2);
-  g.AddUndirectedEdge(NodeID(0), NodeID(1));
+  g.AddEdge(NodeID(0), NodeID(1));
 
   SpringLayoutAlgorithm<Graph>::Configuration algConfig;
   algConfig.stiffness = 1.0;

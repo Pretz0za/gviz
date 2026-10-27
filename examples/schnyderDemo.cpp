@@ -11,9 +11,9 @@
 static Graph BuildRandomPlanarGraph(int n, double keepProbability, unsigned seed) {
   Graph g;
   NodeID a = g.AddNode(), b = g.AddNode(), c = g.AddNode();
-  g.AddUndirectedEdge(a, b);
-  g.AddUndirectedEdge(b, c);
-  g.AddUndirectedEdge(c, a);
+  g.AddEdge(a, b);
+  g.AddEdge(b, c);
+  g.AddEdge(c, a);
 
   std::vector<std::array<NodeID, 3>> faces = {{a, b, c}};
   std::mt19937 rng(seed);
@@ -31,7 +31,7 @@ static Graph BuildRandomPlanarGraph(int n, double keepProbability, unsigned seed
     int anchor = pickAnchor(rng);
     for (int k = 0; k < 3; k++) {
       if (k == anchor || coin(rng) < keepProbability)
-        g.AddUndirectedEdge(v, face[static_cast<size_t>(k)]);
+        g.AddEdge(v, face[static_cast<size_t>(k)]);
     }
 
     faces.push_back({face[0], face[1], v});

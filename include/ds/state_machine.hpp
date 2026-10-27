@@ -23,7 +23,7 @@ public:
   T Current() const;
 
 private:
-  Graph m_graph;
+  Graph m_graph{Graph::GraphFlags::Directed};
   IndexSpace m_stateSpace;
   DenseComponentPool<DataComponent<T>> *m_statePool;
   NodeID m_current;

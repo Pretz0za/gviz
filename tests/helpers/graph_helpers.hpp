@@ -27,6 +27,13 @@ inline Graph MakeGraph(uint32_t nodeCount) {
   return g;
 }
 
+inline Graph MakeDirectedGraph(uint32_t nodeCount) {
+  Graph g(Graph::GraphFlags::Directed);
+  for (uint32_t i = 0; i < nodeCount; i++)
+    g.AddNode();
+  return g;
+}
+
 inline DecoratedGraph<Graph> Decorate(Graph &g, uint8_t dimension = 2) {
   DecoratedGraph<Graph> dg(g);
   dg.dimension = dimension;
@@ -71,7 +78,7 @@ inline void SetPosition(DenseComponentPool<PositionComponent> *pool,
 // constructor requires to already exist.
 struct GripFixture {
   explicit GripFixture(uint32_t nodeCount, uint8_t dimension = 2)
-      : graph(MakeGraph(nodeCount)), dg(Decorate(graph, dimension)) {
+      : graph(MakeDirectedGraph(nodeCount)), dg(Decorate(graph, dimension)) {
     positions = WithPositions(dg, dimension);
     physics = WithPhysics(dg);
     heat = WithLocalHeat(dg);
