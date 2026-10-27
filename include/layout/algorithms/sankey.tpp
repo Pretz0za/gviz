@@ -13,6 +13,7 @@ SankeyLayoutAlgorithm<G>::SankeyLayoutAlgorithm(G &graph, Configuration *config)
   m_curves = m_dg.edgeSpace.template SetPool<CubicBezierComponent>();
   m_halfWidths = m_dg.edgeSpace.template SetPool<HalfWidthComponent>();
   m_positions = m_dg.nodeSpace.template SetPool<PositionComponent>(2);
+  m_radii = m_dg.nodeSpace.template SetPool<RadiusComponent>(CONSTANT);
 }
 
 template <GraphLike G>
@@ -22,8 +23,7 @@ double SankeyLayoutAlgorithm<G>::EdgeWeight(EdgeID id) const {
 
 template <GraphLike G>
 double SankeyLayoutAlgorithm<G>::EdgeHalfWidth(EdgeID id) const {
-  double weight = EdgeWeight(id) * m_config->thicknessScale;
-  return std::max(weight / 2.0, m_config->minThickness / 2.0);
+  return EdgeWeight(id) * m_config->thicknessScale / 2.0;
 }
 
 template <GraphLike G> void SankeyLayoutAlgorithm<G>::AssignLayers() {
@@ -103,8 +103,7 @@ template <GraphLike G> void SankeyLayoutAlgorithm<G>::ComputeExtents() {
     SankeyNodeDecorator *info = m_info->Find(i);
     info->inHalf = inHalf;
     info->outHalf = outHalf;
-    info->extent =
-        std::max(2.0 * std::max(inHalf, outHalf), m_config->minThickness);
+    info->extent = 2.0 * std::max(inHalf, outHalf);
   }
 }
 
@@ -178,6 +177,8 @@ void SankeyLayoutAlgorithm<G>::AssignPortsAndBuildCurves() {
 template <GraphLike G> void SankeyLayoutAlgorithm<G>::Layout() {
   if (m_graph->Size() == 0)
     return;
+
+  m_radii->SetConstantRadius(m_config->nodeWidth / 2.0);
 
   AssignLayers();
   OrderWithinLayers();

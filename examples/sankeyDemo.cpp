@@ -2,7 +2,6 @@
 #include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
 #include "layout/algorithms/sankey.hpp"
-#include "layout/components/radius.hpp"
 #include "render/components/color.hpp"
 #include "render/renderer.hpp"
 #include <algorithm>
@@ -107,15 +106,11 @@ int main() {
 
   SankeyLayoutAlgorithm<Graph>::Configuration layoutConfig;
   layoutConfig.thicknessScale = 4.0;
-  layoutConfig.minThickness = 4.0;
   layoutConfig.nodeWidth = 24.0;
   SankeyLayoutAlgorithm<Graph> layout(g, &layoutConfig);
   layout.Tick();
 
   DecoratedGraph<Graph> &dg = layout.Decorated();
-  auto *radii = dg.nodeSpace.SetPool<RadiusComponent>(MANUAL);
-  for (NodeID nid : g.Nodes())
-    radii->Find(g.MapToDense(nid).Raw())->radius = layoutConfig.nodeWidth / 2.0;
 
   auto *edgeColors = dg.edgeSpace.SetPool<ColorComponent>();
   for (EdgeID eid : g.Edges())

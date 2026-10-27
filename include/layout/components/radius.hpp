@@ -17,6 +17,7 @@ typedef struct RadiusComponent : Component {
 enum RadiusFunction {
   MICHEALIS_MENTEN,
   MANUAL,
+  CONSTANT,
 };
 
 template <>
@@ -36,6 +37,8 @@ public:
     m_function = target;
   }
 
+  void SetConstantRadius(double radius) { m_constant.radius = radius; }
+
   void OnAdd() override {
     if (m_function == MANUAL) {
       m_data.emplace_back();
@@ -49,6 +52,8 @@ public:
   inline const RadiusComponent *Find(EntityID id) const {
     if (m_function == MANUAL)
       return &m_data[id];
+    if (m_function == CONSTANT)
+      return &m_constant;
     return m_degreeView.Find(id);
   }
 
@@ -61,6 +66,8 @@ public:
   size_t Size() const {
     if (m_function == MANUAL)
       return m_data.size();
+    if (m_function == CONSTANT)
+      return 0;
     return m_degreeView.Size();
   }
 
@@ -77,4 +84,5 @@ private:
   std::vector<RadiusComponent> m_data;
   RadiusFunction m_function;
   ComponentPoolView<DegreeComponent, RadiusComponent> m_degreeView;
+  RadiusComponent m_constant;
 };
