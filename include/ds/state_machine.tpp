@@ -51,7 +51,7 @@ template <typename T> bool StateMachine<T>::Transition(T to) {
 
 template <typename T> std::vector<T> StateMachine<T>::Transitions() const {
   std::vector<T> result;
-  result.reserve(m_graph.OutNeighbors(m_current).size());
+  result.reserve(m_graph.OutDegree(m_current));
   for (const AdjEntry &entry : m_graph.OutNeighbors(m_current))
     result.push_back(m_statePool->Find(entry.other.Raw())->data);
   return result;
