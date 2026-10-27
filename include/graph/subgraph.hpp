@@ -67,6 +67,8 @@ public:
   // How many nodes have been added to this subgraph so far.
   uint32_t Version() const { return m_size; }
 
+  bool IsDirected() const { return m_parent->IsDirected(); }
+
   IndexSpace &NodeSpace();
 
   IndexSpace &EdgeSpace();

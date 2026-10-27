@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "ds/flags.hpp"
 #include "ecs/components.hpp"
 #include "ecs/index_space.hpp"
 #include "ecs/resource.hpp"
@@ -20,6 +21,8 @@
 
 class Graph {
 public:
+  enum class GraphFlags : uint8_t { None = 0, Directed = 1 << 0 };
+
   Graph();
 
   NodeID AddNode();
@@ -72,6 +75,8 @@ public:
   // whether the graph's topology has changed since they last looked.
   uint64_t Version() const { return m_version; }
 
+  bool IsDirected() const { return m_flags.Has(GraphFlags::Directed); }
+
   IndexSpace &NodeSpace();
   IndexSpace &EdgeSpace();
 
@@ -88,6 +93,7 @@ private:
   DenseComponentPool<EdgeComponent> *m_edgePool;
   DenseComponentPool<WeightComponent> *m_weightPool;
   uint64_t m_version = 0;
+  Flags<GraphFlags> m_flags = GraphFlags::None;
   std::unordered_map<std::type_index, std::unique_ptr<IResourceHolder>>
       m_resources;
 };
