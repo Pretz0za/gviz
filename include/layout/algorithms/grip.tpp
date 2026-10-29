@@ -17,7 +17,7 @@
 template <GraphLike G>
 GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph, Configuration *config)
     : m_config(RequireConfiguration(config)),
-      m_dimension(m_config->dimension), m_dg(graph) {
+      m_dimension(m_config->dimension), m_view(&graph), m_dg(m_view) {
 
   m_dg.dimension = m_dimension;
   m_visible = &m_dg.template SetResource<VisibleNodesResource>(graph.Size(), 0);
@@ -33,10 +33,10 @@ GRIPLayoutAlgorithm<G>::GRIPLayoutAlgorithm(G &graph, Configuration *config)
                                                        // m_dimension based
 
   // systems grip uses
-  m_placementSystem = std::make_unique<PositionBarrycentric<G>>(m_dg);
-  m_filtrationSystem = std::make_unique<MisFiltrationSystem<G>>(m_dg);
+  m_placementSystem = std::make_unique<PositionBarrycentric<View>>(m_dg);
+  m_filtrationSystem = std::make_unique<MisFiltrationSystem<View>>(m_dg);
   m_physicsSystem =
-      std::make_unique<GRIPPhysicsSystem<G>>(m_dg, &m_config->physicsConfig);
+      std::make_unique<GRIPPhysicsSystem<View>>(m_dg, &m_config->physicsConfig);
 
 #ifdef GVIZ_DEBUG_CHARTS
   m_chart = m_dg.template SetResource<ChartRecorderResource>(m_dg.nodeSpace)

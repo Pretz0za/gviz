@@ -4,6 +4,7 @@
 #include "config/configuration.hpp"
 #include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
+#include "graph/undirected_view.hpp"
 #include "layout/components/mass.hpp"
 #include "layout/components/physics.hpp"
 #include "layout/components/position.hpp"
@@ -14,6 +15,8 @@
 
 template <GraphLike G> class SpringLayoutAlgorithm {
 public:
+  using View = UndirectedView<G>;
+
   class Configuration : public IConfiguration {
   public:
     Configuration() = default;
@@ -50,12 +53,12 @@ public:
 
   Configuration *Config() { return m_config; }
 
-  DecoratedGraph<G> &Decorated() { return m_dg; }
+  DecoratedGraph<View> &Decorated() { return m_dg; }
 
 private:
   Configuration *m_config;
-  DecoratedGraph<G> m_dg;
-  G *m_graph;
+  View m_graph;
+  DecoratedGraph<View> m_dg;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<VelocityComponent> *m_velocity;
   DenseComponentPool<PhysicsComponent> *m_physics;

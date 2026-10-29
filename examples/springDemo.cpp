@@ -1,5 +1,6 @@
 #include "graph/decorated_graph.hpp"
 #include "graph/graph.hpp"
+#include "graph/undirected_view.hpp"
 #include "layout/algorithms/spring.hpp"
 #include "layout/components/radius.hpp"
 #include "layout/placement/randomized.hpp"
@@ -43,11 +44,11 @@ int main() {
   layoutConfig.damping = 1.5;
   layoutConfig.timeStep = 0.08;
   SpringLayoutAlgorithm<Graph> layout(g, &layoutConfig);
-  DecoratedGraph<Graph> &dg = layout.Decorated();
+  auto &dg = layout.Decorated();
 
-  PositionRandomized<Graph>::Configuration randomConfig;
+  PositionRandomized<UndirectedView<Graph>>::Configuration randomConfig;
   randomConfig.boundingBoxWidth = static_cast<uint32_t>(squareSide * 0.6);
-  PositionRandomized<Graph> randomizer(dg, &randomConfig);
+  PositionRandomized<UndirectedView<Graph>> randomizer(dg, &randomConfig);
   randomizer.PlaceAll();
 
   NodeID topLeft = nodes[0][0];

@@ -4,6 +4,7 @@
 #include "config/configuration.hpp"
 #include "debug/chart_recorder.hpp"
 #include "graph/decorated_graph.hpp"
+#include "graph/undirected_view.hpp"
 #include "layout/filtration/mis_filtration.hpp"
 #include "layout/physics/grip.hpp"
 #include "layout/placement/barrycenter.hpp"
@@ -14,6 +15,8 @@
 // https://www2.cs.arizona.edu/~kobourov/grip_demo.pdf.
 template <GraphLike G> class GRIPLayoutAlgorithm {
 public:
+  using View = UndirectedView<G>;
+
   class Configuration : public IConfiguration {
   public:
     Configuration() = default;
@@ -21,7 +24,7 @@ public:
     uint32_t placementKNearest = 10;
     double simplexExtent = 100000.0;
     uint8_t dimension = 2;
-    typename GRIPPhysicsSystem<G>::Configuration physicsConfig;
+    typename GRIPPhysicsSystem<View>::Configuration physicsConfig;
 
     Configuration WithPlacementKNearest(uint32_t v) { placementKNearest = v; return *this; }
     Configuration WithSimplexExtent(double v) { simplexExtent = v; return *this; }
@@ -38,7 +41,7 @@ public:
 
   Configuration *Config() { return m_config; }
 
-  DecoratedGraph<G> &Decorated() { return m_dg; }
+  DecoratedGraph<View> &Decorated() { return m_dg; }
 
   void RunFiltration();
   uint32_t TransitionState();
@@ -52,11 +55,12 @@ private:
   uint32_t m_currLayer;
   DenseNodeSet *m_visible;
   uint8_t m_dimension;
-  DecoratedGraph<G> m_dg;
+  View m_view;
+  DecoratedGraph<View> m_dg;
   NestedFiltrationResult *m_filtrationOutput;
-  std::unique_ptr<MisFiltrationSystem<G>> m_filtrationSystem = nullptr;
-  std::unique_ptr<PositionBarrycentric<G>> m_placementSystem = nullptr;
-  std::unique_ptr<GRIPPhysicsSystem<G>> m_physicsSystem = nullptr;
+  std::unique_ptr<MisFiltrationSystem<View>> m_filtrationSystem = nullptr;
+  std::unique_ptr<PositionBarrycentric<View>> m_placementSystem = nullptr;
+  std::unique_ptr<GRIPPhysicsSystem<View>> m_physicsSystem = nullptr;
 #ifdef GVIZ_DEBUG_CHARTS
   ChartRecorder *m_chart = nullptr;
 #endif

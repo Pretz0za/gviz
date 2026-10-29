@@ -14,7 +14,7 @@ template <GraphLike G>
 TreeConvexLayoutAlgorithm<G>::TreeConvexLayoutAlgorithm(G &graph,
                                                         bool respectEmbedding,
                                                         Configuration *config)
-    : m_config(RequireConfiguration(config)), m_dg(graph), m_graph(&graph),
+    : m_config(RequireConfiguration(config)), m_graph(&graph), m_dg(m_graph),
       m_respectEmbedding(respectEmbedding) {
   uint8_t dimension = m_config->dimension;
   m_dg.dimension = dimension;
@@ -59,8 +59,8 @@ void TreeConvexLayoutAlgorithm<G>::TransitionTo(EdgeLengthMode mode,
 template <GraphLike G> NodeID TreeConvexLayoutAlgorithm<G>::ChooseRoot() const {
   NodeID best = INVALID_NODE_ID;
   uint32_t bestDegree = 0;
-  for (NodeID id : m_graph->Nodes()) {
-    uint32_t degree = m_graph->OutDegree(id);
+  for (NodeID id : m_graph.Nodes()) {
+    uint32_t degree = m_graph.OutDegree(id);
     if (degree > bestDegree) {
       bestDegree = degree;
       best = id;
@@ -74,7 +74,7 @@ std::vector<AdjEntry>
 TreeConvexLayoutAlgorithm<G>::Children(DenseNodeID v) const {
   NodeID parent = m_info->Find(v.Raw())->parent;
   std::vector<AdjEntry> result;
-  for (const AdjEntry &adj : m_graph->OutNeighbors(m_graph->MapToSparse(v)))
+  for (const AdjEntry &adj : m_graph.OutNeighbors(m_graph.MapToSparse(v)))
     if (adj.other != parent)
       result.push_back(adj);
 
@@ -86,20 +86,20 @@ TreeConvexLayoutAlgorithm<G>::Children(DenseNodeID v) const {
 
 template <GraphLike G>
 void TreeConvexLayoutAlgorithm<G>::BuildParents(NodeID root) {
-  uint32_t n = m_graph->Size();
+  uint32_t n = m_graph.Size();
   DenseNodeSet visited(n, false);
   std::vector<NodeID> stack;
   stack.push_back(root);
-  visited.Set(m_graph->MapToDense(root));
-  m_info->Find(m_graph->MapToDense(root).Raw())->depth = 0;
+  visited.Set(m_graph.MapToDense(root));
+  m_info->Find(m_graph.MapToDense(root).Raw())->depth = 0;
 
   while (!stack.empty()) {
     NodeID current = stack.back();
     stack.pop_back();
-    uint32_t currentDepth = m_info->Find(m_graph->MapToDense(current).Raw())->depth;
+    uint32_t currentDepth = m_info->Find(m_graph.MapToDense(current).Raw())->depth;
     uint32_t order = 0;
-    for (const AdjEntry &adj : m_graph->OutNeighbors(current)) {
-      DenseNodeID denseOther = m_graph->MapToDense(adj.other);
+    for (const AdjEntry &adj : m_graph.OutNeighbors(current)) {
+      DenseNodeID denseOther = m_graph.MapToDense(adj.other);
       if (visited.Test(denseOther))
         continue;
       visited.Set(denseOther);
@@ -121,7 +121,7 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ClassifyShapes() {
     stack.pop_back();
     order.push_back(id);
     for (const AdjEntry &adj : Children(id))
-      stack.push_back(m_graph->MapToDense(adj.other));
+      stack.push_back(m_graph.MapToDense(adj.other));
   }
 
   for (auto it = order.rbegin(); it != order.rend(); ++it) {
@@ -135,7 +135,7 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ClassifyShapes() {
     uint32_t subtreeSize = 1;
     for (const AdjEntry &adj : children) {
       ConvexNodeDecorator *child =
-          m_info->Find(m_graph->MapToDense(adj.other).Raw());
+          m_info->Find(m_graph.MapToDense(adj.other).Raw());
       subtreeSize += child->subtreeSize;
       if (child->shape == TreeShape::Other)
         anyOther = true;
@@ -164,7 +164,7 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::ClassifyShapes() {
 
 template <GraphLike G>
 void TreeConvexLayoutAlgorithm<G>::ReorderForMinimumForks() {
-  uint32_t n = m_graph->Size();
+  uint32_t n = m_graph.Size();
   for (uint32_t i = 0; i < n; i++) {
     std::vector<AdjEntry> children = Children(DenseNodeID{i});
     if (children.empty())
@@ -173,7 +173,7 @@ void TreeConvexLayoutAlgorithm<G>::ReorderForMinimumForks() {
     std::vector<AdjEntry> paths, rakes, others;
     for (const AdjEntry &adj : children) {
       TreeShape shape =
-          m_info->Find(m_graph->MapToDense(adj.other).Raw())->shape;
+          m_info->Find(m_graph.MapToDense(adj.other).Raw())->shape;
       if (shape == TreeShape::Path)
         paths.push_back(adj);
       else if (shape == TreeShape::Rake)
@@ -210,7 +210,7 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::RotateRootChildren() {
     return;
 
   auto shapeOf = [&](size_t idx) {
-    return m_info->Find(m_graph->MapToDense(children[idx].other).Raw())->shape;
+    return m_info->Find(m_graph.MapToDense(children[idx].other).Raw())->shape;
   };
 
   size_t start = 0;
@@ -242,7 +242,7 @@ TreeConvexLayoutAlgorithm<G>::PartitionForks(
   size_t i = 0;
 
   auto shapeOf = [&](size_t idx) {
-    return m_info->Find(m_graph->MapToDense(children[idx].other).Raw())->shape;
+    return m_info->Find(m_graph.MapToDense(children[idx].other).Raw())->shape;
   };
 
   while (i < k) {
@@ -268,7 +268,7 @@ template <GraphLike G> bool TreeConvexLayoutAlgorithm<G>::IsTripleRake() const {
   if (children.size() != 3)
     return false;
   for (const AdjEntry &adj : children) {
-    TreeShape shape = m_info->Find(m_graph->MapToDense(adj.other).Raw())->shape;
+    TreeShape shape = m_info->Find(m_graph.MapToDense(adj.other).Raw())->shape;
     if (shape != TreeShape::Path && shape != TreeShape::Rake)
       return false;
   }
@@ -283,7 +283,7 @@ void TreeConvexLayoutAlgorithm<G>::AssignChainSlope(DenseNodeID w, double slope,
   for (const AdjEntry &adj : Children(w)) {
     double edgeSlope = (first || !allowBend) ? slope : slope + pi;
     m_edgeInfo->Find(adj.edge.Raw())->slope = edgeSlope;
-    AssignChainSlope(m_graph->MapToDense(adj.other), edgeSlope, allowBend);
+    AssignChainSlope(m_graph.MapToDense(adj.other), edgeSlope, allowBend);
     first = false;
   }
 }
@@ -302,7 +302,7 @@ void TreeConvexLayoutAlgorithm<G>::AssignRakeSlopes(DenseNodeID w, double lo,
     double subHi = subLo + width;
     double dir = (subLo + subHi) / 2.0;
     m_edgeInfo->Find(children[i].edge.Raw())->slope = dir;
-    AssignRakeSlopes(m_graph->MapToDense(children[i].other), subLo, subHi);
+    AssignRakeSlopes(m_graph.MapToDense(children[i].other), subLo, subHi);
   }
 }
 
@@ -324,7 +324,7 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::AssignTripleRake() {
     double armSlope = static_cast<double>(i) * armStep;
     const AdjEntry &adj = children[i];
     m_edgeInfo->Find(adj.edge.Raw())->slope = armSlope;
-    DenseNodeID child = m_graph->MapToDense(adj.other);
+    DenseNodeID child = m_graph.MapToDense(adj.other);
     AssignRakeSlopes(child, armSlope - halfWedge, armSlope + halfWedge);
   }
 }
@@ -365,7 +365,7 @@ double TreeConvexLayoutAlgorithm<G>::AssignSlopesAt(DenseNodeID v,
       if (!sharedOpening) {
         const AdjEntry &firstPath = children[seg.begin];
         m_edgeInfo->Find(firstPath.edge.Raw())->slope = currentSlope;
-        AssignRakeSlopes(m_graph->MapToDense(firstPath.other), currentSlope,
+        AssignRakeSlopes(m_graph.MapToDense(firstPath.other), currentSlope,
                          currentSlope + m_angleStep / 2.0);
         if (!haveFirst) {
           firstSlope = currentSlope;
@@ -378,14 +378,14 @@ double TreeConvexLayoutAlgorithm<G>::AssignSlopesAt(DenseNodeID v,
         double theta1 = currentSlope;
         double theta2 = currentSlope + m_angleStep;
         m_edgeInfo->Find(rake.edge.Raw())->slope = theta2;
-        AssignRakeSlopes(m_graph->MapToDense(rake.other), theta1, theta2);
+        AssignRakeSlopes(m_graph.MapToDense(rake.other), theta1, theta2);
         currentSlope += m_angleStep;
       }
 
       currentSlope += m_angleStep;
       const AdjEntry &lastPath = children[seg.end];
       m_edgeInfo->Find(lastPath.edge.Raw())->slope = currentSlope;
-      AssignRakeSlopes(m_graph->MapToDense(lastPath.other),
+      AssignRakeSlopes(m_graph.MapToDense(lastPath.other),
                        currentSlope - m_angleStep / 2.0, currentSlope);
       lastSlope = currentSlope;
 
@@ -395,7 +395,7 @@ double TreeConvexLayoutAlgorithm<G>::AssignSlopesAt(DenseNodeID v,
     }
 
     const AdjEntry &adj = children[i];
-    DenseNodeID child = m_graph->MapToDense(adj.other);
+    DenseNodeID child = m_graph.MapToDense(adj.other);
     TreeShape shape = m_info->Find(child.Raw())->shape;
 
     if (shape == TreeShape::Path) {
@@ -444,7 +444,7 @@ void TreeConvexLayoutAlgorithm<G>::PlacePreorder(DenseNodeID v, double x,
   auto &pos = m_positions->Data();
   for (const AdjEntry &adj : Children(v)) {
     ConvexEdgeDecorator *edge = m_edgeInfo->Find(adj.edge.Raw());
-    DenseNodeID child = m_graph->MapToDense(adj.other);
+    DenseNodeID child = m_graph.MapToDense(adj.other);
     edge->length = EdgeLengthFor(child);
     double cx = x + edge->length * std::cos(edge->slope);
     double cy = y + edge->length * std::sin(edge->slope);
@@ -488,7 +488,7 @@ double TreeConvexLayoutAlgorithm<G>::EdgeLengthFor(DenseNodeID topVertex) const 
 
 template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Layout(NodeID root) {
   constexpr double pi = std::numbers::pi;
-  uint32_t n = m_graph->Size();
+  uint32_t n = m_graph.Size();
   if (n == 0)
     return;
 
@@ -503,7 +503,7 @@ template <GraphLike G> void TreeConvexLayoutAlgorithm<G>::Layout(NodeID root) {
   if (root == NodeID{0xffffffff})
     root = ChooseRoot();
   BuildParents(root);
-  m_root = m_graph->MapToDense(root);
+  m_root = m_graph.MapToDense(root);
   ClassifyShapes();
 
   TreeShape rootShape = m_info->Find(m_root.Raw())->shape;

@@ -4,6 +4,7 @@
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
 #include "graph/decorated_graph.hpp"
+#include "graph/undirected_view.hpp"
 #include "layout/components/position.hpp"
 #include "layout/planarity/rotation_system.hpp"
 #include "layout/planarity/schnyder_wood.hpp"
@@ -15,6 +16,8 @@
 
 template <GraphLike G> class SchnyderLayoutAlgorithm {
 public:
+  using View = UndirectedView<G>;
+
   class Configuration : public IConfiguration {
   public:
     Configuration() = default;
@@ -41,18 +44,18 @@ public:
   void Tick();
   void RandomizeRoots();
 
-  DecoratedGraph<G> &Decorated() { return m_dg; }
+  DecoratedGraph<View> &Decorated() { return m_dg; }
 
 private:
   void RebuildWood(NodeID s0, NodeID s1);
   void ComputeCoordinates();
 
   Configuration *m_config;
-  G *m_graph;
-  DecoratedGraph<G> m_dg;
+  View m_graph;
+  DecoratedGraph<View> m_dg;
   DenseComponentPool<PositionComponent> *m_positions;
-  PlanarRotationSystem<G> m_rotation;
-  std::unique_ptr<SchnyderWood<G>> m_wood;
+  PlanarRotationSystem<View> m_rotation;
+  std::unique_ptr<SchnyderWood<View>> m_wood;
   std::array<NodeID, 3> m_root{};
   uint64_t m_lastConfigHash = 0;
   bool m_hasRun = false;

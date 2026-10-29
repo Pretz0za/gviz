@@ -43,7 +43,7 @@ int main() {
   TreeConvexLayoutAlgorithm<Graph> layout(g, false, &layoutConfig);
   layout.Tick();
 
-  DecoratedGraph<Graph> &dg = layout.Decorated();
+  auto &dg = layout.Decorated();
   Renderer renderer(1280, 720, "gviz treeDemo", dg);
   renderer.SetLockToFit(true);
 

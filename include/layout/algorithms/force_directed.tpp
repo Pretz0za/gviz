@@ -18,7 +18,7 @@
 template <GraphLike G, ForceModel F>
 ForceDirectedLayoutAlgorithm<G, F>::ForceDirectedLayoutAlgorithm(G &graph, Configuration *config)
     : m_config(RequireConfiguration(config)), m_dg(graph), m_graph(&graph),
-      m_positions(nullptr), m_mass(nullptr),
+      m_view(&graph), m_positions(nullptr), m_mass(nullptr),
       m_dimension(m_config->dimension) {
   m_dg.dimension = m_dimension;
 
@@ -119,7 +119,7 @@ void ForceDirectedLayoutAlgorithm<G, F>::Tick() {
 
     // Attractive Forces
     NodeID nid = m_graph->MapToSparse(DenseNodeID{i});
-    for (AdjEntry adj : m_graph->OutNeighbors(nid)) {
+    for (AdjEntry adj : m_view.OutNeighbors(nid)) {
       DenseNodeID nbrDenseID = m_graph->MapToDense(adj.other);
       m_forceModel->AttractiveTick(DenseNodeID{i}, nbrDenseID);
     }

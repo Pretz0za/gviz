@@ -10,7 +10,7 @@
 
 template <GraphLike G>
 SpringLayoutAlgorithm<G>::SpringLayoutAlgorithm(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_dg(graph), m_graph(&graph),
+    : m_config(RequireConfiguration(config)), m_graph(&graph), m_dg(m_graph),
       m_dimension(m_config->dimension) {
   m_dg.dimension = m_dimension;
 
@@ -31,44 +31,44 @@ SpringLayoutAlgorithm<G>::SpringLayoutAlgorithm(G &graph, Configuration *config)
 
 template <GraphLike G>
 void SpringLayoutAlgorithm<G>::Fix(NodeID node) {
-  DenseNodeID dense = m_graph->MapToDense(node);
+  DenseNodeID dense = m_graph.MapToDense(node);
   m_fixed->Set(dense);
   ZeroOut(m_velocity->Find(dense.Raw())->vel, m_dimension);
 }
 
 template <GraphLike G>
 void SpringLayoutAlgorithm<G>::Unfix(NodeID node) {
-  m_fixed->Clear(m_graph->MapToDense(node));
+  m_fixed->Clear(m_graph.MapToDense(node));
 }
 
 template <GraphLike G>
 bool SpringLayoutAlgorithm<G>::IsFixed(NodeID node) const {
-  return m_fixed->Test(m_graph->MapToDense(node));
+  return m_fixed->Test(m_graph.MapToDense(node));
 }
 
 template <GraphLike G>
 void SpringLayoutAlgorithm<G>::SetPosition(NodeID node, const double *pos) {
-  DenseNodeID dense = m_graph->MapToDense(node);
+  DenseNodeID dense = m_graph.MapToDense(node);
   Copy(pos, m_positions->Find(dense.Raw())->pos, m_dimension);
   ZeroOut(m_velocity->Find(dense.Raw())->vel, m_dimension);
 }
 
 template <GraphLike G>
 void SpringLayoutAlgorithm<G>::Tick() {
-  uint32_t size = m_graph->Size();
+  uint32_t size = m_graph.Size();
 
   for (uint32_t i = 0; i < size; i++)
     ZeroOut(m_physics->Find(i)->disp, m_dimension);
 
   double diff[3];
-  for (NodeID nid : m_graph->Nodes()) {
-    DenseNodeID vDense = m_graph->MapToDense(nid);
+  for (NodeID nid : m_graph.Nodes()) {
+    DenseNodeID vDense = m_graph.MapToDense(nid);
     double *vPos = m_positions->Find(vDense.Raw())->pos;
     double *vForce = m_physics->Find(vDense.Raw())->disp;
 
-    for (AdjEntry adj : m_graph->OutNeighbors(nid)) {
-      DenseNodeID uDense = m_graph->MapToDense(adj.other);
-      DenseEdgeID edgeDense = m_graph->MapToDense(adj.edge);
+    for (AdjEntry adj : m_graph.OutNeighbors(nid)) {
+      DenseNodeID uDense = m_graph.MapToDense(adj.other);
+      DenseEdgeID edgeDense = m_graph.MapToDense(adj.edge);
       SpringComponent *spring = m_springs->Find(edgeDense.Raw());
       double *uPos = m_positions->Find(uDense.Raw())->pos;
 

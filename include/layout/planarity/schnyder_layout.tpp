@@ -9,14 +9,14 @@
 
 template <GraphLike G>
 SchnyderLayoutAlgorithm<G>::SchnyderLayoutAlgorithm(G &graph, Configuration *config)
-    : m_config(RequireConfiguration(config)), m_graph(&graph), m_dg(graph),
+    : m_config(RequireConfiguration(config)), m_graph(&graph), m_dg(m_graph),
       m_rotation(m_dg) {
   m_dg.dimension = 2;
   m_positions = m_dg.nodeSpace.template SetPool<PositionComponent>(2);
 }
 
 template <GraphLike G> void SchnyderLayoutAlgorithm<G>::RebuildWood(NodeID s0, NodeID s1) {
-  m_wood = std::make_unique<SchnyderWood<G>>(m_rotation, s0, s1);
+  m_wood = std::make_unique<SchnyderWood<View>>(m_rotation, s0, s1);
   m_root[0] = m_wood->Root(0);
   m_root[1] = m_wood->Root(1);
   m_root[2] = m_wood->Root(2);
@@ -25,14 +25,14 @@ template <GraphLike G> void SchnyderLayoutAlgorithm<G>::RebuildWood(NodeID s0, N
 }
 
 template <GraphLike G> void SchnyderLayoutAlgorithm<G>::Layout() {
-  if (m_graph->Size() < 3)
+  if (m_graph.Size() < 3)
     throw std::runtime_error("SchnyderLayoutAlgorithm requires at least 3 vertices");
 
   m_rotation.Compute();
-  TriangulationSystem<G> triangulation(m_rotation);
+  TriangulationSystem<View> triangulation(m_rotation);
   triangulation.Compute();
 
-  NodeID s0 = m_graph->MapToSparse(DenseNodeID{0});
+  NodeID s0 = m_graph.MapToSparse(DenseNodeID{0});
   NodeID s1 = m_rotation.Neighbors(s0)[0].other;
   RebuildWood(s0, s1);
 
@@ -58,13 +58,13 @@ template <GraphLike G> void SchnyderLayoutAlgorithm<G>::RandomizeRoots() {
   if (!m_hasRun)
     return;
 
-  uint32_t n = m_graph->Size();
+  uint32_t n = m_graph.Size();
   std::uniform_int_distribution<uint32_t> pickNode(0, n - 1);
 
   NodeID s0;
   const std::vector<AdjEntry> *out0;
   do {
-    s0 = m_graph->MapToSparse(DenseNodeID{pickNode(m_rng)});
+    s0 = m_graph.MapToSparse(DenseNodeID{pickNode(m_rng)});
     out0 = &m_rotation.Neighbors(s0);
   } while (out0->empty());
 
@@ -75,10 +75,10 @@ template <GraphLike G> void SchnyderLayoutAlgorithm<G>::RandomizeRoots() {
 }
 
 template <GraphLike G> void SchnyderLayoutAlgorithm<G>::ComputeCoordinates() {
-  const SchnyderWood<G> &wood = *m_wood;
+  const SchnyderWood<View> &wood = *m_wood;
   const std::array<NodeID, 3> &root = m_root;
 
-  uint32_t n = m_graph->Size();
+  uint32_t n = m_graph.Size();
 
   double side = m_config->scale;
   std::array<std::pair<double, double>, 3> corners = {
@@ -87,7 +87,7 @@ template <GraphLike G> void SchnyderLayoutAlgorithm<G>::ComputeCoordinates() {
       std::make_pair(side * 0.5, side * 0.8660254037844386),
   };
 
-  auto denseOf = [&](NodeID v) { return m_graph->MapToDense(v).Raw(); };
+  auto denseOf = [&](NodeID v) { return m_graph.MapToDense(v).Raw(); };
 
   std::vector<int> pathColor(n, -1);
   std::vector<bool> visited(n, false);
@@ -97,7 +97,7 @@ template <GraphLike G> void SchnyderLayoutAlgorithm<G>::ComputeCoordinates() {
 
   auto &posData = m_positions->Data();
 
-  for (NodeID v : m_graph->Nodes()) {
+  for (NodeID v : m_graph.Nodes()) {
     if (v == root[0] || v == root[1] || v == root[2])
       continue;
 
@@ -130,7 +130,7 @@ template <GraphLike G> void SchnyderLayoutAlgorithm<G>::ComputeCoordinates() {
 
     visitedList.clear();
 
-    for (NodeID w : m_graph->Nodes()) {
+    for (NodeID w : m_graph.Nodes()) {
       uint32_t dw = denseOf(w);
       if (pathColor[dw] != -1 || visited[dw])
         continue;

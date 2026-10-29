@@ -50,7 +50,7 @@ int main() {
   SchnyderLayoutAlgorithm<Graph> layout(g, &layoutConfig);
   layout.Tick();
 
-  DecoratedGraph<Graph> &dg = layout.Decorated();
+  auto &dg = layout.Decorated();
   auto *radii = dg.nodeSpace.SetPool<RadiusComponent>(MANUAL);
   for (uint32_t i = 0; i < radii->Size(); i++)
     radii->Data()[i].radius = 8.0;

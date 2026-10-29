@@ -5,6 +5,7 @@
 #include "debug/chart_recorder.hpp"
 #include "ds/quadtree.hpp"
 #include "graph/decorated_graph.hpp"
+#include "graph/undirected_view.hpp"
 #include "layout/algorithms/types.hpp"
 #include "layout/components/mass.hpp"
 #include "layout/components/position.hpp"
@@ -54,6 +55,7 @@ private:
   Configuration *m_config;
   DecoratedGraph<G> m_dg;
   G *m_graph;
+  UndirectedView<G> m_view;
   DenseComponentPool<PositionComponent> *m_positions;
   DenseComponentPool<MassComponent> *m_mass;
   std::unique_ptr<F> m_forceModel;

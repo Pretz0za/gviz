@@ -7,6 +7,7 @@
 #include "graph/components/adjacency.hpp"
 #include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
+#include "graph/undirected_view.hpp"
 #include "layout/components/position.hpp"
 #include "layout/animation.hpp"
 #include "layout/components/convex_edge_decorator.hpp"
@@ -17,6 +18,8 @@
 
 template <GraphLike G> class TreeConvexLayoutAlgorithm {
 public:
+  using View = UndirectedView<G>;
+
   class Configuration : public IConfiguration {
   public:
     Configuration() = default;
@@ -57,9 +60,9 @@ public:
   void TransitionTo(EdgeLengthMode mode, double durationSeconds,
                     Easing easing = Easing::EaseInOutCubic);
 
-  PositionAnimationSystem<G> &Animation() { return m_animation; }
+  PositionAnimationSystem<View> &Animation() { return m_animation; }
 
-  DecoratedGraph<G> &Decorated() { return m_dg; }
+  DecoratedGraph<View> &Decorated() { return m_dg; }
 
 private:
   struct ForkSegment {
@@ -93,8 +96,8 @@ private:
   double EdgeLengthFor(DenseNodeID topVertex) const;
 
   Configuration *m_config;
-  DecoratedGraph<G> m_dg;
-  G *m_graph;
+  View m_graph;
+  DecoratedGraph<View> m_dg;
   bool m_respectEmbedding;
   DenseComponentPool<ConvexNodeDecorator> *m_info;
   DenseComponentPool<ConvexEdgeDecorator> *m_edgeInfo;
@@ -105,7 +108,7 @@ private:
   double m_resolution = 0.0;
   double m_placementLength = 0.0;
   StateMachine<EdgeLengthMode> *m_edgeLengthMode;
-  PositionAnimationSystem<G> m_animation;
+  PositionAnimationSystem<View> m_animation;
   uint64_t m_lastConfigHash = 0;
   bool m_hasRun = false;
 };
