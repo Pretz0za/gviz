@@ -12,3 +12,5 @@ namespace Decorations {
 template <GraphLike G> bool DecorateTree(DecoratedGraph<G> &graph, NodeID root);
 
 } // namespace Decorations
+
+#include "graph/decorations/tree.tpp"

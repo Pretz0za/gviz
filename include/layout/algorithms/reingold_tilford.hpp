@@ -3,7 +3,9 @@
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
 #include "ecs/components.hpp"
+#include "graph/components/adjacency.hpp"
 #include "graph/decorated_graph.hpp"
+#include "graph/decorations/components/tree_node_decorator.hpp"
 #include "graph/types.hpp"
 #include "graph/undirected_view.hpp"
 #include "layout/components/rt_node_decorator.hpp"
@@ -51,11 +53,22 @@ public:
   void Tick();
 
 private:
+  DenseNodeID expand();
+
+  std::generator<AdjEntry> children(NodeID node);
+  AdjEntry firstChild(NodeID node);
+  void initializeLeafDecorators(DenseNodeID node);
+
   View m_view;
   DecoratedGraph<View> m_dg;
   Configuration *m_config;
 
-  DenseComponentPool<RTNodeDecorator> *m_decorators;
+  DenseNodeSet *m_visible;
+  std::vector<DenseNodeID> m_placedRoots;
+  std::vector<NodeID> m_stack;
+
+  DenseComponentPool<RTNodeDecorator> *m_rtDecorators;
+  DenseComponentPool<TreeNodeDecorator> *m_treeDecorators;
 };
 
 #include "reingold_tilford.tpp"

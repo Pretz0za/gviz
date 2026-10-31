@@ -3,8 +3,8 @@
 #include "concept/graphLike.hpp"
 #include "ecs/index_space.hpp"
 #include "graph/decorated_graph.hpp"
+#include "graph/decorations/components/rotation_node_decorator.hpp"
 #include "graph/types.hpp"
-#include "layout/components/planar_rotation.hpp"
 #include <cstddef>
 #include <vector>
 
@@ -24,6 +24,7 @@ public:
   void InsertNeighborAt(NodeID v, size_t index, NodeID neighbor);
 
 private:
+  DecoratedGraph<G> *m_dg;
   G *m_graph;
   DenseComponentPool<PlanarRotationAdjacencyComponent> *m_rotation;
 };

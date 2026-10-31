@@ -42,7 +42,7 @@ add_library(gviz ${GVIZ_LIB_TYPE}
 	src/ds/bfs_scratch.cpp
 
 	src/layout/placement/helpers.cpp
-	src/layout/planarity/boyer_myrvold.cpp
+	src/graph/decorations/boyer_myrvold.cpp
 )
 
 target_include_directories(gviz
