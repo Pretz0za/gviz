@@ -2,9 +2,11 @@
 
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
+#include "ecs/components.hpp"
 #include "graph/decorated_graph.hpp"
 #include "graph/types.hpp"
 #include "graph/undirected_view.hpp"
+#include "layout/components/rt_node_decorator.hpp"
 template <GraphLike G> class ReingoldTilfordLayoutAlgorithm {
 public:
   using View = UndirectedView<G>;
@@ -36,20 +38,24 @@ public:
     }
   };
 
-  ReingoldTilfordLayoutAlgorithm<G>(G &graph, NodeID root, Configuration *config);
+  ReingoldTilfordLayoutAlgorithm<G>(G &graph, NodeID root,
+                                    Configuration *config);
 
   // detect a root?
   // ReingoldTilfordLayoutAlgorithm<G>(G &graph, Configuration *config);
 
-  void SetRoot(NodeID newRoot);
+  bool SetRoot(NodeID newRoot);
   void PlaceAll();
   void PlaceNext();
 
   void Tick();
 
 private:
+  View m_view;
   DecoratedGraph<View> m_dg;
   Configuration *m_config;
 
-
+  DenseComponentPool<RTNodeDecorator> *m_decorators;
 };
+
+#include "reingold_tilford.tpp"
