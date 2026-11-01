@@ -55,8 +55,8 @@ template <GraphLike G> bool DecorateTree(DecoratedGraph<G> &graph, NodeID root) 
   if (visitedCount != n)
     return false;
 
-  graph.template SetResource<TreeCertifacteResource>(
-      TreeCertifacteResource{root, totalDepth});
+  graph.template SetResource<TreeCertificateResource>(
+      TreeCertificateResource{root, totalDepth});
   return true;
 }
 

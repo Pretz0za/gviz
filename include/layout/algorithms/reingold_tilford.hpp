@@ -2,16 +2,20 @@
 
 #include "concept/graphLike.hpp"
 #include "config/configuration.hpp"
+#include "ds/state_machine.hpp"
 #include "ecs/components.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/decorated_graph.hpp"
 #include "graph/decorations/components/tree_node_decorator.hpp"
+#include "graph/decorations/resources/tree_certificate.hpp"
 #include "graph/types.hpp"
 #include "graph/undirected_view.hpp"
 #include "layout/components/rt_node_decorator.hpp"
 template <GraphLike G> class ReingoldTilfordLayoutAlgorithm {
 public:
   using View = UndirectedView<G>;
+
+  enum class States : uint8_t { Initial, SubtreePlaced, Comparison, Terminal };
 
   class Configuration : IConfiguration {
   public:
@@ -53,22 +57,54 @@ public:
   void Tick();
 
 private:
+  struct ComparisonState {
+    std::generator<AdjEntry> generator;
+    std::ranges::iterator_t<std::generator<AdjEntry>> it;
+    AdjEntry prevSibling;
+    NodeID lrContour;
+    NodeID rlContour;
+    double lOffset = 0.0;
+    double rOffset = 0.0;
+
+    bool iterate() {
+      prevSibling = *it;
+      it++;
+      if (it == generator.end())
+        return false;
+      lrContour = prevSibling.other;
+      rlContour = (*it).other;
+      lOffset = 0.0;
+      rOffset = 0.0;
+      return true;
+    }
+  };
+
   DenseNodeID expand();
 
-  std::generator<AdjEntry> children(NodeID node);
-  AdjEntry firstChild(NodeID node);
-  void initializeLeafDecorators(DenseNodeID node);
+  std::generator<AdjEntry> children(NodeID node) const;
+  AdjEntry firstChild(NodeID node) const;
+
+  void comparisonStep();
+
+  void solveLeafDecorators(DenseNodeID node);
+  void solveSingleChildDecorators(DenseNodeID node);
+
+  TreeCertificateResource *m_tree;
 
   View m_view;
   DecoratedGraph<View> m_dg;
   Configuration *m_config;
 
   DenseNodeSet *m_visible;
-  std::vector<DenseNodeID> m_placedRoots;
+  DenseNodeSet *m_placedRoots;
   std::vector<NodeID> m_stack;
 
   DenseComponentPool<RTNodeDecorator> *m_rtDecorators;
   DenseComponentPool<TreeNodeDecorator> *m_treeDecorators;
+
+  StateMachine<States> m_stateMachine;
+  DenseNodeID m_lastSubtreePlaced = INVALID_DENSE_NODE_ID;
+  ComparisonState m_comparisonState;
 };
 
 #include "reingold_tilford.tpp"
