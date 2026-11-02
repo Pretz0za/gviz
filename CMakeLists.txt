@@ -68,11 +68,6 @@ if(GVIZ_DEBUG_CHARTS)
     target_compile_definitions(gviz PUBLIC GVIZ_DEBUG_CHARTS)
 endif()
 
-add_executable(main main.cpp)
-set_target_properties(main PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/)
-target_link_libraries(main PRIVATE gviz)
-
 option(GVIZ_BUILD_RENDER "Build the WebGPU/GLFW graph renderer + demo" OFF)
 
 if(GVIZ_BUILD_RENDER)
@@ -227,6 +222,9 @@ if(GVIZ_BUILD_RENDER)
 
     add_executable(springDemo examples/springDemo.cpp)
     target_link_libraries(springDemo PRIVATE gvizRender gviz)
+
+    add_executable(rtDemo examples/rtDemo.cpp)
+    target_link_libraries(rtDemo PRIVATE gvizRender gviz)
 endif()
 
 option(GVIZ_BUILD_TESTS "Build the gviz unit test suite" OFF)

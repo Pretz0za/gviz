@@ -4,7 +4,7 @@
 #include "graph/types.hpp"
 
 struct RTNodeDecorator : Component {
-  std::vector<float> offsets;
+  std::vector<double> offsets;
 
   // left and right most at the last layer of the subtree at this node
   double lMax = 0.0;

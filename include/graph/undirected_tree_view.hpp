@@ -87,7 +87,9 @@ public:
     co_return;
   }
 
-  uint32_t ChildCount(NodeID node) const { return m_view.OutDegree(node) - 1; }
+  uint32_t ChildCount(NodeID node) const {
+    return m_view.OutDegree(node) - (Parent(node).IsValid() ? 1 : 0);
+  }
 
   AdjEntry FirstChild(NodeID node) const {
     for (const AdjEntry &adj : Children(node))

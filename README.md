@@ -119,6 +119,7 @@ and is populated, never by branching on which layout algorithm is running:
 | `SpringLayoutAlgorithm` | Small/medium graphs, interactive scenes | Direct mass-spring-damper simulation over edges, with node pinning (`Fix`/`Unfix`/`SetPosition`) for interactive dragging. |
 | `SankeyLayoutAlgorithm` | Weighted, (acyclic) directed flow graphs | Assigns nodes to layers/columns, orders them within a layer, and sizes/curves edges proportional to `WeightComponent` to draw a classic Sankey flow diagram. |
 | `TreeConvexLayoutAlgorithm` | Trees / hierarchies | Places children in an angular wedge around each parent (optionally respecting a given planar embedding), with configurable edge-length modes (uniform, depth-based, subtree-size) and animated transitions between them. |
+| `ReingoldTilfordLayoutAlgorithm` | Classic Trees / hierarchies | Places children in a classic tree layout where symetric subtrees lead to symetric layouts, parents are centered over children, depth increases along one dimension, and subtrees are packed as tightly as possible along the other dimension. |
 | `SchnyderLayoutAlgorithm` | Planar (triangulated) graphs | Computes a Schnyder wood (3-coloring/orientation of a planar triangulation via its rotation system) and derives straight-line planar coordinates from the three resulting spanning trees. |
 
 Supporting planarity infrastructure (`PlanarRotationSystem`, Boyer-Myrvold
@@ -126,21 +127,14 @@ planarity testing/embedding, `TriangulationSystem`) backs the tree and
 Schnyder algorithms but isn't itself a layout algorithm.
 
 ## To Be Implemented
-
-1. **Reingold-Tilford layout.** Port the classic Reingold-Tilford tree
-   layout algorithm, with step-by-step animation of its separation and
-   contour-comparison events.
-2. **Interactivity.** Click-to-pick a vertex, inspect its data, and highlight
+1. **Interactivity.** Click-to-pick a vertex, inspect its data, and highlight
    its in/out neighbors in the rendered view.
-3. **Explicit graph classification.** A clear, queryable distinction between
-   weighted/unweighted and directed/undirected graphs — likely a `uint8_t`
-   flags field on `Graph`/`Subgraph` that algorithms can branch on.
-4. **`.gexf` import.** Parse `.gexf` files into a `DecoratedGraph`, using the
+2. **`.gexf` import.** Parse `.gexf` files into a `DecoratedGraph`, using the
    decoration to carry `.gexf`-specific viz elements; this may require
    layout algorithm constructors to accept a `DecoratedGraph` directly.
-5. **End-to-end GUI.** Possibly a full application shell around the
+3. **End-to-end GUI.** Possibly a full application shell around the
    renderer, rather than code-driven demos.
-6. **GUI widget system.** A widget is the renderer-side analog of a System:
+4. **GUI widget system.** A widget is the renderer-side analog of a System:
    it consumes a subset of component pools and/or resources and produces a
    rendered widget as output, instead of producing derived component data.
    Widgets would be orchestrated and composed through the renderer API, so
