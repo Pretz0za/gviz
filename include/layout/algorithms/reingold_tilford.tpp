@@ -6,6 +6,7 @@
 #include "layout/components/rt_node_decorator.hpp"
 #include "layout/types.hpp"
 #include "reingold_tilford.hpp"
+#include <algorithm>
 #include <cstdint>
 
 template <GraphLike G>
@@ -60,10 +61,16 @@ template <GraphLike G> void ReingoldTilfordLayoutAlgorithm<G>::PlaceNext() {
   }
 
   case States::Comparison: {
-    if (m_comparisonState.currsep < 1.0)
+
+    if (m_comparisonState.currsep < 1.0) {
       comparisonStep();
-    else
-      iterateContours();
+      return;
+    }
+
+    bool cont = iterateContours();
+    if (!cont)
+      comparisonConclude();
+
     return;
   }
 
@@ -81,27 +88,27 @@ bool ReingoldTilfordLayoutAlgorithm<G>::iterateContours() {
   if (isContourEnd(lr) || isContourEnd(rl))
     return false;
 
-  // iterate left subtree right contour
-  DenseNodeID lrDense = m_view.MapToDense(lr);
-  NodeID lrNext = m_view.FirstChild(lr).other;
-  if (!lrNext.IsValid()) {
-    lrNext = m_rtDecorators->Find(lrDense.Raw())->threadTo;
-  }
-  double lStep = m_rtDecorators->Find(lrDense.Raw())->offsets.front();
-  s.lOffset += lStep;
-  s.currsep -= lStep;
-  s.lrContour = lrNext;
-
   // iterate right subtree left contour
   DenseNodeID rlDense = m_view.MapToDense(rl);
-  NodeID rlNext = m_rtDecorators->Find(rlDense.Raw())->threadTo;
+  NodeID rlNext = m_view.FirstChild(rl).other;
   if (!rlNext.IsValid()) {
-    rlNext = m_view.LastChild(rl).other;
+    rlNext = m_rtDecorators->Find(rlDense.Raw())->threadTo;
   }
-  double rStep = m_rtDecorators->Find(rlDense.Raw())->offsets.back();
-  s.rOffset += rStep;
+  double rStep = m_rtDecorators->Find(rlDense.Raw())->offsets.front();
+  s.lOffset += rStep;
   s.currsep += rStep;
   s.rlContour = rlNext;
+
+  // iterate left subtree right contour
+  DenseNodeID lrDense = m_view.MapToDense(lr);
+  NodeID lrNext = m_rtDecorators->Find(lrDense.Raw())->threadTo;
+  if (!lrNext.IsValid()) {
+    lrNext = m_view.LastChild(lr).other;
+  }
+  double lStep = m_rtDecorators->Find(lrDense.Raw())->offsets.back();
+  s.rOffset += lStep;
+  s.currsep -= lStep;
+  s.lrContour = lrNext;
 
   return true;
 }
@@ -119,6 +126,169 @@ NodeID ReingoldTilfordLayoutAlgorithm<G>::getAncestor(NodeID node) {
 }
 
 template <GraphLike G>
+void ReingoldTilfordLayoutAlgorithm<G>::markAncestorAlongRightContour(
+    NodeID start) {
+
+  NodeID curr = start;
+
+  while (curr.IsValid()) {
+    DenseNodeID dense = m_view.MapToDense(curr);
+    m_rtDecorators->Find(dense.Raw())->ancestor = start;
+    curr = m_rtDecorators->Find(dense.Raw())->threadTo;
+    if (!curr.IsValid()) {
+      curr = m_view.LastChild(dense).other;
+    }
+  }
+}
+
+template <GraphLike G>
+void ReingoldTilfordLayoutAlgorithm<G>::comparisonConclude() {
+  ComparisonState &s = m_comparisonState;
+  if (isContourEnd(s.lrContour) && !isContourEnd(s.rlContour)) {
+    // ancestor stuff
+    s.defualtAncestor = s.currRightSubtreeIdx;
+
+    DenseNodeID lcmDense = m_view.MapToDense(s.leastCommonAncestor);
+    RTNodeDecorator *lcmDec = m_rtDecorators->Find(lcmDense.Raw());
+
+    // threading
+    DenseNodeID rlDense = m_view.MapToDense(s.rlContour);
+    NodeID rlNext = m_view.FirstChild(s.rlContour).other;
+    if (!rlNext.IsValid()) {
+      rlNext = m_rtDecorators->Find(rlDense.Raw())->threadTo;
+    }
+    double rStep = m_rtDecorators->Find(rlDense.Raw())->offsets.front();
+
+    RTNodeDecorator *lmostDec =
+        m_rtDecorators->Find(m_view.MapToDense(lcmDec->lMost));
+
+    lmostDec->threadTo = rlNext;
+    double toOldRootPos = lmostDec->offsets.back();
+    lmostDec->offsets.clear();
+
+    //      Vector from LMost to the LCM's position pre mering the new child
+    // +    Vector from LCM old to new position (totalNewSeparation / 2)
+    // +    Vector from LCM new position to just merged child (rightSubtreeIdx)
+    // +    Vector from just merged child to where we thread to (offset+step)
+    lmostDec->offsets.push_back(toOldRootPos + (s.totalNewSeparation / 2.0) +
+                                lcmDec->offsets[s.currRightSubtreeIdx] +
+                                s.rOffset + rStep);
+
+    // extremes
+    AdjEntry adj = *s.it;
+    NodeID rightSubtree = adj.other;
+    DenseNodeID rightDense = m_view.MapToDense(rightSubtree);
+    RTNodeDecorator *rightDec = m_rtDecorators->Find(rightDense.Raw());
+
+    lcmDec->lMost = rightDec->lMost;
+    RTNodeDecorator *newLMostDec =
+        m_rtDecorators->Find(m_view.MapToDense(lcmDec->lMost.Raw()));
+    double ogOffset = newLMostDec->offsets.back();
+    newLMostDec->offsets.clear();
+    newLMostDec->offsets.push_back(ogOffset -
+                                   lcmDec->offsets[s.currRightSubtreeIdx]);
+
+    lcmDec->rMost = rightDec->rMost;
+    RTNodeDecorator *newRMostDec =
+        m_rtDecorators->Find(m_view.MapToDense(lcmDec->rMost).Raw());
+    ogOffset = newRMostDec->offsets.back();
+    newRMostDec->offsets.clear();
+    newRMostDec->offsets.push_back(ogOffset -
+                                   lcmDec->offsets[s.currRightSubtreeIdx]);
+
+  } else if (!isContourEnd(s.lrContour) && isContourEnd(s.rlContour)) {
+    // ancestor stuff
+    NodeID rightSubtree = (*s.it).other;
+    DenseNodeID rightDense = m_view.MapToDense(rightSubtree);
+    markAncestorAlongRightContour(rightSubtree);
+
+    DenseNodeID lcmDense = m_view.MapToDense(s.leastCommonAncestor);
+    RTNodeDecorator *lcmDec = m_rtDecorators->Find(lcmDense.Raw());
+
+    // threading
+    DenseNodeID lrDense = m_view.MapToDense(s.lrContour);
+    NodeID lrNext = m_rtDecorators->Find(lrDense.Raw())->threadTo;
+    if (!lrNext.IsValid()) {
+      lrNext = m_view.LastChild(s.lrContour).other;
+    }
+    double lStep = m_rtDecorators->Find(lrDense.Raw())->offsets.back();
+
+    RTNodeDecorator *rmostDec = m_rtDecorators->Find(
+        m_view.MapToDense(m_rtDecorators->Find(rightDense.Raw())->rMost));
+
+    rmostDec->threadTo = lrNext;
+    double toRightSubtree = rmostDec->offsets.back();
+    rmostDec->offsets.clear();
+
+    //      Vector from Rmost to right subtree root
+    // +    Vector from right subtreee root to its parent' new position (LCM)
+    // +    Vector from LCM new position to the child where lrContour started
+    // +    Vector from that subtree's root to where we are on the contour lNext
+    rmostDec->offsets.push_back(
+        toRightSubtree - lcmDec->offsets[s.currRightSubtreeIdx] +
+        lcmDec->offsets[s.currRightSubtreeIdx - 1] + s.lOffset + lStep);
+
+    // extremes
+    RTNodeDecorator *lMostDec =
+        m_rtDecorators->Find(m_view.MapToDense(lcmDec->lMost.Raw()));
+    double ogOffset = lMostDec->offsets.back();
+    lMostDec->offsets.clear();
+    lMostDec->offsets.push_back(ogOffset + (s.totalNewSeparation / 2.0));
+
+    RTNodeDecorator *rMostDec =
+        m_rtDecorators->Find(m_view.MapToDense(lcmDec->rMost.Raw()));
+    ogOffset = rMostDec->offsets.back();
+    rMostDec->offsets.clear();
+    rMostDec->offsets.push_back(ogOffset + (s.totalNewSeparation / 2.0));
+
+  } else {
+    // ancestor stuff
+    NodeID rightSubtree = (*s.it).other;
+    DenseNodeID rightDense = m_view.MapToDense(rightSubtree);
+    RTNodeDecorator *rightDec = m_rtDecorators->Find(rightDense.Raw());
+    markAncestorAlongRightContour(rightSubtree);
+
+    DenseNodeID lcmDense = m_view.MapToDense(s.leastCommonAncestor);
+    RTNodeDecorator *lcmDec = m_rtDecorators->Find(lcmDense.Raw());
+
+    // extremes
+    RTNodeDecorator *lMostDec =
+        m_rtDecorators->Find(m_view.MapToDense(lcmDec->lMost.Raw()));
+    double ogOffset = lMostDec->offsets.back();
+    lMostDec->offsets.clear();
+    lMostDec->offsets.push_back(ogOffset + (s.totalNewSeparation / 2.0));
+
+    lcmDec->rMost = rightDec->rMost;
+    RTNodeDecorator *newRMostDec =
+        m_rtDecorators->Find(m_view.MapToDense(lcmDec->rMost.Raw()));
+    ogOffset = newRMostDec->offsets.back();
+    newRMostDec->offsets.clear();
+    newRMostDec->offsets.push_back(ogOffset -
+                                   lcmDec->offsets[s.currRightSubtreeIdx]);
+  }
+
+  DenseNodeID denseParent = m_view.MapToDense(s.leastCommonAncestor);
+  DenseNodeID denseRightSubtree = m_view.MapToDense(s.currRightSubtreeIdx);
+  DenseNodeID denseFirstChild =
+      m_view.MapToDense(m_view.FirstChild(s.leastCommonAncestor));
+
+  RTNodeDecorator *parentDec = m_rtDecorators->Find(denseParent.Raw());
+  RTNodeDecorator *rightSubtreeDec =
+      m_rtDecorators->Find(denseRightSubtree.Raw());
+  RTNodeDecorator *firstChildDec = m_rtDecorators->Find(denseFirstChild.Raw());
+
+  parentDec->lMax = std::max(firstChildDec->lMax + parentDec->offsets[0],
+                             rightSubtreeDec->lMax -
+                                 parentDec->offsets[s.currRightSubtreeIdx]);
+
+  parentDec->rMax = std::max(firstChildDec->rMax - parentDec->offsets[0],
+                             rightSubtreeDec->rMax +
+                                 parentDec->offsets[s.currRightSubtreeIdx]);
+
+  return s.iterate();
+}
+
+template <GraphLike G>
 void ReingoldTilfordLayoutAlgorithm<G>::comparisonStep() {
   auto &s = m_comparisonState;
   if (s.currsep < 1.0) {
@@ -126,6 +296,7 @@ void ReingoldTilfordLayoutAlgorithm<G>::comparisonStep() {
     uint32_t n = m_view.SiblingAdjacencyDist(s.leastCommonAncestor, ancestor,
                                              s.currRightSubtreeIdx);
     double splitSeparation = (1.0 - s.currsep) / static_cast<double>(n);
+    double newSeparation = 0.0;
     std::vector<double> &offsets =
         m_rtDecorators->Find(m_view.MapToDense(s.leastCommonAncestor).Raw())
             ->offsets;
@@ -134,7 +305,10 @@ void ReingoldTilfordLayoutAlgorithm<G>::comparisonStep() {
       uint32_t idx = s.currRightSubtreeIdx - i;
       uint32_t mult = n - i;
       offsets[idx] += (splitSeparation * static_cast<double>(mult));
+      newSeparation += (splitSeparation * static_cast<double>(mult));
     }
+
+    s.totalNewSeparation += newSeparation;
   }
 }
 

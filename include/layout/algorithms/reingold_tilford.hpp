@@ -68,18 +68,20 @@ private:
     double lOffset = 0.0;
     double rOffset = 0.0;
     double currsep = 0.0;
+    double totalNewSeparation = 0.0;
 
     bool iterate() {
       prevSibling = *it;
       it++;
-      if (it == generator.end())
-        return false;
       lrContour = prevSibling.other;
       rlContour = (*it).other;
       lOffset = 0.0;
       rOffset = 0.0;
+      currsep = 0.0;
       currRightSubtreeIdx++;
-      return true;
+      totalNewSeparation = 0.0;
+
+      return it != generator.end();
     }
   };
 
@@ -89,6 +91,8 @@ private:
 
   NodeID getAncestor(NodeID node);
   void comparisonStep();
+  void markAncestorAlongRightContour(NodeID start );
+  void comparisonConclude();
   bool iterateContours();
 
   void solveLeafDecorators(DenseNodeID node);
