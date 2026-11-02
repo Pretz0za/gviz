@@ -11,6 +11,7 @@
 #include "graph/types.hpp"
 #include "graph/undirected_view.hpp"
 #include "layout/components/rt_node_decorator.hpp"
+#include <utility>
 template <GraphLike G> class ReingoldTilfordLayoutAlgorithm {
 public:
   using View = UndirectedView<G>;
@@ -61,10 +62,14 @@ private:
     std::generator<AdjEntry> generator;
     std::ranges::iterator_t<std::generator<AdjEntry>> it;
     AdjEntry prevSibling;
+    NodeID leastCommonAncestor;
+    NodeID defualtAncestor;
     NodeID lrContour;
     NodeID rlContour;
+    uint32_t currRightSubtreeIdx;
     double lOffset = 0.0;
     double rOffset = 0.0;
+    double currsep = 0.0;
 
     bool iterate() {
       prevSibling = *it;
@@ -75,16 +80,26 @@ private:
       rlContour = (*it).other;
       lOffset = 0.0;
       rOffset = 0.0;
+      currRightSubtreeIdx++;
       return true;
     }
   };
 
   DenseNodeID expand();
 
+  uint32_t childCount(NodeID node) const;
   std::generator<AdjEntry> children(NodeID node) const;
   AdjEntry firstChild(NodeID node) const;
+  AdjEntry lastChild(NodeID node) const;
+  AdjEntry findChild(NodeID parent, NodeID child) const;
+  AdjEntry isLeaf(NodeID node) const;
+  uint32_t siblingAdjacencyDist(NodeID parent, NodeID child1,
+                                NodeID child2) const;
+  bool isContourEnd(NodeID node) const;
 
+  NodeID getAncestor(NodeID node);
   void comparisonStep();
+  bool iterateContours();
 
   void solveLeafDecorators(DenseNodeID node);
   void solveSingleChildDecorators(DenseNodeID node);
@@ -96,7 +111,7 @@ private:
   Configuration *m_config;
 
   DenseNodeSet *m_visible;
-  DenseNodeSet *m_placedRoots;
+  std::vector<DenseNodeID> *m_placedRoots;
   std::vector<NodeID> m_stack;
 
   DenseComponentPool<RTNodeDecorator> *m_rtDecorators;
