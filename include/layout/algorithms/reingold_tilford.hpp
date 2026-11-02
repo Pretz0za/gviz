@@ -6,15 +6,13 @@
 #include "ecs/components.hpp"
 #include "graph/components/adjacency.hpp"
 #include "graph/decorated_graph.hpp"
-#include "graph/decorations/components/tree_node_decorator.hpp"
-#include "graph/decorations/resources/tree_certificate.hpp"
 #include "graph/types.hpp"
-#include "graph/undirected_view.hpp"
+#include "graph/undirected_tree_view.hpp"
 #include "layout/components/rt_node_decorator.hpp"
 #include <utility>
 template <GraphLike G> class ReingoldTilfordLayoutAlgorithm {
 public:
-  using View = UndirectedView<G>;
+  using View = UndirectedTreeView<G>;
 
   enum class States : uint8_t { Initial, SubtreePlaced, Comparison, Terminal };
 
@@ -87,14 +85,6 @@ private:
 
   DenseNodeID expand();
 
-  uint32_t childCount(NodeID node) const;
-  std::generator<AdjEntry> children(NodeID node) const;
-  AdjEntry firstChild(NodeID node) const;
-  AdjEntry lastChild(NodeID node) const;
-  AdjEntry findChild(NodeID parent, NodeID child) const;
-  AdjEntry isLeaf(NodeID node) const;
-  uint32_t siblingAdjacencyDist(NodeID parent, NodeID child1,
-                                NodeID child2) const;
   bool isContourEnd(NodeID node) const;
 
   NodeID getAncestor(NodeID node);
@@ -104,10 +94,8 @@ private:
   void solveLeafDecorators(DenseNodeID node);
   void solveSingleChildDecorators(DenseNodeID node);
 
-  TreeCertificateResource *m_tree;
-
+  DecoratedGraph<G> m_dg;
   View m_view;
-  DecoratedGraph<View> m_dg;
   Configuration *m_config;
 
   DenseNodeSet *m_visible;
@@ -115,7 +103,6 @@ private:
   std::vector<NodeID> m_stack;
 
   DenseComponentPool<RTNodeDecorator> *m_rtDecorators;
-  DenseComponentPool<TreeNodeDecorator> *m_treeDecorators;
 
   StateMachine<States> m_stateMachine;
   DenseNodeID m_lastSubtreePlaced = INVALID_DENSE_NODE_ID;
